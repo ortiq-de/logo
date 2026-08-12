@@ -101,35 +101,97 @@ for (const { key, path } of SVG_FILES) {
 // The hexagon mark is single-tone (six facets at fixed opacity, matching
 // base.svg) since a lockup needs one flat color — themed via currentColor,
 // same contract as createTextLockup/createIconLockup always had.
-// Slot layout: mark 0-48, 8px gap, icon 56-76 (20×20 @ y=18), 4px gap, text.
+//
+// createTextLockup: mark at x=0,y=4 (48×48), text starts at x=56.
+// createIconLockup: mark at x=24,y=24 (48×48, extra margin on every side so
+// any of the 8 placements fits without clipping). placement chooses where
+// the icon sits: 'e'|'n'|'s'|'w' render inline just outside that edge of the
+// mark with a small gap; 'ne'|'se'|'sw'|'nw' render as a small association
+// badge (stroke ring, no fill) overlapping that corner of the mark. The mark
+// itself never moves — only the icon moves around it.
 const HEX_PATHS = paletteData.facetGeometry.map(g => {
   const path = svgMap.base.match(new RegExp(`id="${g.id}" d="([^"]+)"`))
   return { d: path[1], op: g.baseOpacity }
 })
-const MARK_INNER = `<svg x="0" y="4" width="48" height="48" viewBox="0 0 540 540"><g fill="currentColor">${
-  HEX_PATHS.map(p => `<path d="${p.d}" opacity="${p.op}"/>`).join('')
-}</g></svg>`
+const MARK_INNER_PATHS = HEX_PATHS.map(p => `<path d="${p.d}" opacity="${p.op}"/>`).join('')
 
-// Use JSON.stringify for string literals so quoting is always correct
-const _svgOpen  = JSON.stringify('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 56">')
-const _svgClose = JSON.stringify('</svg>')
-const _markStr  = JSON.stringify(MARK_INNER)
-const _tx56     = JSON.stringify('<text x="56" y="37" font-family="\'Space Grotesk\',system-ui,sans-serif" font-size="24" font-weight="600" letter-spacing="-0.5" fill="currentColor">')
-const _tx80     = JSON.stringify('<text x="80" y="37" font-family="\'Space Grotesk\',system-ui,sans-serif" font-size="24" font-weight="600" letter-spacing="-0.5" fill="currentColor">')
-const _txClose  = JSON.stringify('</text>')
+const _markInnerStr = JSON.stringify(MARK_INNER_PATHS)
 
 const LOCKUP_FN_SRC = `
-var _be_mark=${_markStr};
-var _be_svgo=${_svgOpen};
-var _be_svgc=${_svgClose};
-var _be_tx56=${_tx56};
-var _be_tx80=${_tx80};
-var _be_txc=${_txClose};
-function createTextLockup(subBrand) {
-  return _be_svgo + _be_mark + _be_tx56 + subBrand + _be_txc + _be_svgc;
+var _be_markInner=${_markInnerStr};
+function _be_mark(x,y){return '<svg x="'+x+'" y="'+y+'" width="48" height="48" viewBox="0 0 540 540"><g fill="currentColor">'+_be_markInner+'</g></svg>';}
+var _be_fonts={'space-grotesk':"'Space Grotesk',system-ui,sans-serif",'inter':"'Inter',system-ui,sans-serif",'system':'system-ui,sans-serif','serif':"Georgia,'Times New Roman',serif",'mono':"'Fira Code','SF Mono',monospace"};
+function _be_esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function _be_calcW(textX,text,fontSize){return Math.ceil(Math.max(220,textX+Math.max(60,String(text).length*fontSize*0.60+8)+12));}
+function _be_extractIcon(iconSvg){
+  var s=String(iconSvg).trim();
+  if(s.slice(0,4)!=='<svg') return {inner:s,vb:'0 0 24 24'};
+  var gt=s.indexOf('>');
+  var openTag=s.slice(0,gt+1);
+  var closeIdx=s.lastIndexOf('</svg>');
+  var inner=closeIdx>-1?s.slice(gt+1,closeIdx):s.slice(gt+1);
+  var vb='0 0 24 24';
+  var vbIdx=openTag.indexOf('viewBox="');
+  if(vbIdx>-1){
+    var start=vbIdx+9;
+    var end=openTag.indexOf('"',start);
+    vb=openTag.slice(start,end);
+  }
+  return {inner:inner,vb:vb};
 }
-function createIconLockup(subBrand, iconSvg) {
-  return _be_svgo + _be_mark + iconSvg + _be_tx80 + subBrand + _be_txc + _be_svgc;
+function createTextLockup(subBrand,options){
+  options=options||{};
+  var fontSize=options.fontSize||24;
+  var ff=_be_fonts[options.fontFamily]||_be_fonts['space-grotesk'];
+  var textX=56,naturalH=56;
+  var naturalW=_be_calcW(textX,subBrand,fontSize);
+  var W=options.width||naturalW, H=options.height||naturalH;
+  var bl=(28+fontSize*0.35).toFixed(1);
+  var text='<text x="'+textX+'" y="'+bl+'" font-family="'+ff+'" font-size="'+fontSize+'" font-weight="600" letter-spacing="-0.5" fill="currentColor">'+_be_esc(subBrand)+'</text>';
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+naturalW+' '+naturalH+'" width="'+W+'" height="'+H+'">'+_be_mark(0,4)+text+'</svg>';
+}
+var _be_ilMarkX=24,_be_ilMarkY=24,_be_ilMarkRight=72,_be_ilMarkBottom=72,_be_ilMarkCx=48,_be_ilMarkCy=48,_be_ilCanvasH=96;
+function _be_ilLayout(placement){
+  var GAP=4,ICON=20,R=12,BICON=16;
+  var corners={
+    ne:{cx:_be_ilMarkRight-4,cy:_be_ilMarkY+4},
+    se:{cx:_be_ilMarkRight-4,cy:_be_ilMarkBottom-4},
+    sw:{cx:_be_ilMarkX+4,cy:_be_ilMarkBottom-4},
+    nw:{cx:_be_ilMarkX+4,cy:_be_ilMarkY+4}
+  };
+  if(corners[placement]){
+    var c=corners[placement];
+    var east=placement==='ne'||placement==='se';
+    return {kind:'badge',cx:c.cx,cy:c.cy,r:R,iconX:c.cx-BICON/2,iconY:c.cy-BICON/2,iconSize:BICON,textX:east?c.cx+R+8:_be_ilMarkRight+8};
+  }
+  var inline={
+    n:{x:_be_ilMarkCx-ICON/2,y:_be_ilMarkY-GAP-ICON},
+    s:{x:_be_ilMarkCx-ICON/2,y:_be_ilMarkBottom+GAP},
+    e:{x:_be_ilMarkRight+GAP,y:_be_ilMarkCy-ICON/2},
+    w:{x:_be_ilMarkX-GAP-ICON,y:_be_ilMarkCy-ICON/2}
+  };
+  var pos=inline[placement]||inline.e;
+  return {kind:'inline',x:pos.x,y:pos.y,size:ICON,textX:placement==='e'?pos.x+ICON+GAP:_be_ilMarkRight+8};
+}
+function createIconLockup(subBrand,iconSvg,options){
+  options=options||{};
+  var placement=options.placement||'e';
+  var fontSize=options.fontSize||24;
+  var ff=_be_fonts[options.fontFamily]||_be_fonts['space-grotesk'];
+  var icon=_be_extractIcon(iconSvg);
+  var layout=_be_ilLayout(placement);
+  var naturalW=_be_calcW(layout.textX,subBrand,fontSize), naturalH=_be_ilCanvasH;
+  var W=options.width||naturalW, H=options.height||naturalH;
+  var bl=(_be_ilMarkCy+fontSize*0.35).toFixed(1);
+  var iconEl;
+  if(layout.kind==='badge'){
+    iconEl='<circle cx="'+layout.cx+'" cy="'+layout.cy+'" r="'+layout.r+'" fill="none" stroke="currentColor" stroke-width="1"/>'+
+      '<svg x="'+layout.iconX+'" y="'+layout.iconY+'" width="'+layout.iconSize+'" height="'+layout.iconSize+'" viewBox="'+icon.vb+'" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" overflow="visible">'+icon.inner+'</svg>';
+  } else {
+    iconEl='<svg x="'+layout.x+'" y="'+layout.y+'" width="'+layout.size+'" height="'+layout.size+'" viewBox="'+icon.vb+'" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" overflow="visible">'+icon.inner+'</svg>';
+  }
+  var text='<text x="'+layout.textX+'" y="'+bl+'" font-family="'+ff+'" font-size="'+fontSize+'" font-weight="600" letter-spacing="-0.5" fill="currentColor">'+_be_esc(subBrand)+'</text>';
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+naturalW+' '+naturalH+'" width="'+W+'" height="'+H+'">'+_be_mark(_be_ilMarkX,_be_ilMarkY)+iconEl+text+'</svg>';
 }`
 
 // ── CJS bundle ────────────────────────────────────────────────────────────
@@ -147,10 +209,12 @@ console.log('✓ index.js (CJS)')
 const esmLines = [
   `export const palette = ${JSON.stringify(paletteData, null, 2)};`,
   ...Object.entries(svgMap).map(([k, v]) => `export const ${k} = ${JSON.stringify(v)};`),
-  LOCKUP_FN_SRC.replace(/^function /gm, 'export function '),
+  LOCKUP_FN_SRC
+    .replace(/^function createTextLockup/m, 'export function createTextLockup')
+    .replace(/^function createIconLockup/m, 'export function createIconLockup'),
 ]
-writeFileSync(join(DIST, 'index.esm.js'), esmLines.join('\n'))
-console.log('✓ index.esm.js (ESM)')
+writeFileSync(join(DIST, 'index.mjs'), esmLines.join('\n'))
+console.log('✓ index.mjs (ESM)')
 
 // ── TypeScript definitions ────────────────────────────────────────────────
 const dtsLines = [
@@ -168,12 +232,24 @@ const dtsLines = [
   ``,
   ...Object.entries(svgMap).map(([k]) => `/** SVG markup string: ${k} */\nexport declare const ${k}: string;`),
   ``,
-  `/** Generate a text-only lockup SVG string. Themed via currentColor. */`,
-  `export declare function createTextLockup(subBrand: string): string;`,
+  `export type LockupFontFamily = 'space-grotesk' | 'inter' | 'system' | 'serif' | 'mono';`,
+  `export interface TextLockupOptions { fontSize?: number; fontFamily?: LockupFontFamily; width?: number; height?: number; }`,
+  `export type IconLockupPlacement = 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'nw';`,
+  `export interface IconLockupOptions extends TextLockupOptions { placement?: IconLockupPlacement; }`,
   ``,
-  `/** Generate an icon+text lockup SVG string. iconSvg should be a <svg> element string */`,
-  `/** positioned at x=56, y=18, width=20, height=20 in the 220×56 viewBox. */`,
-  `export declare function createIconLockup(subBrand: string, iconSvg: string): string;`,
+  `/** Generate a text-only lockup SVG string (mark + sub-brand name). Themed via currentColor. */`,
+  `export declare function createTextLockup(subBrand: string, options?: TextLockupOptions): string;`,
+  ``,
+  `/**`,
+  ` * Generate an icon+text lockup SVG string. iconSvg may be either the icon's inner`,
+  ` * markup (e.g. Feather-style circle/path elements) or a full <svg viewBox="...">...</svg>`,
+  ` * string — only its inner content and viewBox are used, since size and position are`,
+  ` * always driven by options.`,
+  ` * options.placement: 'e' (default) sits inline beside the mark; 'n'|'s'|'w' sit inline`,
+  ` * on the other edges; the 4 corners ('ne'|'se'|'sw'|'nw') render as a small association`,
+  ` * badge overlapping that corner of the mark. The mark itself never moves.`,
+  ` */`,
+  `export declare function createIconLockup(subBrand: string, iconSvg: string, options?: IconLockupOptions): string;`,
 ]
 writeFileSync(join(DIST, 'index.d.ts'), dtsLines.join('\n'))
 console.log('✓ index.d.ts (TypeScript)')
@@ -271,12 +347,16 @@ const distPkg = {
   name: rootPkg.name,
   version: rootPkg.version,
   description: rootPkg.description,
-  type: 'module',
+  // index.js is genuine CommonJS (module.exports) and index.mjs is genuine ESM
+  // (export function) — the .mjs extension makes the ESM build unambiguous
+  // regardless of "type", so "commonjs" here is what makes index.js resolve
+  // correctly for require() without also breaking the ESM import path.
+  type: 'commonjs',
   main: './index.js',
-  module: './index.esm.js',
+  module: './index.mjs',
   types: './index.d.ts',
   exports: {
-    '.':       { import: './index.esm.js', require: './index.js', types: './index.d.ts' },
+    '.':       { import: './index.mjs', require: './index.js', types: './index.d.ts' },
     './css':   './index.css',
     './states-css': './states.css',
     './palette': './palette.json',

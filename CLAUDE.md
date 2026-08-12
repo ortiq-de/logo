@@ -2,7 +2,7 @@
 
 Brand asset repository for Ortiq. Six-facet hexagon mark with full state animation system, HTTP error states, lockup templates, favicon set, and CI release pipeline.
 
-**Current version:** v4.0.1
+**Current version:** v5.0.0
 **GH Pages:** https://ortiq-de.github.io/logo/ (interactive facet + UI theme customizer, sub-logo builder)
 **npm:** `@ortiq-de/logo` on GitHub Packages
 
@@ -111,14 +111,28 @@ npm install @ortiq-de/logo
 import { base, stateLoading, http404, palette } from '@ortiq-de/logo'
 import '@ortiq-de/logo/css'
 
-// Programmatic lockup generation (v2.4.0+)
+// Programmatic lockup generation (v2.4.0+; options added in v5.0.0)
 import { createTextLockup, createIconLockup } from '@ortiq-de/logo'
 
-const blogSvg = createTextLockup('blog')           // returns SVG string
-const gitSvg  = createIconLockup('git', iconSvg)  // iconSvg = <svg x=56 y=18 w=20 h=20 ...>
+const blogSvg = createTextLockup('blog')  // returns SVG string
+const gitSvg  = createIconLockup('git', iconInnerSvg, {
+  placement: 'se',        // 'n'|'ne'|'e'|'se'|'s'|'sw'|'w'|'nw' — corners render as a badge, edges sit inline
+  width: 320, height: 96, // optional explicit output size (defaults to auto-computed)
+  fontSize: 24,           // optional
+  fontFamily: 'inter',    // 'space-grotesk' (default) | 'inter' | 'system' | 'serif' | 'mono'
+})
+// iconInnerSvg = inner markup only, e.g. '<circle cx="6" cy="6" r="3"/>...' (viewBox defaults to
+// "0 0 24 24"; a full <svg viewBox="...">...</svg> string also works — only its inner content
+// and viewBox are read, since createIconLockup always positions/sizes the icon itself).
 ```
 
 ## Lockup system
+
+The fixed geometry below is the convention baked into the static template files
+(`lockup/template.svg`, `lockup/icon-template.svg`, `lockup/blog.svg`). The
+`createIconLockup()` JS/npm API (see Install, above) is more flexible — it takes
+`options.placement` (8 directions) and `options.width`/`height` instead of this
+one fixed east/8px-gap layout, so its output won't exactly match these templates.
 
 ```
 Mark area:   x=0,  y=0,  w=48, h=56   (mark at y+4, 48×48)
@@ -182,7 +196,7 @@ Favicon HTML:
 - **Tag push (`v*.*.*`):** full release bundle + npm publish
 
 ```bash
-git tag v4.0.1 && git push origin v4.0.1
+git tag v5.0.0 && git push origin v5.0.0
 ```
 
 Release artifacts: zip/tarball with all SVGs, PNGs at 7 sizes, favicon.ico, webmanifest, CJS/ESM/CSS bundles, TypeScript defs, palette.json.

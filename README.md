@@ -92,8 +92,8 @@ Available classes: `state-neutral` `state-loading` `state-success` `state-warnin
 ## Versioning
 
 ```bash
-git tag v4.0.1
-git push origin v4.0.1
+git tag v5.0.0
+git push origin v5.0.0
 ```
 
 CI builds and publishes a release with PNG exports (16–512px), JS/ESM/CSS bundles, and `palette.json`.
