@@ -191,6 +191,9 @@
     .dl-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius); background: var(--surface); color: var(--text); text-decoration: none; font-size: 13px; font-weight: 500; border: 1px solid transparent; transition: all 0.2s; }
     .dl-btn:hover { border-color: var(--accent); color: var(--accent); }
     .dl-btn svg { flex-shrink: 0; }
+    .dl-btn .dl-name { display: flex; flex-direction: column; line-height: 1.35; }
+    .dl-btn .dl-size { font-size: 10px; opacity: 0.5; font-weight: 400; }
+    .dl-empty { font-size: 13px; opacity: 0.4; padding: 10px 0; }
 
     footer { border-top: 1px solid var(--border); padding: 28px 0; text-align: center; font-size: 12px; opacity: 0.3; }
 
@@ -483,12 +486,12 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   <!-- Download -->
   <section>
     <div class="section-label">Download</div>
-    <div class="dl-grid">
-      <a class="dl-btn" id="dl-zip" href="https://github.com/ortiq-de/logo/releases/latest/download/ortiq-logo.zip">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        ZIP bundle
-      </a>
-      <a class="dl-btn" href="https://github.com/ortiq-de/logo/releases/latest">
+    <div class="section-sub">Every artifact from the latest release, fetched live from GitHub.</div>
+    <div class="dl-grid" id="dl-assets">
+      <span class="dl-empty">Loading release assets…</span>
+    </div>
+    <div class="dl-grid" style="margin-top:12px">
+      <a class="dl-btn" href="https://github.com/ortiq-de/logo/releases">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
         All releases
       </a>
@@ -857,15 +860,33 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     });
   });
 
-  // ── Release version badge ──
+  // ── Release version badge + downloadable asset list ──
+  function formatBytes(n) {
+    if (n < 1024) return n + ' B';
+    if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+    return (n / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+  const DL_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
   fetch('https://api.github.com/repos/ortiq-de/logo/releases/latest')
-    .then(r => r.json()).then(d => {
-      if (d.tag_name) {
-        document.getElementById('version-badge').textContent = d.tag_name;
-        const z = document.getElementById('dl-zip');
-        if (z) z.href = `https://github.com/ortiq-de/logo/releases/download/${d.tag_name}/ortiq-logo-${d.tag_name}.zip`;
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(d => {
+      if (!d.tag_name) return Promise.reject();
+      document.getElementById('version-badge').textContent = d.tag_name;
+      const wrap = document.getElementById('dl-assets');
+      const assets = (d.assets || []).slice().sort((a, b) => a.name.localeCompare(b.name));
+      if (assets.length) {
+        wrap.innerHTML = assets.map(a => `
+          <a class="dl-btn" href="${a.browser_download_url}" download>
+            ${DL_ICON}
+            <span class="dl-name">${a.name}<span class="dl-size">${formatBytes(a.size)}</span></span>
+          </a>`).join('');
+      } else {
+        wrap.innerHTML = '<span class="dl-empty">Release published with no attached assets.</span>';
       }
-    }).catch(() => {});
+    })
+    .catch(() => {
+      document.getElementById('dl-assets').innerHTML = '<span class="dl-empty">No releases published yet — check back after the next tagged release.</span>';
+    });
 
   // ── Mode toggle ──
   document.getElementById('mode-dark').addEventListener('click', () => { uiMode = 'dark'; uiOverrides = {}; renderUiTokenGrid(); applyUiTokens(); persist(); });
