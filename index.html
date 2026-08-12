@@ -54,7 +54,9 @@
       background: var(--surface); border-radius: var(--radius); padding: 40px;
       display: flex; align-items: center; justify-content: center; min-height: 340px;
     }
-    .preview-card svg { width: 260px; height: 260px; }
+    .preview-card > svg { width: 260px; height: 260px; }
+    .preview-card.wide { min-height: 140px; }
+    .preview-card.wide > div > svg { width: auto; max-width: 100%; height: auto; }
     .sidebar { background: var(--surface); border-radius: var(--radius); padding: 24px; display: flex; flex-direction: column; gap: 22px; }
     .sidebar h3 { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
     .sidebar .hint { font-size: 11px; opacity: 0.45; line-height: 1.5; }
@@ -236,45 +238,130 @@
 <main>
 <div class="container">
 
-  <!-- Mark customizer -->
+  <!-- Mark & lockups -->
   <section>
-    <div class="section-label">Six facets, six colors</div>
-    <div class="section-sub">Each facet of the hexagon is its own gradient, derived from a base color. Edit a facet directly, or rebuild all six from one hue.</div>
-    <div class="customizer">
-      <div class="preview-card">
-        <svg id="live-preview" viewBox="0 0 540 540" xmlns="http://www.w3.org/2000/svg">
-          <defs id="live-defs"></defs>
-          <g id="live-mark"></g>
-        </svg>
+    <div class="section-label">Mark &amp; lockups</div>
+    <div class="section-sub">Every facet, and every place the mark appears — the same colors follow across all three tabs.</div>
+
+    <div class="gen-tabs" id="main-tabs">
+      <button class="gen-tab active" data-maintab="mark">Mark</button>
+      <button class="gen-tab" data-maintab="text-lockup">Text lockup</button>
+      <button class="gen-tab" data-maintab="icon-lockup">Icon lockup</button>
+    </div>
+
+    <!-- Mark tab -->
+    <div class="gen-panel" id="tab-mark">
+      <div class="customizer">
+        <div class="preview-card">
+          <svg id="live-preview" viewBox="0 0 540 540" xmlns="http://www.w3.org/2000/svg">
+            <defs id="live-defs"></defs>
+            <g id="live-mark"></g>
+          </svg>
+        </div>
+        <div class="sidebar">
+          <div>
+            <h3>Facet colors</h3>
+            <div class="hint">Click a swatch to edit, or type a hex code.</div>
+          </div>
+          <div id="facet-rows"></div>
+
+          <div class="tint-row">
+            <span class="label">Rebuild all six from one hue</span>
+            <input type="color" id="tint-swatch" value="#206de9">
+          </div>
+          <div class="preset-row" id="preset-row"></div>
+
+          <div class="sidebar-actions">
+            <button class="action-btn primary" id="copy-svg-btn">Copy SVG code</button>
+            <div class="dl-format-row">
+              <button class="action-btn" id="dl-svg-btn">Download .svg</button>
+              <button class="action-btn" id="dl-png-btn">Download .png</button>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="sidebar">
-        <div>
-          <h3>Facet colors</h3>
-          <div class="hint">Click a swatch to edit, or type a hex code.</div>
-        </div>
-        <div id="facet-rows"></div>
 
-        <div class="tint-row">
-          <span class="label">Rebuild all six from one hue</span>
-          <input type="color" id="tint-swatch" value="#206de9">
-        </div>
-        <div class="preset-row" id="preset-row"></div>
+      <!-- Color token codes widget -->
+      <div class="palette-codes">
+        <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;opacity:0.35">Color tokens</span>
+        <button class="codes-toggle" id="codes-toggle">show codes</button>
+        <div class="token-grid hidden" id="token-grid"></div>
+      </div>
+    </div>
 
-        <div class="sidebar-actions">
-          <button class="action-btn primary" id="copy-svg-btn">Copy SVG code</button>
-          <div class="dl-format-row">
-            <button class="action-btn" id="dl-svg-btn">Download .svg</button>
-            <button class="action-btn" id="dl-png-btn">Download .png</button>
+    <!-- Text lockup tab -->
+    <div class="gen-panel hidden" id="tab-text-lockup">
+      <div class="customizer">
+        <div class="preview-card wide"><div id="tl-preview"></div></div>
+        <div class="sidebar">
+          <div>
+            <label class="field-label" for="tl-name">Sub-brand name</label>
+            <input class="gen-text-input" type="text" id="tl-name" value="blog" placeholder="e.g. blog, store, docs…" maxlength="48" autocomplete="off" spellcheck="false">
+            <div class="gen-slider-row">
+              <span class="lbl">Font size</span>
+              <input class="gen-slider" type="range" id="tl-font-size" min="12" max="40" value="24" step="1">
+              <span class="gen-slider-val" id="tl-font-size-val">24px</span>
+            </div>
+          </div>
+          <div class="gen-color-row" style="margin-top:0">
+            <label>Background <input type="color" id="tl-bg-color" value="#0a0e15"></label>
+            <label><input type="checkbox" id="tl-with-bg"> Include background</label>
+          </div>
+          <div class="sidebar-actions">
+            <button class="action-btn primary" id="tl-copy-btn">Copy SVG code</button>
+            <div class="dl-format-row">
+              <button class="action-btn" id="tl-dl-svg-btn">Download .svg</button>
+              <button class="action-btn" id="tl-dl-png-btn">Download .png</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Color token codes widget -->
-    <div class="palette-codes">
-      <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;opacity:0.35">Color tokens</span>
-      <button class="codes-toggle" id="codes-toggle">show codes</button>
-      <div class="token-grid hidden" id="token-grid"></div>
+    <!-- Icon lockup tab -->
+    <div class="gen-panel hidden" id="tab-icon-lockup">
+      <div class="customizer">
+        <div class="preview-card wide"><div id="il-preview"></div></div>
+        <div class="sidebar">
+          <div>
+            <label class="field-label">Placement — indicates association with the main mark</label>
+            <div class="chip-row">
+              <button class="chip active" data-placement="east">East</button>
+              <button class="chip" data-placement="southeast">South-east badge</button>
+            </div>
+          </div>
+          <div>
+            <label class="field-label">Icon — pick a preset, or use your own SVG below</label>
+            <div class="icon-picker-grid" id="il-preset-icons"></div>
+            <label class="gen-upload-label" for="il-svg-file" style="margin-top:14px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Upload SVG
+              <input type="file" id="il-svg-file" accept=".svg" style="display:none">
+            </label>
+            <textarea class="gen-svg-textarea" id="il-svg-code" rows="4" placeholder="…or paste SVG code here"></textarea>
+          </div>
+          <div>
+            <label class="field-label" for="il-name">Sub-brand name</label>
+            <input class="gen-text-input" type="text" id="il-name" value="blog" placeholder="e.g. blog, store, docs…" maxlength="48" autocomplete="off" spellcheck="false">
+            <div class="gen-slider-row">
+              <span class="lbl">Font size</span>
+              <input class="gen-slider" type="range" id="il-font-size" min="12" max="40" value="24" step="1">
+              <span class="gen-slider-val" id="il-font-size-val">24px</span>
+            </div>
+          </div>
+          <div class="gen-color-row" style="margin-top:0">
+            <label>Background <input type="color" id="il-bg-color" value="#0a0e15"></label>
+            <label><input type="checkbox" id="il-with-bg"> Include background</label>
+          </div>
+          <div class="sidebar-actions">
+            <button class="action-btn primary" id="il-copy-btn">Copy SVG code</button>
+            <div class="dl-format-row">
+              <button class="action-btn" id="il-dl-svg-btn">Download .svg</button>
+              <button class="action-btn" id="il-dl-png-btn">Download .png</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -351,88 +438,6 @@
   <section>
     <div class="section-label">Lockup system — Space Grotesk 600, baseline y=37</div>
     <div class="lockup-grid" id="lockup-grid"></div>
-  </section>
-
-  <!-- Sub-brand Logo Generator -->
-  <section>
-    <div class="section-label">Sub-brand logo generator</div>
-    <div class="gen-card">
-
-      <div class="gen-tabs">
-        <button class="gen-tab active" data-tab="text">Text</button>
-        <button class="gen-tab" data-tab="icon">Add icon (SVG)</button>
-      </div>
-
-      <div class="gen-panel" id="gen-panel-text">
-        <label class="field-label" for="gen-text">Sub-brand name</label>
-        <input class="gen-text-input" type="text" id="gen-text" value="blog" placeholder="e.g. blog, store, docs…" maxlength="48" autocomplete="off" spellcheck="false">
-        <div class="gen-slider-row">
-          <span class="lbl">Font size</span>
-          <input class="gen-slider" type="range" id="gen-font-size" min="12" max="40" value="24" step="1">
-          <span class="gen-slider-val" id="gen-font-size-val">24px</span>
-        </div>
-      </div>
-
-      <div class="gen-panel hidden" id="gen-panel-icon">
-        <label class="field-label">Icon — pick a preset, or use your own SVG below</label>
-        <div class="icon-picker-grid" id="gen-preset-icons"></div>
-        <label class="gen-upload-label" for="gen-svg-file" style="margin-top:14px">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Upload SVG
-          <input type="file" id="gen-svg-file" accept=".svg" style="display:none">
-        </label>
-        <textarea class="gen-svg-textarea" id="gen-svg-code" rows="5" placeholder="…or paste SVG code here&#10;&#10;&lt;svg viewBox=&quot;0 0 24 24&quot;&gt;&#10;  &lt;path d=&quot;…&quot; fill=&quot;currentColor&quot;/&gt;&#10;&lt;/svg&gt;"></textarea>
-        <p class="gen-icon-note">Tip: SVGs using <code>fill="currentColor"</code> will automatically pick up the mark color. Icon slot is 20×20 at x=56,y=18.</p>
-        <div style="margin-top:14px">
-          <label class="field-label" for="gen-text-icon">Sub-brand name</label>
-          <input class="gen-text-input" type="text" id="gen-text-icon" value="blog" placeholder="e.g. blog, store, docs…" maxlength="48" autocomplete="off" spellcheck="false">
-        </div>
-        <div class="gen-slider-row">
-          <span class="lbl">Font size</span>
-          <input class="gen-slider" type="range" id="gen-font-size-icon" min="12" max="40" value="24" step="1">
-          <span class="gen-slider-val" id="gen-font-size-val-icon">24px</span>
-        </div>
-      </div>
-
-      <div>
-        <label class="field-label">Palette</label>
-        <div class="preset-row" id="gen-preset-row"></div>
-        <div class="gen-color-row">
-          <label>Mark color <input type="color" id="gen-mark-color" value="#206de9"></label>
-          <label>Background <input type="color" id="gen-bg-color" value="#0a0e15"></label>
-          <label><input type="checkbox" id="gen-with-bg"> Include background</label>
-        </div>
-      </div>
-
-      <div>
-        <label class="field-label">Live preview <span id="gen-size-hint" style="opacity:0.4;font-size:9px;letter-spacing:0;text-transform:none;margin-left:4px"></span></label>
-        <div class="gen-preview-box" id="gen-preview-box"></div>
-      </div>
-
-      <div class="gen-dl-row">
-        <div class="gen-dl-group">
-          <label class="field-label">Size</label>
-          <div class="chip-row">
-            <button class="chip" data-scale="0.5">½×</button>
-            <button class="chip active" data-scale="1">1×</button>
-            <button class="chip" data-scale="2">2×</button>
-            <button class="chip" data-scale="4">4×</button>
-          </div>
-        </div>
-        <div class="gen-dl-group">
-          <label class="field-label">Format</label>
-          <div class="chip-row">
-            <button class="chip active" data-fmt="svg">SVG</button>
-            <button class="chip" data-fmt="png">PNG</button>
-          </div>
-        </div>
-        <button class="gen-dl-btn" id="gen-dl-btn">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download
-        </button>
-      </div>
-
-    </div>
   </section>
 
   <!-- Install -->
@@ -559,10 +564,9 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   let PALETTE = null;              // fetched palette.json
   let activePresetId = 'cobalt';
   let facetColors = null;          // { p0: '#hex', ... } — the "light" tone per facet
+  let markSolidColor = '#206de9';  // single representative mark color, shared by both lockup tabs
   let uiMode = 'dark';
   let uiOverrides = {};            // per-token overrides on top of the active preset's ui[uiMode]
-  let gScale = 1;
-  let gFormat = 'svg';
 
   function tintFacets(hue, sat, light) {
     const out = {};
@@ -672,33 +676,20 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
         activePresetId = id;
         facetColors = {};
         Object.entries(p.facets).forEach(([fid, c]) => { facetColors[fid] = c.light; });
+        markSolidColor = p.solid;
+        document.getElementById('tint-swatch').value = p.solid;
         uiOverrides = {};
         renderFacetRows();
         renderPresetRow();
         renderUiTokenGrid();
         applyUiTokens();
         renderAll();
+        updateTextLockupPreview();
+        updateIconLockupPreview();
         persist();
       });
       wrap.appendChild(btn);
     });
-    // mirror onto the generator's palette row
-    const genWrap = document.getElementById('gen-preset-row');
-    if (genWrap) {
-      genWrap.innerHTML = '';
-      Object.entries(PALETTE.presets).forEach(([id, p]) => {
-        const btn = document.createElement('button');
-        btn.className = 'preset-swatch' + (activePresetId === id ? ' active' : '');
-        btn.innerHTML = `<span class="dot" style="background:${p.solid}"></span>${p.name}`;
-        btn.addEventListener('click', () => {
-          document.getElementById('gen-mark-color').value = p.solid;
-          document.getElementById('gen-bg-color').value = currentUiTokens().background;
-          gMarkColor = p.solid; gBgColor = currentUiTokens().background;
-          updateGenPreview();
-        });
-        genWrap.appendChild(btn);
-      });
-    }
   }
 
   const UI_TOKEN_LABELS = {
@@ -897,10 +888,13 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     const { r, g, b } = hexToRgb(e.target.value);
     const hsl = rgbToHsl(r, g, b);
     facetColors = tintFacets(hsl.h, hsl.s, hsl.l);
+    markSolidColor = e.target.value;
     activePresetId = 'custom';
     renderFacetRows();
     renderPresetRow();
     renderAll();
+    updateTextLockupPreview();
+    updateIconLockupPreview();
     persist();
   });
 
@@ -920,76 +914,21 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       () => alert('PNG export failed — try SVG instead.'));
   });
 
-  // ── Sub-brand generator ──
-  let gMode      = 'text';
-  let gText      = 'blog';
-  let gFontSize  = 24;
-  let gMarkColor = '#206de9';
-  let gBgColor   = '#0a0e15';
-  let gWithBg    = false;
-  let gIconInner = null;
-  let gIconVB    = '0 0 24 24';
-
-  // Slot layout: mark 0-48, 8px gap, icon 56-76 (20×20 @ y=18), 4px gap, text.
-  function textX() { return (gMode === 'icon' && gIconInner) ? 80 : 56; }
-  function calcW() {
-    const tx = textX();
-    return Math.ceil(Math.max(220, tx + Math.max(60, gText.length * gFontSize * 0.60 + 8) + 12));
-  }
-  function buildGenSVG(opts) {
-    const W = calcW(), H = 56;
-    const bl = (28 + gFontSize * 0.35).toFixed(1);
-    const ff = (opts && opts.useSystemFont) ? 'system-ui,sans-serif' : "'Space Grotesk',system-ui,sans-serif";
-    const markInner = singleToneInner(false);
-    const mark = `<svg x="0" y="4" width="48" height="48" viewBox="0 0 540 540"><g fill="${gMarkColor}">${markInner}</g></svg>`;
-    const iconEl = (gMode === 'icon' && gIconInner)
-      ? `<svg x="56" y="18" width="20" height="20" viewBox="${gIconVB}" color="${gMarkColor}" fill="none" stroke="${gMarkColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" overflow="visible">${gIconInner}</svg>`
-      : '';
-    const bg = gWithBg ? `<rect width="${W}" height="${H}" fill="${gBgColor}"/>` : '';
-    const text = gText
-      ? `<text x="${textX()}" y="${bl}" font-family="${ff}" font-size="${gFontSize}" font-weight="600" letter-spacing="-0.5" fill="${gMarkColor}">${xe(gText)}</text>`
-      : '';
-    const wh = (opts && opts.forDownload)
-      ? ` width="${Math.round(W * gScale)}" height="${Math.round(H * gScale)}"`
-      : ` width="${W}" height="${H}"`;
-    const fi = (opts && opts.forDownload && !opts.useSystemFont)
-      ? `<style>@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600&amp;display=swap');</style>`
-      : '';
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}"${wh}>${fi}${bg}${mark}${iconEl}${text}</svg>`;
-  }
-  function updateGenPreview() {
-    const W = calcW();
-    document.getElementById('gen-size-hint').textContent = `${W} × 56 px`;
-    document.getElementById('gen-preview-box').innerHTML = buildGenSVG({});
-  }
-
-  document.getElementById('gen-text').addEventListener('input', e => { gText = e.target.value; updateGenPreview(); });
-  document.getElementById('gen-text-icon').addEventListener('input', e => { gText = e.target.value; updateGenPreview(); });
-
-  function setFontSize(v) {
-    gFontSize = parseInt(v);
-    document.getElementById('gen-font-size').value = v;
-    document.getElementById('gen-font-size-icon').value = v;
-    document.getElementById('gen-font-size-val').textContent = v + 'px';
-    document.getElementById('gen-font-size-val-icon').textContent = v + 'px';
-    updateGenPreview();
-  }
-  document.getElementById('gen-font-size').addEventListener('input', e => setFontSize(e.target.value));
-  document.getElementById('gen-font-size-icon').addEventListener('input', e => setFontSize(e.target.value));
-
-  document.querySelectorAll('.gen-tab').forEach(tab => {
+  // ── Main tabs: Mark / Text lockup / Icon lockup ──
+  document.querySelectorAll('#main-tabs .gen-tab').forEach(tab => {
     tab.addEventListener('click', () => {
-      document.querySelectorAll('.gen-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('#main-tabs .gen-tab').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
-      gMode = tab.dataset.tab;
-      document.getElementById('gen-panel-text').classList.toggle('hidden', gMode !== 'text');
-      document.getElementById('gen-panel-icon').classList.toggle('hidden', gMode !== 'icon');
-      if (gMode === 'icon') document.getElementById('gen-text-icon').value = gText;
-      else document.getElementById('gen-text').value = gText;
-      updateGenPreview();
+      const target = tab.dataset.maintab;
+      document.getElementById('tab-mark').classList.toggle('hidden', target !== 'mark');
+      document.getElementById('tab-text-lockup').classList.toggle('hidden', target !== 'text-lockup');
+      document.getElementById('tab-icon-lockup').classList.toggle('hidden', target !== 'icon-lockup');
+      if (target === 'text-lockup') updateTextLockupPreview();
+      if (target === 'icon-lockup') updateIconLockupPreview();
     });
   });
 
+  // ── Shared SVG-parsing helper (used by the Icon lockup tab) ──
   function parseSVG(str) {
     try {
       const doc = new DOMParser().parseFromString(str.trim(), 'image/svg+xml');
@@ -1005,19 +944,131 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       return { inner: svg.innerHTML, vb: svg.getAttribute('viewBox') || '0 0 24 24' };
     } catch (_) { return null; }
   }
-  function applyIcon(str) {
-    const panel = document.getElementById('gen-preset-icons');
+
+  // ── Text lockup tab ──
+  let tlName = 'blog', tlFontSize = 24, tlWithBg = false, tlBgColor = '#0a0e15';
+
+  function calcLockupW(textStartX, text, fontSize) {
+    return Math.ceil(Math.max(220, textStartX + Math.max(60, text.length * fontSize * 0.60 + 8) + 12));
+  }
+  function buildTextLockupSVG(opts) {
+    opts = opts || {};
+    const textX = 56, H = 56;
+    const W = calcLockupW(textX, tlName, tlFontSize);
+    const bl = (28 + tlFontSize * 0.35).toFixed(1);
+    const ff = opts.useSystemFont ? 'system-ui,sans-serif' : "'Space Grotesk',system-ui,sans-serif";
+    const mark = `<svg x="0" y="4" width="48" height="48" viewBox="0 0 540 540"><g fill="${markSolidColor}">${singleToneInner(false)}</g></svg>`;
+    const bg = tlWithBg ? `<rect width="${W}" height="${H}" fill="${tlBgColor}"/>` : '';
+    const text = tlName
+      ? `<text x="${textX}" y="${bl}" font-family="${ff}" font-size="${tlFontSize}" font-weight="600" letter-spacing="-0.5" fill="${markSolidColor}">${xe(tlName)}</text>`
+      : '';
+    const wh = opts.forDownload ? ` width="${W}" height="${H}"` : ` width="${W}" height="${H}"`;
+    const fi = (opts.forDownload && !opts.useSystemFont)
+      ? `<style>@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600&amp;display=swap');</style>`
+      : '';
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}"${wh}>${fi}${bg}${mark}${text}</svg>`;
+  }
+  function updateTextLockupPreview() {
+    document.getElementById('tl-preview').innerHTML = buildTextLockupSVG({});
+  }
+  document.getElementById('tl-name').addEventListener('input', e => { tlName = e.target.value; updateTextLockupPreview(); });
+  document.getElementById('tl-font-size').addEventListener('input', e => {
+    tlFontSize = parseInt(e.target.value);
+    document.getElementById('tl-font-size-val').textContent = e.target.value + 'px';
+    updateTextLockupPreview();
+  });
+  document.getElementById('tl-bg-color').addEventListener('input', e => { tlBgColor = e.target.value; updateTextLockupPreview(); });
+  document.getElementById('tl-with-bg').addEventListener('change', e => { tlWithBg = e.target.checked; updateTextLockupPreview(); });
+  document.getElementById('tl-copy-btn').addEventListener('click', () => {
+    navigator.clipboard.writeText(buildTextLockupSVG({})).then(() => {
+      const btn = document.getElementById('tl-copy-btn');
+      const t = btn.textContent; btn.textContent = 'Copied!'; btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = t; btn.classList.remove('copied'); }, 1500);
+    });
+  });
+  document.getElementById('tl-dl-svg-btn').addEventListener('click', () => {
+    const name = (tlName || 'logo').replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 32) || 'logo';
+    downloadSVG(buildTextLockupSVG({ forDownload: true }), `ortiq-${name}.svg`);
+  });
+  document.getElementById('tl-dl-png-btn').addEventListener('click', () => {
+    const name = (tlName || 'logo').replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 32) || 'logo';
+    const W = calcLockupW(56, tlName, tlFontSize) * 3, H = 56 * 3;
+    downloadPNG(buildTextLockupSVG({ forDownload: true, useSystemFont: true }), W, H, `ortiq-${name}-${W}x${H}.png`,
+      () => alert('PNG export failed — try SVG instead.'));
+  });
+
+  // ── Icon lockup tab ──
+  let ilName = 'blog', ilFontSize = 24, ilWithBg = false, ilBgColor = '#0a0e15';
+  let ilIconInner = null, ilIconVB = '0 0 24 24', ilPlacement = 'east';
+
+  // East: mark 0-48, 4px gap, icon 52-72 (20×20 @ y=18), 4px gap, text at 76.
+  // South-east: badge backdrop (r=12, center 44,48) overlapping the mark's bottom-right corner, text at 64.
+  function ilTextX() {
+    if (!ilIconInner) return 56;
+    return ilPlacement === 'southeast' ? 64 : 76;
+  }
+  function buildIconLockupSVG(opts) {
+    opts = opts || {};
+    const H = 56;
+    const textX = ilTextX();
+    const W = calcLockupW(textX, ilName, ilFontSize);
+    const bl = (28 + ilFontSize * 0.35).toFixed(1);
+    const ff = opts.useSystemFont ? 'system-ui,sans-serif' : "'Space Grotesk',system-ui,sans-serif";
+    const mark = `<svg x="0" y="4" width="48" height="48" viewBox="0 0 540 540"><g fill="${markSolidColor}">${singleToneInner(false)}</g></svg>`;
+    let iconEl = '';
+    if (ilIconInner) {
+      if (ilPlacement === 'southeast') {
+        const backdrop = `<circle cx="44" cy="48" r="12" fill="${ilWithBg ? ilBgColor : 'var(--bg,#0a0e15)'}" stroke="${markSolidColor}" stroke-width="1" opacity="0.98"/>`;
+        iconEl = `${backdrop}<svg x="36" y="40" width="16" height="16" viewBox="${ilIconVB}" color="${markSolidColor}" fill="none" stroke="${markSolidColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" overflow="visible">${ilIconInner}</svg>`;
+      } else {
+        iconEl = `<svg x="52" y="18" width="20" height="20" viewBox="${ilIconVB}" color="${markSolidColor}" fill="none" stroke="${markSolidColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" overflow="visible">${ilIconInner}</svg>`;
+      }
+    }
+    const bg = ilWithBg ? `<rect width="${W}" height="${H}" fill="${ilBgColor}"/>` : '';
+    const text = ilName
+      ? `<text x="${textX}" y="${bl}" font-family="${ff}" font-size="${ilFontSize}" font-weight="600" letter-spacing="-0.5" fill="${markSolidColor}">${xe(ilName)}</text>`
+      : '';
+    const wh = ` width="${W}" height="${H}"`;
+    const fi = (opts.forDownload && !opts.useSystemFont)
+      ? `<style>@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600&amp;display=swap');</style>`
+      : '';
+    // South-east badge order: bg, mark, badge+icon (on top), text. East: bg, mark, icon, text.
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}"${wh}>${fi}${bg}${mark}${iconEl}${text}</svg>`;
+  }
+  function updateIconLockupPreview() {
+    document.getElementById('il-preview').innerHTML = buildIconLockupSVG({});
+  }
+  document.getElementById('il-name').addEventListener('input', e => { ilName = e.target.value; updateIconLockupPreview(); });
+  document.getElementById('il-font-size').addEventListener('input', e => {
+    ilFontSize = parseInt(e.target.value);
+    document.getElementById('il-font-size-val').textContent = e.target.value + 'px';
+    updateIconLockupPreview();
+  });
+  document.getElementById('il-bg-color').addEventListener('input', e => { ilBgColor = e.target.value; updateIconLockupPreview(); });
+  document.getElementById('il-with-bg').addEventListener('change', e => { ilWithBg = e.target.checked; updateIconLockupPreview(); });
+
+  document.querySelectorAll('[data-placement]').forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelectorAll('[data-placement]').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+      ilPlacement = c.dataset.placement;
+      updateIconLockupPreview();
+    });
+  });
+
+  function ilApplyIcon(str) {
+    const panel = document.getElementById('il-preset-icons');
     if (panel) panel.querySelectorAll('.icon-opt').forEach(b => b.classList.remove('selected'));
     const r = parseSVG(str);
-    if (r) { gIconInner = r.inner; gIconVB = r.vb; }
-    else gIconInner = null;
-    updateGenPreview();
+    if (r) { ilIconInner = r.inner; ilIconVB = r.vb; }
+    else ilIconInner = null;
+    updateIconLockupPreview();
   }
-  document.getElementById('gen-svg-code').addEventListener('input', e => applyIcon(e.target.value));
-  document.getElementById('gen-svg-file').addEventListener('change', e => {
+  document.getElementById('il-svg-code').addEventListener('input', e => ilApplyIcon(e.target.value));
+  document.getElementById('il-svg-file').addEventListener('change', e => {
     const f = e.target.files[0]; if (!f) return;
     const reader = new FileReader();
-    reader.onload = ev => { document.getElementById('gen-svg-code').value = ev.target.result; applyIcon(ev.target.result); };
+    reader.onload = ev => { document.getElementById('il-svg-code').value = ev.target.result; ilApplyIcon(ev.target.result); };
     reader.readAsText(f);
   });
 
@@ -1040,7 +1091,7 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     { id: 'book',  label: 'Docs',   vb: '0 0 24 24',
       paths: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>' },
   ];
-  const presetIconPanel = document.getElementById('gen-preset-icons');
+  const presetIconPanel = document.getElementById('il-preset-icons');
   PRESET_ICONS.forEach(icon => {
     const btn = document.createElement('button');
     btn.className = 'icon-opt';
@@ -1049,40 +1100,30 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     btn.addEventListener('click', () => {
       presetIconPanel.querySelectorAll('.icon-opt').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
-      document.getElementById('gen-svg-code').value = '';
-      gIconInner = icon.paths;
-      gIconVB = icon.vb;
-      updateGenPreview();
+      document.getElementById('il-svg-code').value = '';
+      ilIconInner = icon.paths;
+      ilIconVB = icon.vb;
+      updateIconLockupPreview();
     });
     presetIconPanel.appendChild(btn);
   });
 
-  document.getElementById('gen-mark-color').addEventListener('input', e => { gMarkColor = e.target.value; updateGenPreview(); });
-  document.getElementById('gen-bg-color').addEventListener('input', e => { gBgColor = e.target.value; updateGenPreview(); });
-  document.getElementById('gen-with-bg').addEventListener('change', e => { gWithBg = e.target.checked; updateGenPreview(); });
-
-  document.querySelectorAll('[data-scale]').forEach(c => {
-    c.addEventListener('click', () => {
-      document.querySelectorAll('[data-scale]').forEach(x => x.classList.remove('active'));
-      c.classList.add('active'); gScale = parseFloat(c.dataset.scale);
+  document.getElementById('il-copy-btn').addEventListener('click', () => {
+    navigator.clipboard.writeText(buildIconLockupSVG({})).then(() => {
+      const btn = document.getElementById('il-copy-btn');
+      const t = btn.textContent; btn.textContent = 'Copied!'; btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = t; btn.classList.remove('copied'); }, 1500);
     });
   });
-  document.querySelectorAll('[data-fmt]').forEach(c => {
-    c.addEventListener('click', () => {
-      document.querySelectorAll('[data-fmt]').forEach(x => x.classList.remove('active'));
-      c.classList.add('active'); gFormat = c.dataset.fmt;
-    });
+  document.getElementById('il-dl-svg-btn').addEventListener('click', () => {
+    const name = (ilName || 'logo').replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 32) || 'logo';
+    downloadSVG(buildIconLockupSVG({ forDownload: true }), `ortiq-${name}.svg`);
   });
-
-  document.getElementById('gen-dl-btn').addEventListener('click', () => {
-    const name = (gText || 'logo').replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 32) || 'logo';
-    const W = calcW(), pw = Math.round(W * gScale), ph = Math.round(56 * gScale);
-    if (gFormat === 'svg') {
-      downloadSVG(buildGenSVG({ forDownload: true }), `ortiq-${name}.svg`);
-    } else {
-      downloadPNG(buildGenSVG({ forDownload: true, useSystemFont: true }), pw, ph, `ortiq-${name}-${pw}x${ph}.png`,
-        () => alert('PNG export failed — try SVG instead.'));
-    }
+  document.getElementById('il-dl-png-btn').addEventListener('click', () => {
+    const name = (ilName || 'logo').replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 32) || 'logo';
+    const W = calcLockupW(ilTextX(), ilName, ilFontSize) * 3, H = 56 * 3;
+    downloadPNG(buildIconLockupSVG({ forDownload: true, useSystemFont: true }), W, H, `ortiq-${name}-${W}x${H}.png`,
+      () => alert('PNG export failed — try SVG instead.'));
   });
 
   // ── Boot ──
@@ -1100,17 +1141,20 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       // keep facetColors as restored/custom; use cobalt's UI tokens as the base for overrides
       if (!PALETTE.presets[activePresetId]) activePresetId = 'cobalt';
     }
-    gMarkColor = PALETTE.presets[PALETTE.default].solid;
-    gBgColor = PALETTE.presets[PALETTE.default].ui.dark.background;
-    document.getElementById('gen-mark-color').value = gMarkColor;
-    document.getElementById('gen-bg-color').value = gBgColor;
+    markSolidColor = PALETTE.presets[activePresetId] ? PALETTE.presets[activePresetId].solid : PALETTE.presets[PALETTE.default].solid;
+    document.getElementById('tint-swatch').value = markSolidColor;
+    tlBgColor = PALETTE.presets[PALETTE.default].ui.dark.background;
+    ilBgColor = tlBgColor;
+    document.getElementById('tl-bg-color').value = tlBgColor;
+    document.getElementById('il-bg-color').value = ilBgColor;
 
     renderFacetRows();
     renderPresetRow();
     renderUiTokenGrid();
     applyUiTokens();
     renderAll();
-    updateGenPreview();
+    updateTextLockupPreview();
+    updateIconLockupPreview();
   }).catch(err => {
     console.error('Failed to load palette.json', err);
   });
