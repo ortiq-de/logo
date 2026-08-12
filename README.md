@@ -1,6 +1,15 @@
 # Ortiq logo system
 
+[![Deploy Pages](https://img.shields.io/github/actions/workflow/status/ortiq-de/logo/pages.yml?branch=main&label=pages)](https://github.com/ortiq-de/logo/actions/workflows/pages.yml)
+[![Release Bundle](https://img.shields.io/github/actions/workflow/status/ortiq-de/logo/release.yml?label=release)](https://github.com/ortiq-de/logo/actions/workflows/release.yml)
+[![Latest release](https://img.shields.io/github/v/release/ortiq-de/logo)](https://github.com/ortiq-de/logo/releases/latest)
+[![npm package](https://img.shields.io/badge/npm-%40ortiq--de%2Flogo-cb3837)](https://github.com/ortiq-de/logo/pkgs/npm/logo)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/ortiq-de/logo/blob/main/package.json)
+[![GH Pages demo](https://img.shields.io/badge/demo-ortiq--de.github.io%2Flogo-206de9)](https://ortiq-de.github.io/logo/)
+
 Six-facet hexagon mark with full state + lockup system. All assets theme via CSS `currentColor` (single-tone) or per-facet gradients (colored).
+
+**Live demo / sub-brand generator:** https://ortiq-de.github.io/logo/
 
 ## File tree
 
