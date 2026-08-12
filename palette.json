@@ -1,45 +1,115 @@
 {
-  "default": "brand-dark",
-  "palettes": {
-    "brand-dark": {
-      "name": "Brand Dark",
-      "background": "#0a0514",
-      "mark": "#f07828",
-      "text": "#eeeef4",
-      "accent": "#5901d8",
-      "muted": "#eeeef420"
+  "version": 2,
+  "default": "cobalt",
+  "facetGeometry": [
+    { "id": "p0", "label": "Upper right", "lightnessDelta": 1,   "satDelta": 5,   "baseOpacity": 0.53 },
+    { "id": "p1", "label": "Right",       "lightnessDelta": -23, "satDelta": -3,  "baseOpacity": 0.35 },
+    { "id": "p2", "label": "Lower right", "lightnessDelta": -8,  "satDelta": 2,   "baseOpacity": 0.44 },
+    { "id": "p3", "label": "Lower left",  "lightnessDelta": -2,  "satDelta": 11,  "baseOpacity": 0.50 },
+    { "id": "p4", "label": "Left",        "lightnessDelta": 22,  "satDelta": -11, "baseOpacity": 0.74 },
+    { "id": "p5", "label": "Upper left",  "lightnessDelta": 10,  "satDelta": -4,  "baseOpacity": 0.62 }
+  ],
+  "presets": {
+    "cobalt": {
+      "name": "Cobalt",
+      "hue": 217, "saturation": 82, "lightness": 52,
+      "solid": "#206de9",
+      "facets": {
+        "p0": { "light": "#5894f3", "dark": "#0e53c4" },
+        "p1": { "light": "#1655bb", "dark": "#09234e" },
+        "p2": { "light": "#3179ed", "dark": "#0d4296" },
+        "p3": { "light": "#4489f8", "dark": "#074cbb" },
+        "p4": { "light": "#c2d5f5", "dark": "#598ee3" },
+        "p5": { "light": "#89b1f0", "dark": "#1c68e3" }
+      },
+      "ui": {
+        "dark":  { "background": "#0a0e15", "surface": "#171d26", "primary": "#206de9", "text": "#edeff2", "textMuted": "#a9b0bc", "border": "#2d3543", "accent": "#4f8cee", "success": "#2ecc71", "warning": "#f5a623", "error": "#e74c3c" },
+        "light": { "background": "#f2f4f8", "surface": "#e3e7ed", "primary": "#206de9", "text": "#101318", "textMuted": "#4c5667", "border": "#d3d7de", "accent": "#145bcc", "success": "#2ecc71", "warning": "#f5a623", "error": "#e74c3c" }
+      }
     },
-    "brand-light": {
-      "name": "Brand Light",
-      "background": "#eeeef4",
-      "mark": "#f07828",
-      "text": "#0a0514",
-      "accent": "#5901d8",
-      "muted": "#0a051420"
+    "violet": {
+      "name": "Violet",
+      "hue": 265, "saturation": 70, "lightness": 52,
+      "solid": "#762fda",
+      "facets": {
+        "p0": { "light": "#9b63e9", "dark": "#5b1ab7" },
+        "p1": { "light": "#5d23af", "dark": "#270e48" },
+        "p2": { "light": "#813ee0", "dark": "#48178c" },
+        "p3": { "light": "#9150ed", "dark": "#5412af" },
+        "p4": { "light": "#d8c6f0", "dark": "#9565d7" },
+        "p5": { "light": "#b591e8", "dark": "#712bd4" }
+      },
+      "ui": {
+        "dark":  { "background": "#0e0a15", "surface": "#1d1726", "primary": "#762fda", "text": "#efedf2", "textMuted": "#b1a9bc", "border": "#362d43", "accent": "#935ae2", "success": "#2ecc71", "warning": "#f5a623", "error": "#e74c3c" },
+        "light": { "background": "#f4f2f8", "surface": "#e7e3ed", "primary": "#762fda", "text": "#141018", "textMuted": "#574c67", "border": "#d8d3de", "accent": "#6322bf", "success": "#2ecc71", "warning": "#f5a623", "error": "#e74c3c" }
+      }
     },
-    "mono-dark": {
-      "name": "Mono Dark",
-      "background": "#0f0f0f",
-      "mark": "#ffffff",
-      "text": "#cccccc",
-      "accent": "#555555",
-      "muted": "#ffffff15"
+    "teal": {
+      "name": "Teal",
+      "hue": 185, "saturation": 65, "lightness": 48,
+      "solid": "#2bbdca",
+      "facets": {
+        "p0": { "light": "#56d6e1", "dark": "#1c95a0" },
+        "p1": { "light": "#248f99", "dark": "#0d3236" },
+        "p2": { "light": "#33c9d7", "dark": "#186f77" },
+        "p3": { "light": "#43d8e5", "dark": "#158e99" },
+        "p4": { "light": "#b8e6ea", "dark": "#5ac4ce" },
+        "p5": { "light": "#84d9e1", "dark": "#2eb1bd" }
+      },
+      "ui": {
+        "dark":  { "background": "#0a1415", "surface": "#172526", "primary": "#2bbdca", "text": "#edf2f2", "textMuted": "#a9babc", "border": "#2d4143", "accent": "#4eceda", "success": "#2ecc71", "warning": "#f5a623", "error": "#e74c3c" },
+        "light": { "background": "#f2f7f8", "surface": "#e3eced", "primary": "#2bbdca", "text": "#101818", "textMuted": "#4c6467", "border": "#d3dede", "accent": "#249da8", "success": "#2ecc71", "warning": "#f5a623", "error": "#e74c3c" }
+      }
     },
-    "mono-light": {
-      "name": "Mono Light",
-      "background": "#f0f0f0",
-      "mark": "#111111",
-      "text": "#333333",
-      "accent": "#888888",
-      "muted": "#11111115"
+    "ember": {
+      "name": "Ember",
+      "hue": 22, "saturation": 85, "lightness": 54,
+      "solid": "#ed6f26",
+      "facets": {
+        "p0": { "light": "#f7975f", "dark": "#d0530b" },
+        "p1": { "light": "#c85614", "dark": "#582609" },
+        "p2": { "light": "#f17b37", "dark": "#a2430b" },
+        "p3": { "light": "#fb8c4b", "dark": "#c84c04" },
+        "p4": { "light": "#f7daca", "dark": "#e7915f" },
+        "p5": { "light": "#f3b590", "dark": "#e86a21" }
+      },
+      "ui": {
+        "dark":  { "background": "#150e0a", "surface": "#261d17", "primary": "#ed6f26", "text": "#f2efed", "textMuted": "#bcb0a9", "border": "#43352d", "accent": "#f18e55", "success": "#2ecc71", "warning": "#f5a623", "error": "#e74c3c" },
+        "light": { "background": "#f8f4f2", "surface": "#ede7e3", "primary": "#ed6f26", "text": "#181310", "textMuted": "#67564c", "border": "#ded7d3", "accent": "#d95b12", "success": "#2ecc71", "warning": "#f5a623", "error": "#e74c3c" }
+      }
     },
-    "indigo": {
-      "name": "Indigo",
-      "background": "#0a0514",
-      "mark": "#5901d8",
-      "text": "#eeeef4",
-      "accent": "#f07828",
-      "muted": "#5901d820"
+    "graphite": {
+      "name": "Graphite",
+      "hue": 220, "saturation": 8, "lightness": 50,
+      "solid": "#757c8a",
+      "facets": {
+        "p0": { "light": "#949dad", "dark": "#575f70" },
+        "p1": { "light": "#5e6268", "dark": "#242628" },
+        "p2": { "light": "#7e8695", "dark": "#454a54" },
+        "p3": { "light": "#8693ac", "dark": "#4a566d" },
+        "p4": { "light": "#d6d6d6", "dark": "#999999" },
+        "p5": { "light": "#b5b7ba", "dark": "#76797f" }
+      },
+      "ui": {
+        "dark":  { "background": "#0a0e15", "surface": "#171c26", "primary": "#757c8a", "text": "#edeff2", "textMuted": "#a9afbc", "border": "#2d3443", "accent": "#9196a1", "success": "#2ecc71", "warning": "#f5a623", "error": "#e74c3c" },
+        "light": { "background": "#f2f4f8", "surface": "#e3e7ed", "primary": "#757c8a", "text": "#101318", "textMuted": "#4c5567", "border": "#d3d7de", "accent": "#636874", "success": "#2ecc71", "warning": "#f5a623", "error": "#e74c3c" }
+      }
+    },
+    "legacy-brand": {
+      "name": "Legacy Brand",
+      "solid": "#f07828",
+      "facets": {
+        "p0": { "light": "#c9517c", "dark": "#752f48" },
+        "p1": { "light": "#6401f2", "dark": "#3a018c" },
+        "p2": { "light": "#861cca", "dark": "#4d1076" },
+        "p3": { "light": "#a736a3", "dark": "#61205f" },
+        "p4": { "light": "#ff862d", "dark": "#9c4e1a" },
+        "p5": { "light": "#eb6c54", "dark": "#883f31" }
+      },
+      "ui": {
+        "dark":  { "background": "#0a0514", "surface": "#170f24", "primary": "#f07828", "text": "#eeeef4", "textMuted": "#a9a3b5", "border": "#2d2438", "accent": "#5901d8", "success": "#2ecc71", "warning": "#f5a623", "error": "#e74c3c" },
+        "light": { "background": "#eeeef4", "surface": "#e0e0ea", "primary": "#f07828", "text": "#0a0514", "textMuted": "#5c5567", "border": "#d0d0da", "accent": "#5901d8", "success": "#2ecc71", "warning": "#f5a623", "error": "#e74c3c" }
+      }
     }
   },
   "tokens": {
