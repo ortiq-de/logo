@@ -1,7 +1,7 @@
 {
-  "name": "@byehsan/logo",
-  "version": "3.0.0",
-  "description": "byEhsan brand logo system — six-facet hexagon mark, state animations, HTTP error states, lockups, favicons",
+  "name": "@ortiq-de/logo",
+  "version": "4.0.0",
+  "description": "Ortiq brand logo system — six-facet hexagon mark, state animations, HTTP error states, lockups, favicons",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -30,11 +30,11 @@
     "registry": "https://npm.pkg.github.com",
     "access": "public"
   },
-  "keywords": ["byehsan", "logo", "brand", "svg", "hexagon", "design-system"],
+  "keywords": ["ortiq", "logo", "brand", "svg", "hexagon", "design-system"],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/byehsan/logo.git"
+    "url": "https://github.com/ortiq-de/logo.git"
   },
-  "homepage": "https://byehsan.github.io/logo/"
+  "homepage": "https://ortiq-de.github.io/logo/"
 }

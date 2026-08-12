@@ -1,10 +1,10 @@
-# CLAUDE.md — byehsan/logo
+# CLAUDE.md — ortiq-de/logo
 
-Brand asset repository for byEhsan. Six-facet hexagon mark with full state animation system, HTTP error states, lockup templates, favicon set, and CI release pipeline.
+Brand asset repository for Ortiq. Six-facet hexagon mark with full state animation system, HTTP error states, lockup templates, favicon set, and CI release pipeline.
 
-**Current version:** v3.0.0
-**GH Pages:** https://byehsan.github.io/logo/ (interactive facet + UI theme customizer, sub-logo builder)
-**npm:** `@byehsan/logo` on GitHub Packages
+**Current version:** v4.0.0
+**GH Pages:** https://ortiq-de.github.io/logo/ (interactive facet + UI theme customizer, sub-logo builder)
+**npm:** `@ortiq-de/logo` on GitHub Packages
 
 ## File tree
 
@@ -102,17 +102,17 @@ Available classes: `state-neutral` `state-loading` `state-success` `state-warnin
 
 ```
 # .npmrc
-@byehsan:registry=https://npm.pkg.github.com
+@ortiq-de:registry=https://npm.pkg.github.com
 
-npm install @byehsan/logo
+npm install @ortiq-de/logo
 ```
 
 ```js
-import { base, stateLoading, http404, palette } from '@byehsan/logo'
-import '@byehsan/logo/css'
+import { base, stateLoading, http404, palette } from '@ortiq-de/logo'
+import '@ortiq-de/logo/css'
 
 // Programmatic lockup generation (v2.4.0+)
-import { createTextLockup, createIconLockup } from '@byehsan/logo'
+import { createTextLockup, createIconLockup } from '@ortiq-de/logo'
 
 const blogSvg = createTextLockup('blog')           // returns SVG string
 const gitSvg  = createIconLockup('git', iconSvg)  // iconSvg = <svg x=56 y=18 w=20 h=20 ...>
@@ -150,7 +150,7 @@ Icon + text lockup (icon slot is 20×20 at x=56,y=18, text starts at x=80):
 
 ## GH Pages — Sub-brand logo generator
 
-The interactive generator at https://byehsan.github.io/logo/ lets designers:
+The interactive generator at https://ortiq-de.github.io/logo/ lets designers:
 - Type a sub-brand name, tune font size, toggle a background fill
 - Add an icon: pick one of 8 presets (git/globe/home/code/star/mail/rss/docs), upload an SVG file, or paste custom SVG code
 - Apply any of the six mark presets, or set an explicit mark/background color
@@ -182,7 +182,7 @@ Favicon HTML:
 - **Tag push (`v*.*.*`):** full release bundle + npm publish
 
 ```bash
-git tag v3.0.0 && git push origin v3.0.0
+git tag v4.0.0 && git push origin v4.0.0
 ```
 
 Release artifacts: zip/tarball with all SVGs, PNGs at 7 sizes, favicon.ico, webmanifest, CJS/ESM/CSS bundles, TypeScript defs, palette.json.

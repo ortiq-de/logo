@@ -154,7 +154,7 @@ console.log('✓ index.esm.js (ESM)')
 
 // ── TypeScript definitions ────────────────────────────────────────────────
 const dtsLines = [
-  `// @byehsan/logo — TypeScript definitions`,
+  `// @ortiq-de/logo — TypeScript definitions`,
   ``,
   `export interface FacetGeometry { id: string; label: string; lightnessDelta: number; satDelta: number; baseOpacity: number; }`,
   `export interface FacetPair { light: string; dark: string; }`,
@@ -182,7 +182,7 @@ console.log('✓ index.d.ts (TypeScript)')
 const toDataUri = svg => `url("data:image/svg+xml,${encodeURIComponent(svg)}")`
 
 const cssLines = [
-  `/* @byehsan/logo — CSS custom properties */`,
+  `/* @ortiq-de/logo — CSS custom properties */`,
   `:root {`,
   `  /* Legacy flat brand tokens */`,
   ...Object.entries(paletteData.tokens).map(([k, v]) => `  --color-${k}: ${v};`),
@@ -252,8 +252,8 @@ try { execSync(`rm "${tmpSvg}"`) } catch {}
 
 // ── PWA webmanifest ───────────────────────────────────────────────────────
 const manifest = {
-  name: 'byEhsan',
-  short_name: 'byEhsan',
+  name: 'Ortiq',
+  short_name: 'Ortiq',
   icons: [
     { src: 'favicons/favicon-192x192.png', sizes: '192x192', type: 'image/png' },
     { src: 'favicons/favicon-512x512.png', sizes: '512x512', type: 'image/png' },
@@ -283,7 +283,7 @@ const distPkg = {
   },
   keywords: rootPkg.keywords,
   license: rootPkg.license,
-  repository: { type: 'git', url: 'https://github.com/byehsan/logo.git' },
+  repository: { type: 'git', url: 'https://github.com/ortiq-de/logo.git' },
 }
 writeFileSync(join(DIST, 'package.json'), JSON.stringify(distPkg, null, 2))
 console.log('✓ dist/package.json')

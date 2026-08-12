@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>byEhsan — logo system</title>
+  <title>Ortiq — logo system</title>
   <link rel="icon" type="image/svg+xml" href="base.svg">
   <link rel="stylesheet" href="states.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -223,7 +223,7 @@
     <div class="inner">
       <div class="logo-lockup">
         <svg id="header-mark" viewBox="0 0 540 540" width="34" height="34" fill="currentColor"></svg>
-        <div class="wordmark"><span>by</span>Ehsan <span class="tag">logo system</span></div>
+        <div class="wordmark"><span>O</span>rtiq <span class="tag">logo system</span></div>
       </div>
       <span class="version-badge" id="version-badge">v3.0.0</span>
     </div>
@@ -439,33 +439,33 @@
       <div class="code-block">
         <h4>npm (GitHub Packages)</h4>
         <pre><span class="hl"># .npmrc</span>
-@byehsan:registry=https://npm.pkg.github.com
+@ortiq-de:registry=https://npm.pkg.github.com
 
 <span class="hl"># install</span>
-npm install @byehsan/logo</pre>
-        <button class="copy-btn" data-copy="npm install @byehsan/logo">Copy</button>
+npm install @ortiq-de/logo</pre>
+        <button class="copy-btn" data-copy="npm install @ortiq-de/logo">Copy</button>
       </div>
       <div class="code-block">
         <h4>Create lockups</h4>
         <pre>import {
   createTextLockup,
   createIconLockup
-} from <span class="hl">'@byehsan/logo'</span>
+} from <span class="hl">'@ortiq-de/logo'</span>
 
 <span class="hl">// transparent SVG string, themed via currentColor</span>
 const blog = createTextLockup(<span class="hl">'blog'</span>)
 const git  = createIconLockup(
   <span class="hl">'git'</span>, gitIconSvgString)</pre>
-        <button class="copy-btn" data-copy="import { createTextLockup, createIconLockup } from '@byehsan/logo'">Copy</button>
+        <button class="copy-btn" data-copy="import { createTextLockup, createIconLockup } from '@ortiq-de/logo'">Copy</button>
       </div>
       <div class="code-block">
         <h4>ESM import</h4>
         <pre>import {
   base, stateLoading,
   http404, palette
-} from <span class="hl">'@byehsan/logo'</span>
-import <span class="hl">'@byehsan/logo/css'</span></pre>
-        <button class="copy-btn" data-copy="import { base, stateLoading, http404, palette } from '@byehsan/logo'">Copy</button>
+} from <span class="hl">'@ortiq-de/logo'</span>
+import <span class="hl">'@ortiq-de/logo/css'</span></pre>
+        <button class="copy-btn" data-copy="import { base, stateLoading, http404, palette } from '@ortiq-de/logo'">Copy</button>
       </div>
       <div class="code-block">
         <h4>Favicon HTML</h4>
@@ -484,15 +484,15 @@ import <span class="hl">'@byehsan/logo/css'</span></pre>
   <section>
     <div class="section-label">Download</div>
     <div class="dl-grid">
-      <a class="dl-btn" id="dl-zip" href="https://github.com/byehsan/logo/releases/latest/download/byehsan-logo.zip">
+      <a class="dl-btn" id="dl-zip" href="https://github.com/ortiq-de/logo/releases/latest/download/ortiq-logo.zip">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         ZIP bundle
       </a>
-      <a class="dl-btn" href="https://github.com/byehsan/logo/releases/latest">
+      <a class="dl-btn" href="https://github.com/ortiq-de/logo/releases/latest">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
         All releases
       </a>
-      <a class="dl-btn" href="https://github.com/byehsan/logo">
+      <a class="dl-btn" href="https://github.com/ortiq-de/logo">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
         Source on GitHub
       </a>
@@ -504,7 +504,7 @@ import <span class="hl">'@byehsan/logo/css'</span></pre>
 
 <footer>
   <div class="container">
-    byEhsan logo system · MIT license · <a href="https://github.com/byehsan/logo" style="color:inherit">github.com/byehsan/logo</a>
+    Ortiq logo system · MIT license · <a href="https://github.com/ortiq-de/logo" style="color:inherit">github.com/ortiq-de/logo</a>
   </div>
 </footer>
 
@@ -803,7 +803,7 @@ import <span class="hl">'@byehsan/logo/css'</span></pre>
   }
 
   // ── Persistence ──
-  const STORAGE_KEY = 'byehsan-logo-prefs';
+  const STORAGE_KEY = 'ortiq-logo-prefs';
   function persist() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ activePresetId, facetColors, uiMode, uiOverrides }));
@@ -858,12 +858,12 @@ import <span class="hl">'@byehsan/logo/css'</span></pre>
   });
 
   // ── Release version badge ──
-  fetch('https://api.github.com/repos/byehsan/logo/releases/latest')
+  fetch('https://api.github.com/repos/ortiq-de/logo/releases/latest')
     .then(r => r.json()).then(d => {
       if (d.tag_name) {
         document.getElementById('version-badge').textContent = d.tag_name;
         const z = document.getElementById('dl-zip');
-        if (z) z.href = `https://github.com/byehsan/logo/releases/download/${d.tag_name}/byehsan-logo-${d.tag_name}.zip`;
+        if (z) z.href = `https://github.com/ortiq-de/logo/releases/download/${d.tag_name}/ortiq-logo-${d.tag_name}.zip`;
       }
     }).catch(() => {});
 
@@ -892,10 +892,10 @@ import <span class="hl">'@byehsan/logo/css'</span></pre>
     });
   });
   document.getElementById('dl-svg-btn').addEventListener('click', () => {
-    downloadSVG(buildColoredSVG({ size: 512 }), 'byehsan-mark.svg');
+    downloadSVG(buildColoredSVG({ size: 512 }), 'ortiq-mark.svg');
   });
   document.getElementById('dl-png-btn').addEventListener('click', () => {
-    downloadPNG(buildColoredSVG({ size: 1024 }), 1024, 1024, 'byehsan-mark-1024x1024.png',
+    downloadPNG(buildColoredSVG({ size: 1024 }), 1024, 1024, 'ortiq-mark-1024x1024.png',
       () => alert('PNG export failed — try SVG instead.'));
   });
 
@@ -1057,9 +1057,9 @@ import <span class="hl">'@byehsan/logo/css'</span></pre>
     const name = (gText || 'logo').replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 32) || 'logo';
     const W = calcW(), pw = Math.round(W * gScale), ph = Math.round(56 * gScale);
     if (gFormat === 'svg') {
-      downloadSVG(buildGenSVG({ forDownload: true }), `byehsan-${name}.svg`);
+      downloadSVG(buildGenSVG({ forDownload: true }), `ortiq-${name}.svg`);
     } else {
-      downloadPNG(buildGenSVG({ forDownload: true, useSystemFont: true }), pw, ph, `byehsan-${name}-${pw}x${ph}.png`,
+      downloadPNG(buildGenSVG({ forDownload: true, useSystemFont: true }), pw, ph, `ortiq-${name}-${pw}x${ph}.png`,
         () => alert('PNG export failed — try SVG instead.'));
     }
   });

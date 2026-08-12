@@ -38,7 +38,7 @@ jobs:
         with:
           node-version: '20'
           registry-url: 'https://npm.pkg.github.com'
-          scope: '@byehsan'
+          scope: '@ortiq-de'
 
       - name: Install system deps (rsvg-convert, imagemagick, zip)
         run: sudo apt-get update && sudo apt-get install -y librsvg2-bin imagemagick zip
@@ -52,25 +52,25 @@ jobs:
       - name: Create release archives
         run: |
           VERSION=${GITHUB_REF_NAME}
-          zip -r "byehsan-logo-${VERSION}.zip" dist/
-          tar -czf "byehsan-logo-${VERSION}.tar.gz" dist/
+          zip -r "ortiq-logo-${VERSION}.zip" dist/
+          tar -czf "ortiq-logo-${VERSION}.tar.gz" dist/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            byehsan-logo-*.zip
-            byehsan-logo-*.tar.gz
+            ortiq-logo-*.zip
+            ortiq-logo-*.tar.gz
           generate_release_notes: true
           body: |
-            ## byEhsan Logo Bundle ${{ github.ref_name }}
+            ## Ortiq Logo Bundle ${{ github.ref_name }}
 
-            **GitHub Pages:** https://byehsan.github.io/logo/
+            **GitHub Pages:** https://ortiq-de.github.io/logo/
 
             ### Artifacts in this release
             | File | Contents |
             |------|----------|
-            | `byehsan-logo-${{ github.ref_name }}.zip` | Full bundle |
+            | `ortiq-logo-${{ github.ref_name }}.zip` | Full bundle |
             | `dist/index.js` | CJS module |
             | `dist/index.esm.js` | ES module |
             | `dist/index.d.ts` | TypeScript definitions |
@@ -83,15 +83,15 @@ jobs:
             ### Install (GitHub Packages)
             ```
             # .npmrc
-            @byehsan:registry=https://npm.pkg.github.com
+            @ortiq-de:registry=https://npm.pkg.github.com
 
-            npm install @byehsan/logo
+            npm install @ortiq-de/logo
             ```
 
             ### Quick use
             ```js
-            import { base, stateLoading, http404, palettes } from '@byehsan/logo'
-            import '@byehsan/logo/css'
+            import { base, stateLoading, http404, palette } from '@ortiq-de/logo'
+            import '@ortiq-de/logo/css'
             ```
 
             ### Favicon HTML
