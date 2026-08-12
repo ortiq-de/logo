@@ -266,7 +266,6 @@
   <!-- Mark & lockups -->
   <section>
     <div class="section-label">Mark &amp; lockups</div>
-    <div class="section-sub">Every facet, and every place the mark appears — the same colors follow across all three tabs.</div>
 
     <div class="gen-tabs" id="main-tabs">
       <button class="gen-tab active" data-maintab="mark">Mark</button>
@@ -1187,7 +1186,7 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     if (ilIconInner) {
       const L = ilPlacementLayout();
       if (L.kind === 'badge') {
-        const backdrop = `<circle cx="${L.cx}" cy="${L.cy}" r="${L.r}" fill="${ilWithBg ? ilBgColor : 'var(--bg,#0a0e15)'}" stroke="${markSolidColor}" stroke-width="1" opacity="0.98"/>`;
+        const backdrop = `<circle cx="${L.cx}" cy="${L.cy}" r="${L.r}" fill="none" stroke="${markSolidColor}" stroke-width="1" opacity="0.98"/>`;
         iconEl = `${backdrop}<svg x="${L.iconX}" y="${L.iconY}" width="${L.iconSize}" height="${L.iconSize}" viewBox="${ilIconVB}" color="${markSolidColor}" fill="none" stroke="${markSolidColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" overflow="visible">${ilIconInner}</svg>`;
       } else {
         iconEl = `<svg x="${L.x}" y="${L.y}" width="${L.size}" height="${L.size}" viewBox="${ilIconVB}" color="${markSolidColor}" fill="none" stroke="${markSolidColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" overflow="visible">${ilIconInner}</svg>`;
