@@ -2,6 +2,12 @@
   byEhsan logo — state animations (Option B: class-driven)
   Usage: add class to the <svg> element, e.g. <svg class="state-loading">
   All animations theme via currentColor — set `color` on the SVG or a parent.
+  The base mark markup expected inside the <svg>:
+    <g id="mark" fill="currentColor">
+      <path id="p0" .../> <path id="p1" .../> ... <path id="p5" .../>
+    </g>
+  Set data-theme="dark"|"light" on <html> (or a parent) to engage the
+  glow/shadow treatment below; falls back to prefers-color-scheme otherwise.
 */
 
 /* ─── KEYFRAMES ─────────────────────────────────────────────────────────── */
@@ -15,13 +21,17 @@
   48%       { transform: scale(1); }
 }
 
-/* loading — smooth patient rotation */
-@keyframes be-smooth-spin {
+/* loading — spinning gem: a glint chases the six facets, slow patient turn */
+@keyframes be-slow-spin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
+@keyframes be-glint {
+  0%, 83%, 100% { filter: brightness(1); }
+  8%             { filter: brightness(1.9); }
+}
 
-/* success — spring joy, loops */
+/* success — spring joy with a burst of light at the peak, loops */
 @keyframes be-joy {
   0%, 65%, 100% { transform: scale(1); }
   15%  { transform: scale(1.2); }
@@ -30,22 +40,26 @@
   52%  { transform: scale(0.98); }
   60%  { transform: scale(1); }
 }
+@keyframes be-joy-flash {
+  0%, 100% { filter: brightness(1); }
+  15%       { filter: brightness(1.6); }
+}
 
-/* warning — asymmetric petal pulse, alert */
-@keyframes be-warn-pulse {
-  0%, 100% { stroke-width: 2;   opacity: 1; }
-  50%       { stroke-width: 3.5; opacity: 0.75; }
+/* warning — alert flare chases fast around all six facets */
+@keyframes be-warn-flare {
+  0%, 100% { filter: brightness(1); }
+  50%       { filter: brightness(1.8); }
 }
 
 /* error — frustrated shake × 3, pause, repeat */
 @keyframes be-frustrated {
   0%, 55%, 100% { transform: translateX(0); }
-  5%   { transform: translateX(-4px); }
-  12%  { transform: translateX(4px); }
-  19%  { transform: translateX(-3.5px); }
-  26%  { transform: translateX(3.5px); }
-  33%  { transform: translateX(-2px); }
-  40%  { transform: translateX(2px); }
+  5%   { transform: translateX(-22px); }
+  12%  { transform: translateX(22px); }
+  19%  { transform: translateX(-19px); }
+  26%  { transform: translateX(19px); }
+  33%  { transform: translateX(-11px); }
+  40%  { transform: translateX(11px); }
   46%  { transform: translateX(0); }
 }
 
@@ -55,28 +69,27 @@
   20%       { transform: rotate(6deg); }
   70%       { transform: rotate(-6deg); }
 }
-
 @keyframes be-drift {
   0%, 100% { opacity: 1; }
-  40%       { opacity: 0.4; }
-  80%       { opacity: 0.9; }
+  40%       { opacity: 0.35; }
+  80%       { opacity: 0.85; }
 }
 
 /* 500 — dying machine, glitch → dim → rattle → flicker → repeat */
 @keyframes be-dying {
-  0%   { transform: translate(0,0);      opacity: 1;   }
-  3%   { transform: translate(2px,-1px); opacity: 0.9; }
-  6%   { transform: translate(-2px,1px); opacity: 0.7; }
-  9%   { transform: translate(1px,-1px); opacity: 0.45;}
-  13%  { transform: translate(0,0);      opacity: 0.2; }
-  72%  { transform: translate(0,0);      opacity: 0.2; }
-  76%  { transform: translate(1px,0);    opacity: 0.28;}
-  80%  { transform: translate(0,0);      opacity: 0.2; }
-  84%  { transform: translate(-1px,1px); opacity: 0.26;}
-  88%  { transform: translate(0,0);      opacity: 0.2; }
-  93%  { opacity: 0.6; }
-  96%  { opacity: 1;   }
-  100% { opacity: 1;   }
+  0%   { transform: translate(0,0);       opacity: 1;    filter: saturate(1); }
+  3%   { transform: translate(11px,-5px); opacity: 0.9;  filter: saturate(1); }
+  6%   { transform: translate(-11px,5px); opacity: 0.7;  filter: saturate(0.7); }
+  9%   { transform: translate(5px,-5px);  opacity: 0.45; filter: saturate(0.5); }
+  13%  { transform: translate(0,0);       opacity: 0.2;  filter: saturate(0.3); }
+  72%  { transform: translate(0,0);       opacity: 0.2;  filter: saturate(0.3); }
+  76%  { transform: translate(5px,0);     opacity: 0.28; filter: saturate(0.35); }
+  80%  { transform: translate(0,0);       opacity: 0.2;  filter: saturate(0.3); }
+  84%  { transform: translate(-5px,5px);  opacity: 0.26; filter: saturate(0.35); }
+  88%  { transform: translate(0,0);       opacity: 0.2;  filter: saturate(0.3); }
+  93%  { opacity: 0.6; filter: saturate(0.6); }
+  96%  { opacity: 1;   filter: saturate(1); }
+  100% { opacity: 1;   filter: saturate(1); }
 }
 
 /* 503 — asleep, slow breathe */
@@ -84,23 +97,23 @@
   0%, 100% { opacity: 0.35; }
   50%       { opacity: 0.15; }
 }
-
 @keyframes be-zzz {
-  0%   { opacity: 0;   transform: translate(0,0)        scale(0.7); }
+  0%   { opacity: 0;   transform: translate(0,0)         scale(0.7); }
   15%  { opacity: 1; }
   85%  { opacity: 0.8; }
-  100% { opacity: 0;   transform: translate(14px,-14px)  scale(1.1); }
+  100% { opacity: 0;   transform: translate(76px,-76px)   scale(1.1); }
 }
 
-/* 403 — appears, tries, gets refused, collapses to nothing, loops */
+/* 403 — appears, tries (flushes), gets refused, collapses to nothing, loops */
 @keyframes be-refused-loop {
-  0%    { transform: scale(0);    opacity: 0;   }
-  15%   { transform: scale(1.05); opacity: 1;   }
-  25%   { transform: scale(1);    opacity: 1;   }
-  40%   { transform: scale(1.08); opacity: 1;   }
-  62%   { transform: scale(0.2);  opacity: 0.2; }
-  80%   { transform: scale(0);    opacity: 0;   }
-  100%  { transform: scale(0);    opacity: 0;   }
+  0%    { transform: scale(0);    opacity: 0;   filter: hue-rotate(0deg); }
+  15%   { transform: scale(1.05); opacity: 1;   filter: hue-rotate(0deg); }
+  25%   { transform: scale(1);    opacity: 1;   filter: hue-rotate(0deg); }
+  40%   { transform: scale(1.08); opacity: 1;   filter: hue-rotate(-20deg); }
+  50%   { transform: scale(1.02); opacity: 1;   filter: hue-rotate(0deg); }
+  62%   { transform: scale(0.2);  opacity: 0.2; filter: hue-rotate(0deg); }
+  80%   { transform: scale(0);    opacity: 0;   filter: hue-rotate(0deg); }
+  100%  { transform: scale(0);    opacity: 0;   filter: hue-rotate(0deg); }
 }
 
 /* ─── STATE CLASSES ─────────────────────────────────────────────────────── */
@@ -108,28 +121,38 @@
 /* neutral */
 .state-neutral #mark {
   transform-box: view-box;
-  transform-origin: 50px 56.67px;
+  transform-origin: 270px 270px;
   animation: be-heartbeat 2.5s ease-in-out infinite;
 }
 
 /* loading */
 .state-loading #mark {
   transform-box: view-box;
-  transform-origin: 50px 56.67px;
-  animation: be-smooth-spin 3s linear infinite;
+  transform-origin: 270px 270px;
+  animation: be-slow-spin 6s linear infinite;
 }
+.state-loading #p0 { animation: be-glint 1.8s ease-in-out 0s   infinite; }
+.state-loading #p1 { animation: be-glint 1.8s ease-in-out 0.3s infinite; }
+.state-loading #p2 { animation: be-glint 1.8s ease-in-out 0.6s infinite; }
+.state-loading #p3 { animation: be-glint 1.8s ease-in-out 0.9s infinite; }
+.state-loading #p4 { animation: be-glint 1.8s ease-in-out 1.2s infinite; }
+.state-loading #p5 { animation: be-glint 1.8s ease-in-out 1.5s infinite; }
 
 /* success */
 .state-success #mark {
   transform-box: view-box;
-  transform-origin: 50px 56.67px;
+  transform-origin: 270px 270px;
   animation: be-joy 2.5s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
 }
+.state-success #mark path { animation: be-joy-flash 2.5s cubic-bezier(0.34, 1.56, 0.64, 1) infinite; }
 
 /* warning */
-.state-warning #p0 path { animation: be-warn-pulse 0.8s ease-in-out infinite; }
-.state-warning #p1 path { animation: be-warn-pulse 0.8s ease-in-out 0.26s infinite; opacity: 0.6; }
-.state-warning #p2 path { animation: be-warn-pulse 0.8s ease-in-out 0.53s infinite; opacity: 0.6; }
+.state-warning #p0 { animation: be-warn-flare 0.8s ease-in-out 0s    infinite; }
+.state-warning #p1 { animation: be-warn-flare 0.8s ease-in-out 0.13s infinite; }
+.state-warning #p2 { animation: be-warn-flare 0.8s ease-in-out 0.26s infinite; }
+.state-warning #p3 { animation: be-warn-flare 0.8s ease-in-out 0.39s infinite; }
+.state-warning #p4 { animation: be-warn-flare 0.8s ease-in-out 0.52s infinite; }
+.state-warning #p5 { animation: be-warn-flare 0.8s ease-in-out 0.65s infinite; }
 
 /* error */
 .state-error #mark { animation: be-frustrated 2.2s ease-in-out infinite; }
@@ -137,11 +160,12 @@
 /* 404 */
 .state-404 #mark {
   transform-box: view-box;
-  transform-origin: 50px 56.67px;
+  transform-origin: 270px 270px;
   animation: be-tilt 2.4s ease-in-out infinite;
 }
-.state-404 #p1 path { animation: be-drift 2.4s ease-in-out 0.3s infinite; }
-.state-404 #p2 path { animation: be-drift 2.4s ease-in-out 0.6s infinite; }
+.state-404 #p1 { animation: be-drift 2.4s ease-in-out 0s    infinite; }
+.state-404 #p3 { animation: be-drift 2.4s ease-in-out 0.35s infinite; }
+.state-404 #p5 { animation: be-drift 2.4s ease-in-out 0.7s  infinite; }
 
 /* 500 */
 .state-500 #mark { animation: be-dying 4s ease-in-out infinite; }
@@ -153,6 +177,26 @@
 /* 403 */
 .state-403 #mark {
   transform-box: view-box;
-  transform-origin: 50px 56.67px;
+  transform-origin: 270px 270px;
   animation: be-refused-loop 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ─── LIGHT / DARK CREATIVE TREATMENT ───────────────────────────────────── */
+/* Dark backgrounds: the mark glows, as if it emits its own light.
+   Light backgrounds: the mark casts a soft shadow, as if it sits on a lit surface. */
+
+/* system-preference fallback first — a page-level [data-theme] choice
+   (same specificity, declared after) always wins over it in the cascade */
+@media (prefers-color-scheme: dark) {
+  #mark { filter: drop-shadow(0 0 8px currentColor) drop-shadow(0 0 2px rgba(255,255,255,0.4)); }
+}
+@media (prefers-color-scheme: light) {
+  #mark { filter: drop-shadow(0 4px 10px rgba(20,30,60,0.25)); }
+}
+
+[data-theme="dark"] #mark {
+  filter: drop-shadow(0 0 8px currentColor) drop-shadow(0 0 2px rgba(255,255,255,0.4));
+}
+[data-theme="light"] #mark {
+  filter: drop-shadow(0 4px 10px rgba(20,30,60,0.25));
 }

@@ -4,17 +4,14 @@
   </style>
 
   <!-- Mark — 48×48, y-offset 4 to center in 56px -->
-  <svg x="0" y="4" width="48" height="48" viewBox="0 0 100 100">
-    <g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
-      <g transform="rotate(0 50 56.67)">
-        <path d="M50,20 Q60,40 40,40 Q60,40 50,70 Q40,40 60,40 Q50,20 50,20 Z"/>
-      </g>
-      <g transform="rotate(120 50 56.67)">
-        <path d="M50,20 Q60,40 40,40 Q60,40 50,70 Q40,40 60,40 Q50,20 50,20 Z"/>
-      </g>
-      <g transform="rotate(240 50 56.67)">
-        <path d="M50,20 Q60,40 40,40 Q60,40 50,70 Q40,40 60,40 Q50,20 50,20 Z"/>
-      </g>
+  <svg x="0" y="4" width="48" height="48" viewBox="0 0 540 540">
+    <g fill="currentColor">
+      <path d="M 270 22 L 484.77 146 L 344.1 227.22 L 270 184.44 Z" opacity="0.53"/>
+      <path d="M 484.77 146 L 484.77 394 L 344.1 312.78 L 344.1 227.22 Z" opacity="0.35"/>
+      <path d="M 484.77 394 L 270 518 L 270 355.56 L 344.1 312.78 Z" opacity="0.44"/>
+      <path d="M 270 518 L 55.23 394 L 195.9 312.78 L 270 355.56 Z" opacity="0.50"/>
+      <path d="M 55.23 394 L 55.23 146 L 195.9 227.22 L 195.9 312.78 Z" opacity="0.74"/>
+      <path d="M 55.23 146 L 270 22 L 270 184.44 L 195.9 227.22 Z" opacity="0.62"/>
     </g>
   </svg>
 

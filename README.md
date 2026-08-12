@@ -1,27 +1,28 @@
 # byEhsan logo system
 
-Triskelion mark with full state + lockup system. All assets theme via CSS `currentColor`.
+Six-facet hexagon mark with full state + lockup system. All assets theme via CSS `currentColor` (single-tone) or per-facet gradients (colored).
 
 ## File tree
 
 ```
-base.svg                   clean mark, currentColor stroke, no animation
+base.svg                    clean mark, currentColor fill, six facets at fixed opacity
 states/
-  neutral.svg              calm blink every 6s
-  loading.svg              3-step discrete rotation, 1.2s cycle
-  success.svg              spring bloom with overshoot, one-shot
-  warning.svg              one petal pulses asymmetrically, 800ms loop
-  error.svg                horizontal shake 300ms, then still
+  neutral.svg               double heartbeat, alive, 2.5s loop
+  loading.svg                spinning gem: glint chases the six facets + slow turn, 1.8s/6s loop
+  success.svg                 spring bloom with light burst at the peak, loops
+  warning.svg                  alert flare chases fast around all six facets, 0.8s loop
+  error.svg                    horizontal shake ×3, then pause, loops
 http/
-  404.svg                  tilt oscillation ±6°, drifting petals
-  500.svg                  glitch twitch → flatlines at 30% opacity
-  503.svg                  slow breathe + Zzz floats up-right, 2s loop
-  403.svg                  bar wipes across once, curt no bounce
+  404.svg                   tilt oscillation ±6°, three facets lose focus
+  500.svg                    glitch → dims and desaturates → death rattle → flicker
+  503.svg                     slow breathe + Zzz floats up-right, 2s loop
+  403.svg                      appears → tries (flushes) → refused → collapses, loops
 lockup/
-  template.svg             mark + gap + dashed slot guide
-  blog.svg                 worked example: "blog" sub-brand
-preview.html               live grid of all marks + states animating
-states.css                 all @keyframes as class-driven selectors (Option B)
+  template.svg              mark + gap + dashed slot guide
+  blog.svg                  worked example: "blog" sub-brand
+preview.html               static offline snapshot of all marks + states (Cobalt palette)
+states.css                 all @keyframes as class-driven selectors (Option B) + light/dark glow/shadow
+palette.json                facet geometry + named presets (mark facets + light/dark UI tokens)
 ```
 
 ## Theming via currentColor
@@ -29,11 +30,11 @@ states.css                 all @keyframes as class-driven selectors (Option B)
 Set `color` on the SVG element (or any parent) to change the mark color:
 
 ```html
-<!-- orange on dark bg -->
-<img src="base.svg" style="color: #f07828">
+<!-- cobalt blue on dark bg -->
+<img src="base.svg" style="color: #206de9">
 
 <!-- or inline -->
-<svg ... style="color: #f07828"> ... </svg>
+<svg ... style="color: #206de9"> ... </svg>
 ```
 
 For React/Vue components, pass a `color` prop and bind it to the SVG's `style.color`.
@@ -50,7 +51,7 @@ Class-driven (Option B — one base SVG + `states.css`):
 
 ```html
 <link rel="stylesheet" href="states.css">
-<svg class="state-loading" ...> <!-- base mark paths --> </svg>
+<svg class="state-loading" ...> <!-- base mark: id="mark" wrapping id="p0".."p5" --> </svg>
 ```
 
 Available classes: `state-neutral` `state-loading` `state-success` `state-warning`
@@ -72,7 +73,7 @@ Available classes: `state-neutral` `state-loading` `state-success` `state-warnin
 
 ## Adding a new state
 
-1. Copy `states/neutral.svg` as a starting point
+1. Copy `states/neutral.svg` as a starting point (six `<path id="p0">`..`<path id="p5">` facets)
 2. Add/replace the `<style>` block with your `@keyframes` and selectors
 3. Add the corresponding `@keyframes be-*` and `.state-*` rules to `states.css`
 4. Add the state to `preview.html`
@@ -82,19 +83,23 @@ Available classes: `state-neutral` `state-loading` `state-success` `state-warnin
 ## Versioning
 
 ```bash
-git tag v2.0.0
-git push origin v2.0.0
+git tag v3.0.0
+git push origin v3.0.0
 ```
 
 CI builds and publishes a release with PNG exports (16–512px), JS/ESM/CSS bundles, and `palette.json`.
 
 ## Palette
 
-| Token   | Hex       |
-|---------|-----------|
-| dark    | `#0a0514` |
-| orange  | `#f07828` |
-| indigo  | `#5901d8` |
-| light   | `#eeeef4` |
-| success | `#2ecc71` |
-| error   | `#e74c3c` |
+Six named presets in `palette.json` — `cobalt` (default), `violet`, `teal`, `ember`, `graphite`, `legacy-brand` — each with six facet gradients plus a complete `ui.dark`/`ui.light` token set (`background`, `surface`, `primary`, `text`, `textMuted`, `border`, `accent`, `success`, `warning`, `error`).
+
+| Legacy token | Hex       |
+|--------------|-----------|
+| dark         | `#0a0514` |
+| orange       | `#f07828` |
+| indigo       | `#5901d8` |
+| light        | `#eeeef4` |
+| success      | `#2ecc71` |
+| error        | `#e74c3c` |
+
+The legacy orange/indigo brand palette survives as the `legacy-brand` preset for continuity.

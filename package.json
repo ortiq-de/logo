@@ -1,7 +1,7 @@
 {
   "name": "@byehsan/logo",
-  "version": "2.4.0",
-  "description": "byEhsan brand logo system — triskelion mark, state animations, HTTP error states, lockups, favicons",
+  "version": "3.0.0",
+  "description": "byEhsan brand logo system — six-facet hexagon mark, state animations, HTTP error states, lockups, favicons",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -30,7 +30,7 @@
     "registry": "https://npm.pkg.github.com",
     "access": "public"
   },
-  "keywords": ["byehsan", "logo", "brand", "svg", "triskelion", "design-system"],
+  "keywords": ["byehsan", "logo", "brand", "svg", "hexagon", "design-system"],
   "license": "MIT",
   "repository": {
     "type": "git",

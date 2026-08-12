@@ -18,13 +18,50 @@ mkdirSync(join(DIST, 'svgs', 'states'), { recursive: true })
 mkdirSync(join(DIST, 'svgs', 'http'), { recursive: true })
 mkdirSync(join(DIST, 'svgs', 'lockup'), { recursive: true })
 
+// ── HSL helpers (no dependencies — keeps the package at zero npm deps) ─────
+function hexToRgb(hex) { const n = parseInt(hex.replace('#', ''), 16); return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 } }
+function rgbToHsl(r, g, b) {
+  r /= 255; g /= 255; b /= 255
+  const max = Math.max(r, g, b), min = Math.min(r, g, b)
+  let h, s, l = (max + min) / 2
+  if (max === min) { h = s = 0 } else {
+    const d = max - min
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break
+      case g: h = (b - r) / d + 2; break
+      case b: h = (r - g) / d + 4; break
+    }
+    h /= 6
+  }
+  return { h: h * 360, s: s * 100, l: l * 100 }
+}
+function hslToHex(h, s, l) {
+  h = ((h % 360) + 360) % 360; s = Math.max(0, Math.min(100, s)) / 100; l = Math.max(0, Math.min(100, l)) / 100
+  const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2
+  let r, g, b
+  if (h < 60) [r, g, b] = [c, x, 0]
+  else if (h < 120) [r, g, b] = [x, c, 0]
+  else if (h < 180) [r, g, b] = [0, c, x]
+  else if (h < 240) [r, g, b] = [0, x, c]
+  else if (h < 300) [r, g, b] = [x, 0, c]
+  else [r, g, b] = [c, 0, x]
+  const toHex = v => Math.round((v + m) * 255).toString(16).padStart(2, '0')
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`
+}
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)) }
+function shade(hex, deltaL) {
+  const { r, g, b } = hexToRgb(hex)
+  const hsl = rgbToHsl(r, g, b)
+  return hslToHex(hsl.h, hsl.s, clamp(hsl.l + deltaL, 0, 100))
+}
+
 // ── Palette ───────────────────────────────────────────────────────────────
 const paletteData = JSON.parse(readFileSync(join(ROOT, 'palette.json'), 'utf8'))
 writeFileSync(join(DIST, 'palette.json'), JSON.stringify(paletteData, null, 2))
 console.log('✓ palette.json')
 
-const DEFAULT_PALETTE = paletteData.palettes[paletteData.default]
-const TOKENS = paletteData.tokens
+const DEFAULT_PALETTE = paletteData.presets[paletteData.default]
 
 // ── SVG sources ───────────────────────────────────────────────────────────
 const SVG_FILES = [
@@ -59,30 +96,34 @@ for (const { key, path } of SVG_FILES) {
 }
 
 // ── subbrandLockup function ───────────────────────────────────────────────
-// Shared implementation injected into both CJS and ESM bundles
-const MARK_PATHS_JSON = JSON.stringify(
-  ['rotate(0 50 56.67)', 'rotate(120 50 56.67)', 'rotate(240 50 56.67)']
-    .map(t => `<g transform="${t}"><path d="M50,20 Q60,40 40,40 Q60,40 50,70 Q40,40 60,40 Q50,20 50,20 Z"/></g>`)
-    .join('')
+// Shared implementation injected into both CJS and ESM bundles.
+// The hexagon mark is single-tone (six facets at fixed opacity, matching
+// base.svg) since a lockup needs one flat color, not a 6-stop gradient.
+const HEX_PATHS_JSON = JSON.stringify(
+  paletteData.facetGeometry.map(g => {
+    const path = svgMap.base.match(new RegExp(`id="${g.id}" d="([^"]+)"`))
+    return { d: path[1], op: g.baseOpacity }
+  })
 )
-const PALETTES_JSON = JSON.stringify(paletteData.palettes)
+const PRESETS_JSON = JSON.stringify(paletteData.presets)
 
 const subbrandFn = `
 function _xe(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-var _mp=${MARK_PATHS_JSON};
-var _pp=${PALETTES_JSON};
+var _hp=${HEX_PATHS_JSON};
+var _pp=${PRESETS_JSON};
+function _mark(color){return _hp.map(function(p){return '<path d="'+p.d+'" opacity="'+p.op+'"/>';}).join('');}
 function subbrandLockup(text,opts){
   opts=opts||{};
-  var p=_pp[opts.palette||'brand-dark']||_pp['brand-dark'];
-  var mc=opts.markColor||p.mark;
+  var p=_pp[opts.preset||'cobalt']||_pp['cobalt'];
+  var mc=opts.markColor||p.solid;
   var fs=Number(opts.fontSize)||24;
   var W=Math.ceil(Math.max(220,64+Math.max(60,String(text).length*fs*0.6+8)+12));
   var bl=(28+fs*0.35).toFixed(1);
-  var bg=opts.bgColor?'<rect width="'+W+'" height="56" fill="'+_xe(opts.bgColor)+'"/>':(opts.withBackground?'<rect width="'+W+'" height="56" fill="'+_xe(p.background||'transparent')+'"/>':'');
+  var bg=opts.bgColor?'<rect width="'+W+'" height="56" fill="'+_xe(opts.bgColor)+'"/>':(opts.withBackground?'<rect width="'+W+'" height="56" fill="'+_xe((p.ui&&p.ui.dark&&p.ui.dark.background)||'transparent')+'"/>':'');
   return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' 56">'
     +bg
-    +'<svg x="0" y="4" width="48" height="48" viewBox="0 0 100 100"><g fill="none" stroke="'+_xe(mc)+'" stroke-width="2" stroke-linejoin="round">'+_mp+'</g></svg>'
-    +'<text x="64" y="'+bl+'" font-family="\'Space Grotesk\',system-ui,sans-serif" font-size="'+fs+'" font-weight="600" letter-spacing="-0.5" fill="'+_xe(mc)+'">'+_xe(text)+'</text>'
+    +'<svg x="0" y="4" width="48" height="48" viewBox="0 0 540 540"><g fill="'+_xe(mc)+'">'+_mark(mc)+'</g></svg>'
+    +'<text x="64" y="'+bl+'" font-family="\\'Space Grotesk\\',system-ui,sans-serif" font-size="'+fs+'" font-weight="600" letter-spacing="-0.5" fill="'+_xe(mc)+'">'+_xe(text)+'</text>'
     +'</svg>';
 }
 `.trim()
@@ -102,43 +143,38 @@ console.log('✓ index.js (CJS)')
 const esmLines = [
   `export const palette = ${JSON.stringify(paletteData, null, 2)};`,
   ...Object.entries(svgMap).map(([k, v]) => `export const ${k} = ${JSON.stringify(v)};`),
-  subbrandFn.replace(/^function /, 'export function '),
+  subbrandFn.replace('function subbrandLockup', 'export function subbrandLockup'),
 ]
 writeFileSync(join(DIST, 'index.esm.js'), esmLines.join('\n'))
 console.log('✓ index.esm.js (ESM)')
 
 // ── TypeScript definitions ────────────────────────────────────────────────
-const tokenTypes = Object.keys(TOKENS).map(k => `  ${k}: string;`).join('\n')
-const paletteEntryType = `{
-  name: string;
-  background: string;
-  mark: string;
-  text: string;
-  accent: string;
-  muted: string;
-}`
+const presetIds = Object.keys(paletteData.presets)
 const dtsLines = [
   `// @byehsan/logo — TypeScript definitions`,
   ``,
-  `export interface PaletteTokens { ${Object.keys(TOKENS).map(k => `${k}: string`).join('; ')}; }`,
-  `export interface PaletteEntry { name: string; background: string; mark: string; text: string; accent: string; muted: string; }`,
-  `export interface Palette { default: string; palettes: Record<string, PaletteEntry>; tokens: PaletteTokens; }`,
+  `export interface FacetGeometry { id: string; label: string; lightnessDelta: number; satDelta: number; baseOpacity: number; }`,
+  `export interface FacetPair { light: string; dark: string; }`,
+  `export interface UiTokens { background: string; surface: string; primary: string; text: string; textMuted: string; border: string; accent: string; success: string; warning: string; error: string; }`,
+  `export interface Preset { name: string; hue?: number; saturation?: number; lightness?: number; solid: string; facets: Record<string, FacetPair>; ui: { dark: UiTokens; light: UiTokens }; }`,
+  `export interface PaletteTokens { ${Object.keys(paletteData.tokens).map(k => `${k}: string`).join('; ')}; }`,
+  `export interface Palette { version: number; default: string; facetGeometry: FacetGeometry[]; presets: Record<string, Preset>; tokens: PaletteTokens; }`,
   ``,
-  `/** Full palette data including named palettes and token map */`,
+  `/** Full palette data including facet geometry, named presets and the legacy flat token map */`,
   `export declare const palette: Palette;`,
   ``,
   ...Object.entries(svgMap).map(([k]) => `/** SVG markup string: ${k} */\nexport declare const ${k}: string;`),
   ``,
   `export interface SubbrandOptions {`,
-  `  /** Named palette from palette.json (default: 'brand-dark') */`,
-  `  palette?: 'brand-dark' | 'brand-light' | 'mono-dark' | 'mono-light' | 'indigo';`,
+  `  /** Named preset from palette.json (default: 'cobalt') */`,
+  `  preset?: ${presetIds.map(id => `'${id}'`).join(' | ')};`,
   `  /** Override the mark and text color (hex) */`,
   `  markColor?: string;`,
   `  /** Explicit background fill color — omit for transparent */`,
   `  bgColor?: string;`,
   `  /** Font size in px (default: 24) */`,
   `  fontSize?: number;`,
-  `  /** Fill background using the palette's background color */`,
+  `  /** Fill background using the preset's dark-mode background color */`,
   `  withBackground?: boolean;`,
   `}`,
   ``,
@@ -148,7 +184,7 @@ const dtsLines = [
   ` *`,
   ` * @example`,
   ` * subbrandLockup('blog')`,
-  ` * subbrandLockup('store', { palette: 'brand-light', bgColor: '#eeeef4' })`,
+  ` * subbrandLockup('store', { preset: 'teal', bgColor: '#0a1415' })`,
   ` */`,
   `export declare function subbrandLockup(text: string, options?: SubbrandOptions): string;`,
 ]
@@ -161,20 +197,22 @@ const toDataUri = svg => `url("data:image/svg+xml,${encodeURIComponent(svg)}")`
 const cssLines = [
   `/* @byehsan/logo — CSS custom properties */`,
   `:root {`,
-  `  /* Brand palette tokens */`,
-  ...Object.entries(TOKENS).map(([k, v]) => `  --color-${k}: ${v};`),
+  `  /* Legacy flat brand tokens */`,
+  ...Object.entries(paletteData.tokens).map(([k, v]) => `  --color-${k}: ${v};`),
   ``,
-  `  /* Default palette (${paletteData.default}) */`,
-  ...Object.entries(DEFAULT_PALETTE).map(([k, v]) => `  --be-${k}: ${v};`),
-  ``,
-  `  /* SVG data URIs */`,
-  ...Object.entries(svgMap).map(([k, v]) => `  --logo-${k}: ${toDataUri(v)};`),
+  `  /* Default preset (${paletteData.default}) — facet gradients + UI tokens (dark mode) */`,
+  ...paletteData.facetGeometry.map(g => `  --be-facet-${g.id}: ${DEFAULT_PALETTE.facets[g.id].light};`),
+  ...Object.entries(DEFAULT_PALETTE.ui.dark).map(([k, v]) => `  --be-ui-dark-${k}: ${v};`),
+  ...Object.entries(DEFAULT_PALETTE.ui.light).map(([k, v]) => `  --be-ui-light-${k}: ${v};`),
   `}`,
   ``,
-  `/* Named palette classes */`,
-  ...Object.entries(paletteData.palettes).map(([id, p]) =>
-    `.be-palette-${id} {\n${Object.entries(p).map(([k, v]) => `  --be-${k}: ${v};`).join('\n')}\n}`
-  ).join('\n'),
+  `/* Named preset classes — facet gradients + light/dark UI token sets */`,
+  ...Object.entries(paletteData.presets).map(([id, p]) => {
+    const facetVars = paletteData.facetGeometry.map(g => `  --be-facet-${g.id}: ${p.facets[g.id].light};`).join('\n')
+    const darkVars = Object.entries(p.ui.dark).map(([k, v]) => `  --be-ui-dark-${k}: ${v};`).join('\n')
+    const lightVars = Object.entries(p.ui.light).map(([k, v]) => `  --be-ui-light-${k}: ${v};`).join('\n')
+    return `.be-preset-${id} {\n${facetVars}\n${darkVars}\n${lightVars}\n}`
+  }),
 ]
 writeFileSync(join(DIST, 'index.css'), cssLines.join('\n'))
 console.log('✓ index.css')
@@ -184,8 +222,8 @@ copyFileSync(join(ROOT, 'states.css'), join(DIST, 'states.css'))
 console.log('✓ states.css')
 
 // ── Favicon generation ────────────────────────────────────────────────────
-// Colour the currentColor SVG with the default mark colour before rasterising
-const faviconSrc = svgMap.base.replace(/currentColor/g, DEFAULT_PALETTE.mark)
+// Colour the currentColor SVG with the default preset's solid colour before rasterising
+const faviconSrc = svgMap.base.replace(/currentColor/g, DEFAULT_PALETTE.solid)
 const tmpSvg = join(DIST, '_favicon-src.svg')
 writeFileSync(tmpSvg, faviconSrc)
 
@@ -233,8 +271,8 @@ const manifest = {
     { src: 'favicons/favicon-192x192.png', sizes: '192x192', type: 'image/png' },
     { src: 'favicons/favicon-512x512.png', sizes: '512x512', type: 'image/png' },
   ],
-  theme_color: DEFAULT_PALETTE.background,
-  background_color: DEFAULT_PALETTE.background,
+  theme_color: DEFAULT_PALETTE.ui.dark.background,
+  background_color: DEFAULT_PALETTE.ui.dark.background,
   display: 'standalone',
 }
 writeFileSync(join(DIST, 'site.webmanifest'), JSON.stringify(manifest, null, 2))

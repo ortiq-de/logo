@@ -1,25 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="512" height="512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 540" width="512" height="512">
   <style>
-    /* warning — one petal pulses stroke-width asymmetrically, 800ms */
-    @keyframes warn-pulse {
-      0%, 100% { stroke-width: 2;   opacity: 1;   }
-      50%       { stroke-width: 3.5; opacity: 0.75; }
+    /* warning — an alert flare chases fast around all six facets, 800ms loop */
+    @keyframes warn-flare {
+      0%, 100% { filter: brightness(1); }
+      50%       { filter: brightness(1.8); }
     }
-    /* p0 pulses — the "raised brow" equivalent */
-    #p0 path { animation: warn-pulse 0.8s ease-in-out infinite; }
-    /* p1 and p2 breathe slightly out of phase */
-    #p1 path { animation: warn-pulse 0.8s ease-in-out 0.26s infinite; opacity: 0.6; }
-    #p2 path { animation: warn-pulse 0.8s ease-in-out 0.53s infinite; opacity: 0.6; }
+    #p0 { animation: warn-flare 0.8s ease-in-out 0s    infinite; }
+    #p1 { animation: warn-flare 0.8s ease-in-out 0.13s infinite; }
+    #p2 { animation: warn-flare 0.8s ease-in-out 0.26s infinite; }
+    #p3 { animation: warn-flare 0.8s ease-in-out 0.39s infinite; }
+    #p4 { animation: warn-flare 0.8s ease-in-out 0.52s infinite; }
+    #p5 { animation: warn-flare 0.8s ease-in-out 0.65s infinite; }
   </style>
-  <g id="mark" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
-    <g id="p0" transform="rotate(0 50 56.67)">
-      <path d="M50,20 Q60,40 40,40 Q60,40 50,70 Q40,40 60,40 Q50,20 50,20 Z"/>
-    </g>
-    <g id="p1" transform="rotate(120 50 56.67)">
-      <path d="M50,20 Q60,40 40,40 Q60,40 50,70 Q40,40 60,40 Q50,20 50,20 Z"/>
-    </g>
-    <g id="p2" transform="rotate(240 50 56.67)">
-      <path d="M50,20 Q60,40 40,40 Q60,40 50,70 Q40,40 60,40 Q50,20 50,20 Z"/>
-    </g>
+  <g id="mark" fill="currentColor">
+    <path id="p0" d="M 270 22 L 484.77 146 L 344.1 227.22 L 270 184.44 Z" opacity="0.53"/>
+    <path id="p1" d="M 484.77 146 L 484.77 394 L 344.1 312.78 L 344.1 227.22 Z" opacity="0.35"/>
+    <path id="p2" d="M 484.77 394 L 270 518 L 270 355.56 L 344.1 312.78 Z" opacity="0.44"/>
+    <path id="p3" d="M 270 518 L 55.23 394 L 195.9 312.78 L 270 355.56 Z" opacity="0.50"/>
+    <path id="p4" d="M 55.23 394 L 55.23 146 L 195.9 227.22 L 195.9 312.78 Z" opacity="0.74"/>
+    <path id="p5" d="M 55.23 146 L 270 22 L 270 184.44 L 195.9 227.22 Z" opacity="0.62"/>
   </g>
 </svg>
