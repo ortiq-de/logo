@@ -2,7 +2,7 @@
 
 Brand asset repository for Ortiq. Six-facet hexagon mark with full state animation system, HTTP error states, lockup templates, favicon set, and CI release pipeline.
 
-**Current version:** v4.0.0
+**Current version:** v4.0.1
 **GH Pages:** https://ortiq-de.github.io/logo/ (interactive facet + UI theme customizer, sub-logo builder)
 **npm:** `@ortiq-de/logo` on GitHub Packages
 
@@ -182,7 +182,7 @@ Favicon HTML:
 - **Tag push (`v*.*.*`):** full release bundle + npm publish
 
 ```bash
-git tag v4.0.0 && git push origin v4.0.0
+git tag v4.0.1 && git push origin v4.0.1
 ```
 
 Release artifacts: zip/tarball with all SVGs, PNGs at 7 sizes, favicon.ico, webmanifest, CJS/ESM/CSS bundles, TypeScript defs, palette.json.
