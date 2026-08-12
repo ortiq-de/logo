@@ -7,7 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="base.svg">
   <link rel="stylesheet" href="states.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@600&family=Fira+Code:wght@600&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg:         #0a0e15;
@@ -140,7 +140,10 @@
     .gen-tab { appearance: none; background: transparent; border: none; color: var(--text); font-family: inherit; font-size: 13px; font-weight: 500; padding: 8px 18px; border-radius: 8px; cursor: pointer; opacity: 0.38; transition: all 0.2s; white-space: nowrap; }
     .gen-tab:hover { opacity: 0.7; background: rgba(255,255,255,0.05); }
     .gen-tab.active { opacity: 1; background: rgba(255,255,255,0.09); }
+    .gen-panel { transition: opacity 0.2s ease, transform 0.2s ease; opacity: 1; transform: translateY(0) scale(1); }
     .gen-panel.hidden { display: none; }
+    .gen-panel.tab-anim-out { opacity: 0; transform: translateY(5px) scale(0.99); }
+    .gen-panel.tab-anim-in { opacity: 0; transform: translateY(-5px) scale(0.99); }
     .field-label { display: block; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; opacity: 0.4; margin-bottom: 8px; }
     .gen-text-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 22px; font-weight: 600; letter-spacing: -0.5px; padding: 11px 16px; transition: border-color 0.2s; }
     .gen-text-input:focus { outline: none; border-color: var(--accent); }
@@ -177,6 +180,28 @@
     .chip.active, .chip:hover { border-color: var(--accent); color: var(--accent); }
     .gen-dl-btn { appearance: none; background: var(--primary); color: var(--bg); border: none; border-radius: 8px; font-family: inherit; font-size: 13px; font-weight: 600; padding: 10px 22px; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; gap: 7px; margin-left: auto; }
     .gen-dl-btn:hover { opacity: 0.85; }
+
+    /* ── Position picker (8-direction) ── */
+    .pos-picker { display: inline-grid; grid-template-columns: repeat(3, 30px); grid-template-rows: repeat(3, 30px); gap: 4px; }
+    .pos-btn { appearance: none; border: 1px solid var(--border); border-radius: 6px; background: transparent; cursor: pointer; color: var(--text); opacity: 0.5; transition: all 0.15s; display: flex; align-items: center; justify-content: center; font-size: 9px; letter-spacing: 0.5px; }
+    .pos-btn:hover { opacity: 0.9; border-color: var(--accent); }
+    .pos-btn.active { opacity: 1; border-color: var(--accent); color: var(--accent); background: rgba(255,255,255,0.06); }
+    .pos-center { border: none; opacity: 0.3; cursor: default; color: var(--text); }
+    .pos-center:hover { opacity: 0.3; border: none; }
+    .pos-center svg { width: 16px; height: 16px; }
+
+    /* ── Size + font controls ── */
+    .gen-size-row { display: flex; gap: 10px; margin-top: 12px; }
+    .gen-size-row .size-field { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .gen-size-row label { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.4; }
+    .gen-num-input, .gen-select {
+      width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px;
+      color: var(--text); font-family: inherit; font-size: 12px; padding: 8px 10px; transition: border-color 0.2s;
+    }
+    .gen-num-input:focus, .gen-select:focus { outline: none; border-color: var(--accent); }
+    .gen-select { cursor: pointer; }
+    .gen-size-reset { font-size: 10px; opacity: 0.4; background: none; border: none; color: var(--text); cursor: pointer; text-decoration: underline; padding: 2px 0; align-self: flex-start; }
+    .gen-size-reset:hover { opacity: 0.8; }
 
     /* ── Install ── */
     .install-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
@@ -303,6 +328,24 @@
               <span class="gen-slider-val" id="tl-font-size-val">24px</span>
             </div>
           </div>
+          <div>
+            <label class="field-label" for="tl-font-family">Font</label>
+            <select class="gen-select" id="tl-font-family">
+              <option value="space-grotesk" selected>Space Grotesk</option>
+              <option value="inter">Inter</option>
+              <option value="system">System UI</option>
+              <option value="serif">Georgia (serif)</option>
+              <option value="mono">Fira Code (mono)</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label">Output size</label>
+            <div class="gen-size-row">
+              <div class="size-field"><label for="tl-width">Width</label><input class="gen-num-input" type="number" id="tl-width" min="40" max="4000" step="1"></div>
+              <div class="size-field"><label for="tl-height">Height</label><input class="gen-num-input" type="number" id="tl-height" min="20" max="2000" step="1"></div>
+            </div>
+            <button class="gen-size-reset" id="tl-size-reset">Reset to auto</button>
+          </div>
           <div class="gen-color-row" style="margin-top:0">
             <label>Background <input type="color" id="tl-bg-color" value="#0a0e15"></label>
             <label><input type="checkbox" id="tl-with-bg"> Include background</label>
@@ -325,9 +368,16 @@
         <div class="sidebar">
           <div>
             <label class="field-label">Placement — indicates association with the main mark</label>
-            <div class="chip-row">
-              <button class="chip active" data-placement="east">East</button>
-              <button class="chip" data-placement="southeast">South-east badge</button>
+            <div class="pos-picker" id="il-pos-picker">
+              <button class="pos-btn" data-placement="nw" title="North-west">NW</button>
+              <button class="pos-btn" data-placement="n" title="North">N</button>
+              <button class="pos-btn" data-placement="ne" title="North-east">NE</button>
+              <button class="pos-btn" data-placement="w" title="West">W</button>
+              <span class="pos-btn pos-center" title="Mark"><svg viewBox="0 0 540 540" fill="currentColor"><path d="M 270 22 L 484.77 146 L 344.1 227.22 L 270 184.44 Z" opacity="0.6"/><path d="M 484.77 146 L 484.77 394 L 344.1 312.78 L 344.1 227.22 Z" opacity="0.4"/><path d="M 484.77 394 L 270 518 L 270 355.56 L 344.1 312.78 Z" opacity="0.5"/><path d="M 270 518 L 55.23 394 L 195.9 312.78 L 270 355.56 Z" opacity="0.55"/><path d="M 55.23 394 L 55.23 146 L 195.9 227.22 L 195.9 312.78 Z" opacity="0.75"/><path d="M 55.23 146 L 270 22 L 270 184.44 L 195.9 227.22 Z" opacity="0.65"/></svg></span>
+              <button class="pos-btn active" data-placement="e" title="East">E</button>
+              <button class="pos-btn" data-placement="sw" title="South-west">SW</button>
+              <button class="pos-btn" data-placement="s" title="South">S</button>
+              <button class="pos-btn" data-placement="se" title="South-east">SE</button>
             </div>
           </div>
           <div>
@@ -348,6 +398,24 @@
               <input class="gen-slider" type="range" id="il-font-size" min="12" max="40" value="24" step="1">
               <span class="gen-slider-val" id="il-font-size-val">24px</span>
             </div>
+          </div>
+          <div>
+            <label class="field-label" for="il-font-family">Font</label>
+            <select class="gen-select" id="il-font-family">
+              <option value="space-grotesk" selected>Space Grotesk</option>
+              <option value="inter">Inter</option>
+              <option value="system">System UI</option>
+              <option value="serif">Georgia (serif)</option>
+              <option value="mono">Fira Code (mono)</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label">Output size</label>
+            <div class="gen-size-row">
+              <div class="size-field"><label for="il-width">Width</label><input class="gen-num-input" type="number" id="il-width" min="40" max="4000" step="1"></div>
+              <div class="size-field"><label for="il-height">Height</label><input class="gen-num-input" type="number" id="il-height" min="20" max="2000" step="1"></div>
+            </div>
+            <button class="gen-size-reset" id="il-size-reset">Reset to auto</button>
           </div>
           <div class="gen-color-row" style="margin-top:0">
             <label>Background <input type="color" id="il-bg-color" value="#0a0e15"></label>
@@ -596,15 +664,21 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 540" width="${size}" height="${size}"><defs>${defs}</defs><g id="mark">${paths}</g></svg>`;
   }
 
-  function singleToneInner(withIds) {
-    return PALETTE.facetGeometry.map(g => {
-      const path = HEX_PATHS.find(p => p.id === g.id);
-      return `<path${withIds ? ` id="${g.id}"` : ''} d="${path.d}" opacity="${g.baseOpacity}"/>`;
+  // Per-facet gradient markup for embedding the mark's full "colored" look in contexts
+  // that need multiple simultaneous copies on the page (each instance needs unique
+  // gradient ids so they don't collide in the document's id namespace).
+  function coloredFacetsMarkup(prefix, withIds) {
+    const defs = HEX_PATHS.map(p => {
+      const light = facetColors[p.id];
+      const dark = shade(light, -22);
+      return `<linearGradient id="${prefix}-grad-${p.id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${light}"/><stop offset="1" stop-color="${dark}"/></linearGradient>`;
     }).join('');
+    const paths = HEX_PATHS.map(p => `<path${withIds ? ` id="${p.id}"` : ''} d="${p.d}" fill="url(#${prefix}-grad-${p.id})"/>`).join('');
+    return `<defs>${defs}</defs>${paths}`;
   }
 
-  function buildSingleToneSVG(size, withIds) {
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 540" width="${size}" height="${size}"><g id="mark" fill="currentColor">${singleToneInner(withIds)}</g></svg>`;
+  function buildColoredMarkSVG(size, prefix, withIds) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 540" width="${size}" height="${size}"><g id="mark">${coloredFacetsMarkup(prefix, withIds)}</g></svg>`;
   }
 
   // ── Download helpers (reused across the customizer, states/http, and the generator) ──
@@ -739,28 +813,28 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     [[120,'120px'],[64,'64px'],[32,'32px'],[16,'16px']].forEach(([size,label]) => {
       const cell = document.createElement('div');
       cell.className = 'mark-cell';
-      cell.innerHTML = `<div class="mark-bg">${buildSingleToneSVG(size, false)}</div><label>${label}</label>`;
+      cell.innerHTML = `<div class="mark-bg">${buildColoredMarkSVG(size, `mg${size}`, false)}</div><label>${label}</label>`;
       wrap.appendChild(cell);
     });
-    document.getElementById('header-mark').innerHTML = singleToneInner(false);
+    document.getElementById('header-mark').innerHTML = coloredFacetsMarkup('hdr', false);
   }
 
   function renderStateCells() {
     ['neutral','loading','success','warning','error','404','500','503','403'].forEach(name => {
       const el = document.getElementById(`cell-${name}`);
       if (!el) return;
-      el.innerHTML = `<g id="mark" fill="currentColor">${singleToneInner(true)}</g>` + (name === '503' ? ZZZ_TEXT : '');
+      el.innerHTML = `<g id="mark">${coloredFacetsMarkup(`st-${name}`, true)}</g>` + (name === '503' ? ZZZ_TEXT : '');
     });
   }
 
   function renderLockupGrid() {
     const wrap = document.getElementById('lockup-grid');
-    const markSvg = `<svg x="0" y="4" width="48" height="48" viewBox="0 0 540 540"><g fill="currentColor">${singleToneInner(false)}</g></svg>`;
+    const markSvg = prefix => `<svg x="0" y="4" width="48" height="48" viewBox="0 0 540 540">${coloredFacetsMarkup(prefix, false)}</svg>`;
     wrap.innerHTML = `
       <div class="lockup-cell">
         <label>Template (text slot guide)</label>
         <svg viewBox="0 0 220 56" width="440" height="112">
-          ${markSvg}
+          ${markSvg('lg1')}
           <line x1="48" y1="4" x2="48" y2="52" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2,2" opacity="0.3"/>
           <line x1="56" y1="4" x2="56" y2="52" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2,2" opacity="0.3"/>
           <rect x="56" y="4" width="160" height="48" fill="none" stroke="currentColor" stroke-width="0.75" stroke-dasharray="3,3" opacity="0.4"/>
@@ -770,7 +844,7 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       <div class="lockup-cell">
         <label>Icon + text template (icon slot guide)</label>
         <svg viewBox="0 0 220 56" width="440" height="112">
-          ${markSvg}
+          ${markSvg('lg2')}
           <line x1="48" y1="4" x2="48" y2="52" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2,2" opacity="0.3"/>
           <line x1="56" y1="4" x2="56" y2="52" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2,2" opacity="0.3"/>
           <rect x="56" y="18" width="20" height="20" fill="none" stroke="currentColor" stroke-width="0.75" stroke-dasharray="3,3" opacity="0.4"/>
@@ -783,7 +857,7 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       <div class="lockup-cell">
         <label>blog — worked example</label>
         <svg viewBox="0 0 220 56" width="440" height="112">
-          ${markSvg}
+          ${markSvg('lg3')}
           <text x="56" y="37" font-family="'Space Grotesk',system-ui,sans-serif" font-size="24" font-weight="600" letter-spacing="-0.5" fill="currentColor">blog</text>
         </svg>
       </div>`;
@@ -915,16 +989,31 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   });
 
   // ── Main tabs: Mark / Text lockup / Icon lockup ──
+  // The mark is the visual anchor across tabs: the preview card stays put and only
+  // crossfades + slides its content, rather than jump-cutting via instant hidden toggle.
+  const MAIN_TAB_PANELS = { mark: 'tab-mark', 'text-lockup': 'tab-text-lockup', 'icon-lockup': 'tab-icon-lockup' };
+  function switchMainTab(target) {
+    const nextEl = document.getElementById(MAIN_TAB_PANELS[target]);
+    const curEl = document.querySelector('.gen-panel:not(.hidden)');
+    if (curEl === nextEl) return;
+    if (target === 'text-lockup') updateTextLockupPreview();
+    if (target === 'icon-lockup') updateIconLockupPreview();
+    if (curEl) {
+      curEl.classList.add('tab-anim-out');
+      setTimeout(() => { curEl.classList.add('hidden'); curEl.classList.remove('tab-anim-out'); }, 200);
+    }
+    nextEl.classList.remove('hidden');
+    nextEl.classList.add('tab-anim-in');
+    // Force layout so the browser registers the "in" starting state before we remove it,
+    // otherwise the transition to the resting state never plays.
+    void nextEl.offsetWidth;
+    requestAnimationFrame(() => nextEl.classList.remove('tab-anim-in'));
+  }
   document.querySelectorAll('#main-tabs .gen-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('#main-tabs .gen-tab').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
-      const target = tab.dataset.maintab;
-      document.getElementById('tab-mark').classList.toggle('hidden', target !== 'mark');
-      document.getElementById('tab-text-lockup').classList.toggle('hidden', target !== 'text-lockup');
-      document.getElementById('tab-icon-lockup').classList.toggle('hidden', target !== 'icon-lockup');
-      if (target === 'text-lockup') updateTextLockupPreview();
-      if (target === 'icon-lockup') updateIconLockupPreview();
+      switchMainTab(tab.dataset.maintab);
     });
   });
 
@@ -945,30 +1034,55 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     } catch (_) { return null; }
   }
 
-  // ── Text lockup tab ──
-  let tlName = 'blog', tlFontSize = 24, tlWithBg = false, tlBgColor = '#0a0e15';
+  // ── Font choices (shared by both lockup tabs) ──
+  const FONT_FAMILIES = {
+    'space-grotesk': "'Space Grotesk',system-ui,sans-serif",
+    'inter':         "'Inter',system-ui,sans-serif",
+    'system':        'system-ui,sans-serif',
+    'serif':         "Georgia,'Times New Roman',serif",
+    'mono':          "'Fira Code','SF Mono',monospace",
+  };
+  const GOOGLE_FONTS_IMPORT = 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600&family=Inter:wght@600&family=Fira+Code:wght@600&display=swap';
+  function needsWebFont(family) { return family === 'space-grotesk' || family === 'inter' || family === 'mono'; }
+  // Canvas rasterization (PNG export) can't reliably wait on an @import webfont, so
+  // downloads fall back to a native stack for any family that would need one.
+  function effectiveFontFamily(family, forPngExport) {
+    return (forPngExport && needsWebFont(family)) ? FONT_FAMILIES.system : FONT_FAMILIES[family];
+  }
 
   function calcLockupW(textStartX, text, fontSize) {
     return Math.ceil(Math.max(220, textStartX + Math.max(60, text.length * fontSize * 0.60 + 8) + 12));
   }
+
+  // ── Text lockup tab ──
+  let tlName = 'blog', tlFontSize = 24, tlFontFamily = 'space-grotesk', tlWithBg = false, tlBgColor = '#0a0e15';
+  let tlWidth = null, tlHeight = null, tlWidthCustom = false, tlHeightCustom = false;
+
+  function tlNaturalSize() {
+    return { w: calcLockupW(56, tlName, tlFontSize), h: 56 };
+  }
   function buildTextLockupSVG(opts) {
     opts = opts || {};
-    const textX = 56, H = 56;
-    const W = calcLockupW(textX, tlName, tlFontSize);
+    const textX = 56;
+    const nat = tlNaturalSize();
+    const W = tlWidthCustom && tlWidth ? tlWidth : nat.w;
+    const H = tlHeightCustom && tlHeight ? tlHeight : nat.h;
     const bl = (28 + tlFontSize * 0.35).toFixed(1);
-    const ff = opts.useSystemFont ? 'system-ui,sans-serif' : "'Space Grotesk',system-ui,sans-serif";
-    const mark = `<svg x="0" y="4" width="48" height="48" viewBox="0 0 540 540"><g fill="${markSolidColor}">${singleToneInner(false)}</g></svg>`;
-    const bg = tlWithBg ? `<rect width="${W}" height="${H}" fill="${tlBgColor}"/>` : '';
+    const ff = effectiveFontFamily(tlFontFamily, opts.useSystemFont);
+    const mark = `<svg x="0" y="4" width="48" height="48" viewBox="0 0 540 540">${coloredFacetsMarkup('tl', false)}</svg>`;
+    const bg = tlWithBg ? `<rect width="${nat.w}" height="${nat.h}" fill="${tlBgColor}"/>` : '';
     const text = tlName
       ? `<text x="${textX}" y="${bl}" font-family="${ff}" font-size="${tlFontSize}" font-weight="600" letter-spacing="-0.5" fill="${markSolidColor}">${xe(tlName)}</text>`
       : '';
-    const wh = opts.forDownload ? ` width="${W}" height="${H}"` : ` width="${W}" height="${H}"`;
-    const fi = (opts.forDownload && !opts.useSystemFont)
-      ? `<style>@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600&amp;display=swap');</style>`
+    const fi = (opts.forDownload && !opts.useSystemFont && needsWebFont(tlFontFamily))
+      ? `<style>@import url('${GOOGLE_FONTS_IMPORT}');</style>`
       : '';
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}"${wh}>${fi}${bg}${mark}${text}</svg>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${nat.w} ${nat.h}" width="${W}" height="${H}">${fi}${bg}${mark}${text}</svg>`;
   }
   function updateTextLockupPreview() {
+    const nat = tlNaturalSize();
+    if (!tlWidthCustom) document.getElementById('tl-width').value = nat.w;
+    if (!tlHeightCustom) document.getElementById('tl-height').value = nat.h;
     document.getElementById('tl-preview').innerHTML = buildTextLockupSVG({});
   }
   document.getElementById('tl-name').addEventListener('input', e => { tlName = e.target.value; updateTextLockupPreview(); });
@@ -976,6 +1090,16 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     tlFontSize = parseInt(e.target.value);
     document.getElementById('tl-font-size-val').textContent = e.target.value + 'px';
     updateTextLockupPreview();
+  });
+  document.getElementById('tl-font-family').addEventListener('change', e => { tlFontFamily = e.target.value; updateTextLockupPreview(); });
+  document.getElementById('tl-width').addEventListener('input', e => {
+    tlWidthCustom = true; tlWidth = parseInt(e.target.value) || tlNaturalSize().w; updateTextLockupPreview();
+  });
+  document.getElementById('tl-height').addEventListener('input', e => {
+    tlHeightCustom = true; tlHeight = parseInt(e.target.value) || tlNaturalSize().h; updateTextLockupPreview();
+  });
+  document.getElementById('tl-size-reset').addEventListener('click', () => {
+    tlWidthCustom = false; tlHeightCustom = false; updateTextLockupPreview();
   });
   document.getElementById('tl-bg-color').addEventListener('input', e => { tlBgColor = e.target.value; updateTextLockupPreview(); });
   document.getElementById('tl-with-bg').addEventListener('change', e => { tlWithBg = e.target.checked; updateTextLockupPreview(); });
@@ -992,50 +1116,98 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   });
   document.getElementById('tl-dl-png-btn').addEventListener('click', () => {
     const name = (tlName || 'logo').replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 32) || 'logo';
-    const W = calcLockupW(56, tlName, tlFontSize) * 3, H = 56 * 3;
+    const nat = tlNaturalSize();
+    const W = (tlWidthCustom && tlWidth) ? tlWidth : nat.w * 3;
+    const H = (tlHeightCustom && tlHeight) ? tlHeight : nat.h * 3;
     downloadPNG(buildTextLockupSVG({ forDownload: true, useSystemFont: true }), W, H, `ortiq-${name}-${W}x${H}.png`,
       () => alert('PNG export failed — try SVG instead.'));
   });
 
   // ── Icon lockup tab ──
-  let ilName = 'blog', ilFontSize = 24, ilWithBg = false, ilBgColor = '#0a0e15';
-  let ilIconInner = null, ilIconVB = '0 0 24 24', ilPlacement = 'east';
+  // 8-direction placement around the mark. The mark itself always sits at a fixed
+  // (IL_MARK_X, IL_MARK_Y) regardless of placement, so switching direction never
+  // shifts the mark — only the icon/badge moves around it.
+  let ilName = 'blog', ilFontSize = 24, ilFontFamily = 'space-grotesk', ilWithBg = false, ilBgColor = '#0a0e15';
+  let ilIconInner = null, ilIconVB = '0 0 24 24', ilPlacement = 'e';
+  let ilWidth = null, ilHeight = null, ilWidthCustom = false, ilHeightCustom = false;
 
-  // East: mark 0-48, 4px gap, icon 52-72 (20×20 @ y=18), 4px gap, text at 76.
-  // South-east: badge backdrop (r=12, center 44,48) overlapping the mark's bottom-right corner, text at 64.
+  const IL_TOPM = 24, IL_BOTM = 24, IL_LEFTM = 24;
+  const IL_MARK_X = IL_LEFTM, IL_MARK_Y = IL_TOPM;
+  const IL_CANVAS_H = IL_TOPM + 48 + IL_BOTM;
+  const IL_MARK_RIGHT = IL_MARK_X + 48, IL_MARK_BOTTOM = IL_MARK_Y + 48;
+  const IL_MARK_CX = IL_MARK_X + 24, IL_MARK_CY = IL_MARK_Y + 24;
+
+  // Corners (ne/se/sw/nw) get a circular badge overlapping the mark's corner.
+  // Edges (n/e/s/w) sit just outside the mark with a small gap, no backdrop.
+  function ilPlacementLayout() {
+    const GAP = 4, ICON = 20, R = 12, BICON = 16;
+    const corners = {
+      ne: { cx: IL_MARK_RIGHT - 4, cy: IL_MARK_Y + 4 },
+      se: { cx: IL_MARK_RIGHT - 4, cy: IL_MARK_BOTTOM - 4 },
+      sw: { cx: IL_MARK_X + 4,     cy: IL_MARK_BOTTOM - 4 },
+      nw: { cx: IL_MARK_X + 4,     cy: IL_MARK_Y + 4 },
+    };
+    if (corners[ilPlacement]) {
+      const { cx, cy } = corners[ilPlacement];
+      const eastSide = ilPlacement === 'ne' || ilPlacement === 'se';
+      return {
+        kind: 'badge', cx, cy, r: R,
+        iconX: cx - BICON / 2, iconY: cy - BICON / 2, iconSize: BICON,
+        textX: eastSide ? cx + R + 8 : IL_MARK_RIGHT + 8,
+      };
+    }
+    const inline = {
+      n: { x: IL_MARK_CX - ICON / 2, y: IL_MARK_Y - GAP - ICON },
+      s: { x: IL_MARK_CX - ICON / 2, y: IL_MARK_BOTTOM + GAP },
+      e: { x: IL_MARK_RIGHT + GAP,   y: IL_MARK_CY - ICON / 2 },
+      w: { x: IL_MARK_X - GAP - ICON, y: IL_MARK_CY - ICON / 2 },
+    };
+    const pos = inline[ilPlacement] || inline.e;
+    return {
+      kind: 'inline', x: pos.x, y: pos.y, size: ICON,
+      textX: ilPlacement === 'e' ? pos.x + ICON + GAP : IL_MARK_RIGHT + 8,
+    };
+  }
   function ilTextX() {
-    if (!ilIconInner) return 56;
-    return ilPlacement === 'southeast' ? 64 : 76;
+    return ilIconInner ? ilPlacementLayout().textX : IL_MARK_RIGHT + 8;
+  }
+  function ilNaturalSize() {
+    return { w: calcLockupW(ilTextX(), ilName, ilFontSize), h: IL_CANVAS_H };
   }
   function buildIconLockupSVG(opts) {
     opts = opts || {};
-    const H = 56;
     const textX = ilTextX();
-    const W = calcLockupW(textX, ilName, ilFontSize);
-    const bl = (28 + ilFontSize * 0.35).toFixed(1);
-    const ff = opts.useSystemFont ? 'system-ui,sans-serif' : "'Space Grotesk',system-ui,sans-serif";
-    const mark = `<svg x="0" y="4" width="48" height="48" viewBox="0 0 540 540"><g fill="${markSolidColor}">${singleToneInner(false)}</g></svg>`;
+    const nat = ilNaturalSize();
+    const W = ilWidthCustom && ilWidth ? ilWidth : nat.w;
+    const H = ilHeightCustom && ilHeight ? ilHeight : nat.h;
+    const bl = (IL_MARK_CY + ilFontSize * 0.35).toFixed(1);
+    const ff = effectiveFontFamily(ilFontFamily, opts.useSystemFont);
+    const mark = `<svg x="${IL_MARK_X}" y="${IL_MARK_Y}" width="48" height="48" viewBox="0 0 540 540">${coloredFacetsMarkup('il', false)}</svg>`;
     let iconEl = '';
     if (ilIconInner) {
-      if (ilPlacement === 'southeast') {
-        const backdrop = `<circle cx="44" cy="48" r="12" fill="${ilWithBg ? ilBgColor : 'var(--bg,#0a0e15)'}" stroke="${markSolidColor}" stroke-width="1" opacity="0.98"/>`;
-        iconEl = `${backdrop}<svg x="36" y="40" width="16" height="16" viewBox="${ilIconVB}" color="${markSolidColor}" fill="none" stroke="${markSolidColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" overflow="visible">${ilIconInner}</svg>`;
+      const L = ilPlacementLayout();
+      if (L.kind === 'badge') {
+        const backdrop = `<circle cx="${L.cx}" cy="${L.cy}" r="${L.r}" fill="${ilWithBg ? ilBgColor : 'var(--bg,#0a0e15)'}" stroke="${markSolidColor}" stroke-width="1" opacity="0.98"/>`;
+        iconEl = `${backdrop}<svg x="${L.iconX}" y="${L.iconY}" width="${L.iconSize}" height="${L.iconSize}" viewBox="${ilIconVB}" color="${markSolidColor}" fill="none" stroke="${markSolidColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" overflow="visible">${ilIconInner}</svg>`;
       } else {
-        iconEl = `<svg x="52" y="18" width="20" height="20" viewBox="${ilIconVB}" color="${markSolidColor}" fill="none" stroke="${markSolidColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" overflow="visible">${ilIconInner}</svg>`;
+        iconEl = `<svg x="${L.x}" y="${L.y}" width="${L.size}" height="${L.size}" viewBox="${ilIconVB}" color="${markSolidColor}" fill="none" stroke="${markSolidColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" overflow="visible">${ilIconInner}</svg>`;
       }
     }
-    const bg = ilWithBg ? `<rect width="${W}" height="${H}" fill="${ilBgColor}"/>` : '';
+    const bg = ilWithBg ? `<rect width="${nat.w}" height="${nat.h}" fill="${ilBgColor}"/>` : '';
     const text = ilName
       ? `<text x="${textX}" y="${bl}" font-family="${ff}" font-size="${ilFontSize}" font-weight="600" letter-spacing="-0.5" fill="${markSolidColor}">${xe(ilName)}</text>`
       : '';
-    const wh = ` width="${W}" height="${H}"`;
-    const fi = (opts.forDownload && !opts.useSystemFont)
-      ? `<style>@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600&amp;display=swap');</style>`
+    const fi = (opts.forDownload && !opts.useSystemFont && needsWebFont(ilFontFamily))
+      ? `<style>@import url('${GOOGLE_FONTS_IMPORT}');</style>`
       : '';
-    // South-east badge order: bg, mark, badge+icon (on top), text. East: bg, mark, icon, text.
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}"${wh}>${fi}${bg}${mark}${iconEl}${text}</svg>`;
+    // Badge placements layer: bg, mark, badge+icon (on top, overlapping the mark), text.
+    // Inline placements layer: bg, mark, icon, text.
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${nat.w} ${nat.h}" width="${W}" height="${H}">${fi}${bg}${mark}${iconEl}${text}</svg>`;
   }
   function updateIconLockupPreview() {
+    const nat = ilNaturalSize();
+    if (!ilWidthCustom) document.getElementById('il-width').value = nat.w;
+    if (!ilHeightCustom) document.getElementById('il-height').value = nat.h;
     document.getElementById('il-preview').innerHTML = buildIconLockupSVG({});
   }
   document.getElementById('il-name').addEventListener('input', e => { ilName = e.target.value; updateIconLockupPreview(); });
@@ -1044,12 +1216,22 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     document.getElementById('il-font-size-val').textContent = e.target.value + 'px';
     updateIconLockupPreview();
   });
+  document.getElementById('il-font-family').addEventListener('change', e => { ilFontFamily = e.target.value; updateIconLockupPreview(); });
+  document.getElementById('il-width').addEventListener('input', e => {
+    ilWidthCustom = true; ilWidth = parseInt(e.target.value) || ilNaturalSize().w; updateIconLockupPreview();
+  });
+  document.getElementById('il-height').addEventListener('input', e => {
+    ilHeightCustom = true; ilHeight = parseInt(e.target.value) || ilNaturalSize().h; updateIconLockupPreview();
+  });
+  document.getElementById('il-size-reset').addEventListener('click', () => {
+    ilWidthCustom = false; ilHeightCustom = false; updateIconLockupPreview();
+  });
   document.getElementById('il-bg-color').addEventListener('input', e => { ilBgColor = e.target.value; updateIconLockupPreview(); });
   document.getElementById('il-with-bg').addEventListener('change', e => { ilWithBg = e.target.checked; updateIconLockupPreview(); });
 
-  document.querySelectorAll('[data-placement]').forEach(c => {
+  document.querySelectorAll('#il-pos-picker .pos-btn[data-placement]').forEach(c => {
     c.addEventListener('click', () => {
-      document.querySelectorAll('[data-placement]').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('#il-pos-picker .pos-btn').forEach(x => x.classList.remove('active'));
       c.classList.add('active');
       ilPlacement = c.dataset.placement;
       updateIconLockupPreview();
@@ -1121,7 +1303,9 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   });
   document.getElementById('il-dl-png-btn').addEventListener('click', () => {
     const name = (ilName || 'logo').replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 32) || 'logo';
-    const W = calcLockupW(ilTextX(), ilName, ilFontSize) * 3, H = 56 * 3;
+    const nat = ilNaturalSize();
+    const W = (ilWidthCustom && ilWidth) ? ilWidth : nat.w * 3;
+    const H = (ilHeightCustom && ilHeight) ? ilHeight : nat.h * 3;
     downloadPNG(buildIconLockupSVG({ forDownload: true, useSystemFont: true }), W, H, `ortiq-${name}-${W}x${H}.png`,
       () => alert('PNG export failed — try SVG instead.'));
   });
