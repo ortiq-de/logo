@@ -4,18 +4,10 @@ on:
   push:
     tags:
       - 'v*.*.*'
-    branches:
-      - main
-  workflow_dispatch:
-    inputs:
-      version_tag:
-        description: 'Version tag to release (e.g. v2.4.0)'
-        required: true
-        default: 'v2.4.0'
 
 jobs:
 
-  # ── Validate SVGs on every push ──────────────────────────────────────────
+  # ── Validate SVGs ─────────────────────────────────────────────────────────
   validate:
     name: Validate SVGs
     runs-on: ubuntu-latest
@@ -30,33 +22,11 @@ jobs:
             xmllint --noout "$f" || exit 1
           done
 
-  # ── Deploy GitHub Pages on every push to main ────────────────────────────
-  pages:
-    name: Deploy GitHub Pages
-    runs-on: ubuntu-latest
-    needs: validate
-    if: github.ref == 'refs/heads/main'
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v4
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: '.'
-      - id: deploy
-        uses: actions/deploy-pages@v4
-
-  # ── Build release bundle + publish npm on tags ───────────────────────────
+  # ── Build release bundle + publish npm ───────────────────────────────────
   bundle:
     name: Build & Release Bundle
     runs-on: ubuntu-latest
     needs: validate
-    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     permissions:
       contents: write
       packages: write
@@ -81,7 +51,7 @@ jobs:
 
       - name: Create release archives
         run: |
-          VERSION=${GITHUB_REF_NAME:-${{ inputs.version_tag }}}
+          VERSION=${GITHUB_REF_NAME}
           zip -r "byehsan-logo-${VERSION}.zip" dist/
           tar -czf "byehsan-logo-${VERSION}.tar.gz" dist/
 
@@ -91,17 +61,16 @@ jobs:
           files: |
             byehsan-logo-*.zip
             byehsan-logo-*.tar.gz
-          tag_name: ${{ github.ref_name || inputs.version_tag }}
           generate_release_notes: true
           body: |
-            ## byEhsan Logo Bundle ${{ github.ref_name || inputs.version_tag }}
+            ## byEhsan Logo Bundle ${{ github.ref_name }}
 
             **GitHub Pages:** https://byehsan.github.io/logo/
 
             ### Artifacts in this release
             | File | Contents |
             |------|----------|
-            | `byehsan-logo-${{ github.ref_name || inputs.version_tag }}.zip` | Full bundle |
+            | `byehsan-logo-${{ github.ref_name }}.zip` | Full bundle |
             | `dist/index.js` | CJS module |
             | `dist/index.esm.js` | ES module |
             | `dist/index.d.ts` | TypeScript definitions |
@@ -135,7 +104,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update package version
-        run: npm version ${{ github.ref_name || inputs.version_tag }} --no-git-tag-version --allow-same-version
+        run: npm version ${{ github.ref_name }} --no-git-tag-version --allow-same-version
 
       - name: Publish to GitHub Packages
         run: npm publish --access public

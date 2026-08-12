@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 56" width="440" height="112">
+  <!-- Mark area (48×48 at y=4) -->
+  <svg x="0" y="4" width="48" height="48" viewBox="0 0 540 540">
+    <g fill="currentColor">
+      <path d="M 270 22 L 484.77 146 L 344.1 227.22 L 270 184.44 Z" opacity="0.53"/>
+      <path d="M 484.77 146 L 484.77 394 L 344.1 312.78 L 344.1 227.22 Z" opacity="0.35"/>
+      <path d="M 484.77 394 L 270 518 L 270 355.56 L 344.1 312.78 Z" opacity="0.44"/>
+      <path d="M 270 518 L 55.23 394 L 195.9 312.78 L 270 355.56 Z" opacity="0.50"/>
+      <path d="M 55.23 394 L 55.23 146 L 195.9 227.22 L 195.9 312.78 Z" opacity="0.74"/>
+      <path d="M 55.23 146 L 270 22 L 270 184.44 L 195.9 227.22 Z" opacity="0.62"/>
+    </g>
+  </svg>
+  <!-- Gap guides (8px gap: x=48 to x=56) -->
+  <line x1="48" y1="4" x2="48" y2="52" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2,2" opacity="0.3"/>
+  <line x1="56" y1="4" x2="56" y2="52" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2,2" opacity="0.3"/>
+  <!-- Icon slot (20×20 at x=56, y=18 — vertically centred in the 56px container) -->
+  <rect x="56" y="18" width="20" height="20" fill="none" stroke="currentColor" stroke-width="0.75" stroke-dasharray="3,3" opacity="0.4"/>
+  <text x="57.5" y="30" font-family="'Space Grotesk',system-ui,sans-serif" font-size="5" fill="currentColor" opacity="0.35">ICON</text>
+  <!-- Gap between icon and text (4px: x=76 to x=80) -->
+  <line x1="80" y1="4" x2="80" y2="52" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2,2" opacity="0.2"/>
+  <!-- Text slot (x=80 baseline y=37) -->
+  <rect x="80" y="4" width="136" height="48" fill="none" stroke="currentColor" stroke-width="0.75" stroke-dasharray="3,3" opacity="0.4"/>
+  <text x="84" y="36" font-family="'Space Grotesk',system-ui,sans-serif" font-size="10" fill="currentColor" opacity="0.35">SUB-BRAND SLOT</text>
+</svg>

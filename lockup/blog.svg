@@ -15,10 +15,10 @@
     </g>
   </svg>
 
-  <!-- Gap: 16px (x=48 to x=64) -->
+  <!-- Gap: 8px (x=48 to x=56) -->
 
   <!-- Sub-brand text — baseline at y=37, cap-height ~24px -->
-  <text x="64" y="37"
+  <text x="56" y="37"
         font-family="'Space Grotesk', system-ui, sans-serif"
         font-size="24" font-weight="600" letter-spacing="-0.5"
         fill="currentColor">blog</text>

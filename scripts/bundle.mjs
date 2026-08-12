@@ -79,8 +79,9 @@ const SVG_FILES = [
   { key: 'http500',        path: 'http/500.svg' },
   { key: 'http503',        path: 'http/503.svg' },
   { key: 'http403',        path: 'http/403.svg' },
-  { key: 'lockupTemplate', path: 'lockup/template.svg' },
-  { key: 'lockupBlog',     path: 'lockup/blog.svg' },
+  { key: 'lockupTemplate',     path: 'lockup/template.svg' },
+  { key: 'lockupBlog',         path: 'lockup/blog.svg' },
+  { key: 'lockupIconTemplate', path: 'lockup/icon-template.svg' },
 ]
 
 const svgMap = {}
@@ -95,46 +96,49 @@ for (const { key, path } of SVG_FILES) {
   console.log(`✓ loaded ${path}`)
 }
 
-// ── subbrandLockup function ───────────────────────────────────────────────
+// ── Lockup utility source ─────────────────────────────────────────────────
 // Shared implementation injected into both CJS and ESM bundles.
 // The hexagon mark is single-tone (six facets at fixed opacity, matching
-// base.svg) since a lockup needs one flat color, not a 6-stop gradient.
-const HEX_PATHS_JSON = JSON.stringify(
-  paletteData.facetGeometry.map(g => {
-    const path = svgMap.base.match(new RegExp(`id="${g.id}" d="([^"]+)"`))
-    return { d: path[1], op: g.baseOpacity }
-  })
-)
-const PRESETS_JSON = JSON.stringify(paletteData.presets)
+// base.svg) since a lockup needs one flat color — themed via currentColor,
+// same contract as createTextLockup/createIconLockup always had.
+// Slot layout: mark 0-48, 8px gap, icon 56-76 (20×20 @ y=18), 4px gap, text.
+const HEX_PATHS = paletteData.facetGeometry.map(g => {
+  const path = svgMap.base.match(new RegExp(`id="${g.id}" d="([^"]+)"`))
+  return { d: path[1], op: g.baseOpacity }
+})
+const MARK_INNER = `<svg x="0" y="4" width="48" height="48" viewBox="0 0 540 540"><g fill="currentColor">${
+  HEX_PATHS.map(p => `<path d="${p.d}" opacity="${p.op}"/>`).join('')
+}</g></svg>`
 
-const subbrandFn = `
-function _xe(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-var _hp=${HEX_PATHS_JSON};
-var _pp=${PRESETS_JSON};
-function _mark(color){return _hp.map(function(p){return '<path d="'+p.d+'" opacity="'+p.op+'"/>';}).join('');}
-function subbrandLockup(text,opts){
-  opts=opts||{};
-  var p=_pp[opts.preset||'cobalt']||_pp['cobalt'];
-  var mc=opts.markColor||p.solid;
-  var fs=Number(opts.fontSize)||24;
-  var W=Math.ceil(Math.max(220,64+Math.max(60,String(text).length*fs*0.6+8)+12));
-  var bl=(28+fs*0.35).toFixed(1);
-  var bg=opts.bgColor?'<rect width="'+W+'" height="56" fill="'+_xe(opts.bgColor)+'"/>':(opts.withBackground?'<rect width="'+W+'" height="56" fill="'+_xe((p.ui&&p.ui.dark&&p.ui.dark.background)||'transparent')+'"/>':'');
-  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' 56">'
-    +bg
-    +'<svg x="0" y="4" width="48" height="48" viewBox="0 0 540 540"><g fill="'+_xe(mc)+'">'+_mark(mc)+'</g></svg>'
-    +'<text x="64" y="'+bl+'" font-family="\\'Space Grotesk\\',system-ui,sans-serif" font-size="'+fs+'" font-weight="600" letter-spacing="-0.5" fill="'+_xe(mc)+'">'+_xe(text)+'</text>'
-    +'</svg>';
+// Use JSON.stringify for string literals so quoting is always correct
+const _svgOpen  = JSON.stringify('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 56">')
+const _svgClose = JSON.stringify('</svg>')
+const _markStr  = JSON.stringify(MARK_INNER)
+const _tx56     = JSON.stringify('<text x="56" y="37" font-family="\'Space Grotesk\',system-ui,sans-serif" font-size="24" font-weight="600" letter-spacing="-0.5" fill="currentColor">')
+const _tx80     = JSON.stringify('<text x="80" y="37" font-family="\'Space Grotesk\',system-ui,sans-serif" font-size="24" font-weight="600" letter-spacing="-0.5" fill="currentColor">')
+const _txClose  = JSON.stringify('</text>')
+
+const LOCKUP_FN_SRC = `
+var _be_mark=${_markStr};
+var _be_svgo=${_svgOpen};
+var _be_svgc=${_svgClose};
+var _be_tx56=${_tx56};
+var _be_tx80=${_tx80};
+var _be_txc=${_txClose};
+function createTextLockup(subBrand) {
+  return _be_svgo + _be_mark + _be_tx56 + subBrand + _be_txc + _be_svgc;
 }
-`.trim()
+function createIconLockup(subBrand, iconSvg) {
+  return _be_svgo + _be_mark + iconSvg + _be_tx80 + subBrand + _be_txc + _be_svgc;
+}`
 
 // ── CJS bundle ────────────────────────────────────────────────────────────
 const cjsLines = [
   `'use strict';`,
   `const palette = ${JSON.stringify(paletteData, null, 2)};`,
   ...Object.entries(svgMap).map(([k, v]) => `const ${k} = ${JSON.stringify(v)};`),
-  subbrandFn,
-  `module.exports = { palette, ${Object.keys(svgMap).join(', ')}, subbrandLockup };`,
+  LOCKUP_FN_SRC,
+  `module.exports = { palette, ${Object.keys(svgMap).join(', ')}, createTextLockup, createIconLockup };`,
 ]
 writeFileSync(join(DIST, 'index.js'), cjsLines.join('\n'))
 console.log('✓ index.js (CJS)')
@@ -143,13 +147,12 @@ console.log('✓ index.js (CJS)')
 const esmLines = [
   `export const palette = ${JSON.stringify(paletteData, null, 2)};`,
   ...Object.entries(svgMap).map(([k, v]) => `export const ${k} = ${JSON.stringify(v)};`),
-  subbrandFn.replace('function subbrandLockup', 'export function subbrandLockup'),
+  LOCKUP_FN_SRC.replace(/^function /gm, 'export function '),
 ]
 writeFileSync(join(DIST, 'index.esm.js'), esmLines.join('\n'))
 console.log('✓ index.esm.js (ESM)')
 
 // ── TypeScript definitions ────────────────────────────────────────────────
-const presetIds = Object.keys(paletteData.presets)
 const dtsLines = [
   `// @byehsan/logo — TypeScript definitions`,
   ``,
@@ -165,28 +168,12 @@ const dtsLines = [
   ``,
   ...Object.entries(svgMap).map(([k]) => `/** SVG markup string: ${k} */\nexport declare const ${k}: string;`),
   ``,
-  `export interface SubbrandOptions {`,
-  `  /** Named preset from palette.json (default: 'cobalt') */`,
-  `  preset?: ${presetIds.map(id => `'${id}'`).join(' | ')};`,
-  `  /** Override the mark and text color (hex) */`,
-  `  markColor?: string;`,
-  `  /** Explicit background fill color — omit for transparent */`,
-  `  bgColor?: string;`,
-  `  /** Font size in px (default: 24) */`,
-  `  fontSize?: number;`,
-  `  /** Fill background using the preset's dark-mode background color */`,
-  `  withBackground?: boolean;`,
-  `}`,
+  `/** Generate a text-only lockup SVG string. Themed via currentColor. */`,
+  `export declare function createTextLockup(subBrand: string): string;`,
   ``,
-  `/**`,
-  ` * Generate a sub-brand lockup SVG string.`,
-  ` * Returns transparent SVG by default — pass bgColor or withBackground to fill.`,
-  ` *`,
-  ` * @example`,
-  ` * subbrandLockup('blog')`,
-  ` * subbrandLockup('store', { preset: 'teal', bgColor: '#0a1415' })`,
-  ` */`,
-  `export declare function subbrandLockup(text: string, options?: SubbrandOptions): string;`,
+  `/** Generate an icon+text lockup SVG string. iconSvg should be a <svg> element string */`,
+  `/** positioned at x=56, y=18, width=20, height=20 in the 220×56 viewBox. */`,
+  `export declare function createIconLockup(subBrand: string, iconSvg: string): string;`,
 ]
 writeFileSync(join(DIST, 'index.d.ts'), dtsLines.join('\n'))
 console.log('✓ index.d.ts (TypeScript)')

@@ -3,7 +3,7 @@
 Brand asset repository for byEhsan. Six-facet hexagon mark with full state animation system, HTTP error states, lockup templates, favicon set, and CI release pipeline.
 
 **Current version:** v3.0.0
-**GH Pages:** https://byehsan.github.io/logo/ (interactive palette + UI theme customizer)
+**GH Pages:** https://byehsan.github.io/logo/ (interactive facet + UI theme customizer, sub-logo builder)
 **npm:** `@byehsan/logo` on GitHub Packages
 
 ## File tree
@@ -29,10 +29,11 @@ http/
   403.svg                   appears → tries (flushes) → refused → collapses to nothing — 2.8s loop
 
 lockup/
-  template.svg              mark (48×48) + 16px gap + dashed slot guide
+  template.svg              mark (48×48) + 8px gap + dashed text slot guide
+  icon-template.svg         mark + 20×20 icon slot (x=56,y=18) + text slot (x=80)
   blog.svg                  worked example: "blog" sub-brand
 
-index.html                  GH Pages site — interactive facet + UI theme customizer, all states live
+index.html                  GH Pages site — facet + UI theme customizer, states, sub-logo builder
 preview.html                static offline snapshot (Cobalt palette, no JS)
 states.css                  class-driven Option B stylesheet (.state-loading etc.) + light/dark glow/shadow
 palette.json                facet geometry + named presets (facets + light/dark UI tokens) + legacy token map
@@ -109,23 +110,51 @@ npm install @byehsan/logo
 ```js
 import { base, stateLoading, http404, palette } from '@byehsan/logo'
 import '@byehsan/logo/css'
+
+// Programmatic lockup generation (v2.4.0+)
+import { createTextLockup, createIconLockup } from '@byehsan/logo'
+
+const blogSvg = createTextLockup('blog')           // returns SVG string
+const gitSvg  = createIconLockup('git', iconSvg)  // iconSvg = <svg x=56 y=18 w=20 h=20 ...>
 ```
 
 ## Lockup system
 
 ```
-Mark area:  x=0,  y=0, w=48, h=56  (mark at y+4, 48×48)
-Gap:        16px  (x=48 to x=64)
-Slot:       x=64, baseline y=37, Space Grotesk 600 24px, letter-spacing -0.5
+Mark area:   x=0,  y=0,  w=48, h=56   (mark at y+4, 48×48)
+Gap:         8px   (x=48 to x=56)
+Text slot:   x=56, baseline y=37, Space Grotesk 600 24px, letter-spacing -0.5
+Icon slot:   x=56, y=18, w=20, h=20   (vertically centred in 56px container)
+Text+icon:   icon at x=56,y=18; text x=80,y=37
 ```
 
-Add a sub-brand:
+Text-only lockup:
 ```xml
-<text x="64" y="37"
+<text x="56" y="37"
       font-family="'Space Grotesk', system-ui, sans-serif"
       font-size="24" font-weight="600" letter-spacing="-0.5"
       fill="currentColor">sub-brand</text>
 ```
+
+Icon + text lockup (icon slot is 20×20 at x=56,y=18, text starts at x=80):
+```xml
+<svg x="56" y="18" width="20" height="20" viewBox="0 0 24 24"
+     fill="none" stroke="currentColor" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- icon paths -->
+</svg>
+<text x="80" y="37" font-family="'Space Grotesk',system-ui,sans-serif"
+      font-size="24" font-weight="600" letter-spacing="-0.5"
+      fill="currentColor">sub-brand</text>
+```
+
+## GH Pages — Sub-brand logo generator
+
+The interactive generator at https://byehsan.github.io/logo/ lets designers:
+- Type a sub-brand name, tune font size, toggle a background fill
+- Add an icon: pick one of 8 presets (git/globe/home/code/star/mail/rss/docs), upload an SVG file, or paste custom SVG code
+- Apply any of the six mark presets, or set an explicit mark/background color
+- Live preview updates instantly; download as SVG or PNG at ½×/1×/2×/4× scale, or copy the SVG source
 
 ## Favicon artifacts (in dist/ after build)
 
