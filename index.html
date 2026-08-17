@@ -290,7 +290,7 @@
 
     <div class="customizer">
       <div class="preview-card" id="shared-preview-card">
-        <div id="shared-preview"></div>
+        <div id="shared-preview" class="gen-panel"></div>
       </div>
 
       <div class="wizard" id="wizard">
@@ -759,6 +759,22 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     </g>`;
   }
 
+  // Lockup canvases (Text/Icon lockup) only apply margin vertically, so a dashed square
+  // (which assumes equal padding on all four sides) would be misleading — just dimension
+  // lines along the left/bottom edges plus a "{w}×{h}px" label.
+  function buildLockupSizeMarksOverlay(w, h, color) {
+    const c = color || 'currentColor';
+    const pad = 3, tick = 6;
+    const label = `${w} × ${h}px`;
+    return `<g class="size-marks" fill="none" stroke="${c}" opacity="0.65">
+      <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${h - pad}" stroke-width="1"/>
+      <line x1="${pad - tick / 2}" y1="${pad}" x2="${pad + tick / 2}" y2="${pad}" stroke-width="1"/>
+      <line x1="${pad - tick / 2}" y1="${h - pad}" x2="${pad + tick / 2}" y2="${h - pad}" stroke-width="1"/>
+      <text x="${pad + 4}" y="${h - pad - 4}" font-family="'Fira Code','SF Mono',monospace"
+            font-size="8" fill="${c}" stroke="none" opacity="0.9">${label}</text>
+    </g>`;
+  }
+
   function buildMarkSVG(opts) {
     opts = opts || {};
     const size = opts.size != null ? opts.size : exportSize;
@@ -982,10 +998,10 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       el.innerHTML = buildMarkSVG({ size: 260, withSizeMarks: showSizeMarks, marksColor: 'currentColor' });
     } else if (activeStep === 2) {
       tlSyncSizeInputs();
-      el.innerHTML = buildTextLockupSVG({});
+      el.innerHTML = buildTextLockupSVG({ withSizeMarks: showSizeMarks, marksColor: 'currentColor' });
     } else {
       ilSyncSizeInputs();
-      el.innerHTML = buildIconLockupSVG({});
+      el.innerHTML = buildIconLockupSVG({ withSizeMarks: showSizeMarks, marksColor: 'currentColor' });
     }
   }
 
@@ -1179,7 +1195,15 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     // otherwise the transition to the resting state never plays.
     void nextBody.offsetWidth;
     requestAnimationFrame(() => nextBody.classList.remove('tab-anim-in'));
+
+    // Crossfade the shared preview's content in sync with the step-body transition,
+    // instead of the old content just jump-cutting to the new one instantly.
+    const sp = document.getElementById('shared-preview');
     renderAll();
+    sp.classList.add('tab-anim-in');
+    void sp.offsetWidth;
+    requestAnimationFrame(() => sp.classList.remove('tab-anim-in'));
+
     persist();
   }
   // Boot-only: apply the restored step's expanded/collapsed classes instantly, with no
@@ -1245,8 +1269,13 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   let tlName = 'blog', tlFontSize = 24, tlFontFamily = 'space-grotesk', tlWithBg = false, tlBgColor = '#0a0e15';
   let tlWidth = null, tlHeight = null, tlWidthCustom = false, tlHeightCustom = false;
 
+  // Vertical padding around the mark uses the same shared `margin` control as Step 1, so
+  // the lockup's canvas height is never an independent, disconnected number — it's always
+  // 48 (mark) + 2×margin, matching the convention Step 1 established.
+  function tlMarkY() { return margin; }
+  function tlCanvasH() { return round2(48 + 2 * margin); }
   function tlNaturalSize() {
-    return { w: calcLockupW(56, tlName, tlFontSize), h: 56 };
+    return { w: calcLockupW(56, tlName, tlFontSize), h: tlCanvasH() };
   }
   function buildTextLockupSVG(opts) {
     opts = opts || {};
@@ -1254,17 +1283,19 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     const nat = tlNaturalSize();
     const W = tlWidthCustom && tlWidth ? tlWidth : nat.w;
     const H = tlHeightCustom && tlHeight ? tlHeight : nat.h;
-    const bl = (28 + tlFontSize * 0.35).toFixed(1);
+    const markY = tlMarkY();
+    const bl = (markY + 24 + tlFontSize * 0.35).toFixed(1);
     const ff = effectiveFontFamily(tlFontFamily, opts.useSystemFont);
-    const mark = `<svg x="0" y="4" width="48" height="48" viewBox="0 0 540 540">${coloredFacetsMarkup('tl', false)}</svg>`;
+    const mark = `<svg x="0" y="${markY}" width="48" height="48" viewBox="0 0 540 540">${coloredFacetsMarkup('tl', false)}</svg>`;
     const bg = tlWithBg ? `<rect width="${nat.w}" height="${nat.h}" fill="${tlBgColor}"/>` : '';
     const text = tlName
       ? `<text x="${textX}" y="${bl}" font-family="${ff}" font-size="${tlFontSize}" font-weight="600" letter-spacing="-0.5" fill="${markSolidColor}">${xe(tlName)}</text>`
       : '';
+    const marks = opts.withSizeMarks ? buildLockupSizeMarksOverlay(nat.w, nat.h, opts.marksColor || 'currentColor') : '';
     const fi = (opts.forDownload && !opts.useSystemFont && needsWebFont(tlFontFamily))
       ? `<style>@import url('${GOOGLE_FONTS_IMPORT}');</style>`
       : '';
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${nat.w} ${nat.h}" width="${W}" height="${H}">${fi}${bg}${mark}${text}</svg>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${nat.w} ${nat.h}" width="${W}" height="${H}">${fi}${bg}${mark}${text}${marks}</svg>`;
   }
   // Syncs the width/height number inputs to the natural computed size (unless the user has
   // set a custom override); called by renderPreview() whenever step 2 is the active step.
@@ -1292,7 +1323,7 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   document.getElementById('tl-bg-color').addEventListener('input', e => { tlBgColor = e.target.value; renderAll(); });
   document.getElementById('tl-with-bg').addEventListener('change', e => { tlWithBg = e.target.checked; renderAll(); });
   document.getElementById('tl-copy-btn').addEventListener('click', () => {
-    navigator.clipboard.writeText(buildTextLockupSVG({})).then(() => {
+    navigator.clipboard.writeText(buildTextLockupSVG({ withSizeMarks: includeSizeMarksInExport, marksColor: SIZE_MARKS_EXPORT_COLOR })).then(() => {
       const btn = document.getElementById('tl-copy-btn');
       const t = btn.textContent; btn.textContent = 'Copied!'; btn.classList.add('copied');
       setTimeout(() => { btn.textContent = t; btn.classList.remove('copied'); }, 1500);
@@ -1300,40 +1331,51 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   });
   document.getElementById('tl-dl-svg-btn').addEventListener('click', () => {
     const name = (tlName || 'logo').replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 32) || 'logo';
-    downloadSVG(buildTextLockupSVG({ forDownload: true }), `ortiq-${name}.svg`);
+    downloadSVG(buildTextLockupSVG({ forDownload: true, withSizeMarks: includeSizeMarksInExport, marksColor: SIZE_MARKS_EXPORT_COLOR }), `ortiq-${name}.svg`);
   });
   document.getElementById('tl-dl-png-btn').addEventListener('click', () => {
     const name = (tlName || 'logo').replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 32) || 'logo';
     const nat = tlNaturalSize();
     const W = (tlWidthCustom && tlWidth) ? tlWidth : nat.w * 3;
     const H = (tlHeightCustom && tlHeight) ? tlHeight : nat.h * 3;
-    downloadPNG(buildTextLockupSVG({ forDownload: true, useSystemFont: true }), W, H, `ortiq-${name}-${W}x${H}.png`,
+    downloadPNG(buildTextLockupSVG({ forDownload: true, useSystemFont: true, withSizeMarks: includeSizeMarksInExport, marksColor: SIZE_MARKS_EXPORT_COLOR }), W, H, `ortiq-${name}-${W}x${H}.png`,
       () => alert('PNG export failed — try SVG instead.'));
   });
 
   // ── Icon lockup tab ──
   // 8-direction placement around the mark. The mark itself always sits at a fixed
-  // (IL_MARK_X, IL_MARK_Y) regardless of placement, so switching direction never
-  // shifts the mark — only the icon/badge moves around it.
+  // offset regardless of placement, so switching direction never shifts the mark —
+  // only the icon/badge moves around it.
   let ilName = 'blog', ilFontSize = 24, ilFontFamily = 'space-grotesk', ilWithBg = false, ilBgColor = '#0a0e15';
   let ilIconInner = null, ilIconVB = '0 0 24 24', ilPlacement = 'e';
   let ilWidth = null, ilHeight = null, ilWidthCustom = false, ilHeightCustom = false;
 
-  const IL_TOPM = 24, IL_BOTM = 24, IL_LEFTM = 24;
-  const IL_MARK_X = IL_LEFTM, IL_MARK_Y = IL_TOPM;
-  const IL_CANVAS_H = IL_TOPM + 48 + IL_BOTM;
-  const IL_MARK_RIGHT = IL_MARK_X + 48, IL_MARK_BOTTOM = IL_MARK_Y + 48;
-  const IL_MARK_CX = IL_MARK_X + 24, IL_MARK_CY = IL_MARK_Y + 24;
+  // Padding around the mark uses the same shared `margin` control as Step 1, floored at 24
+  // — the minimum clearance an inline icon or corner badge needs on any side to avoid
+  // clipping — so a small margin never breaks placement, but a larger one still grows the
+  // canvas to match, same convention as Step 1 and the Text lockup canvas.
+  function ilGeom() {
+    const pad = Math.max(margin, 24);
+    const markX = pad, markY = pad;
+    const markRight = markX + 48, markBottom = markY + 48;
+    return {
+      pad, markX, markY,
+      canvasH: round2(pad + 48 + pad),
+      markRight, markBottom,
+      markCx: markX + 24, markCy: markY + 24,
+    };
+  }
 
   // Corners (ne/se/sw/nw) get a circular badge overlapping the mark's corner.
   // Edges (n/e/s/w) sit just outside the mark with a small gap, no backdrop.
   function ilPlacementLayout() {
+    const g = ilGeom();
     const GAP = 4, ICON = 20, R = 12, BICON = 16;
     const corners = {
-      ne: { cx: IL_MARK_RIGHT - 4, cy: IL_MARK_Y + 4 },
-      se: { cx: IL_MARK_RIGHT - 4, cy: IL_MARK_BOTTOM - 4 },
-      sw: { cx: IL_MARK_X + 4,     cy: IL_MARK_BOTTOM - 4 },
-      nw: { cx: IL_MARK_X + 4,     cy: IL_MARK_Y + 4 },
+      ne: { cx: g.markRight - 4, cy: g.markY + 4 },
+      se: { cx: g.markRight - 4, cy: g.markBottom - 4 },
+      sw: { cx: g.markX + 4,     cy: g.markBottom - 4 },
+      nw: { cx: g.markX + 4,     cy: g.markY + 4 },
     };
     if (corners[ilPlacement]) {
       const { cx, cy } = corners[ilPlacement];
@@ -1341,36 +1383,37 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       return {
         kind: 'badge', cx, cy, r: R,
         iconX: cx - BICON / 2, iconY: cy - BICON / 2, iconSize: BICON,
-        textX: eastSide ? cx + R + 8 : IL_MARK_RIGHT + 8,
+        textX: eastSide ? cx + R + 8 : g.markRight + 8,
       };
     }
     const inline = {
-      n: { x: IL_MARK_CX - ICON / 2, y: IL_MARK_Y - GAP - ICON },
-      s: { x: IL_MARK_CX - ICON / 2, y: IL_MARK_BOTTOM + GAP },
-      e: { x: IL_MARK_RIGHT + GAP,   y: IL_MARK_CY - ICON / 2 },
-      w: { x: IL_MARK_X - GAP - ICON, y: IL_MARK_CY - ICON / 2 },
+      n: { x: g.markCx - ICON / 2, y: g.markY - GAP - ICON },
+      s: { x: g.markCx - ICON / 2, y: g.markBottom + GAP },
+      e: { x: g.markRight + GAP,   y: g.markCy - ICON / 2 },
+      w: { x: g.markX - GAP - ICON, y: g.markCy - ICON / 2 },
     };
     const pos = inline[ilPlacement] || inline.e;
     return {
       kind: 'inline', x: pos.x, y: pos.y, size: ICON,
-      textX: ilPlacement === 'e' ? pos.x + ICON + GAP : IL_MARK_RIGHT + 8,
+      textX: ilPlacement === 'e' ? pos.x + ICON + GAP : g.markRight + 8,
     };
   }
   function ilTextX() {
-    return ilIconInner ? ilPlacementLayout().textX : IL_MARK_RIGHT + 8;
+    return ilIconInner ? ilPlacementLayout().textX : ilGeom().markRight + 8;
   }
   function ilNaturalSize() {
-    return { w: calcLockupW(ilTextX(), ilName, ilFontSize), h: IL_CANVAS_H };
+    return { w: calcLockupW(ilTextX(), ilName, ilFontSize), h: ilGeom().canvasH };
   }
   function buildIconLockupSVG(opts) {
     opts = opts || {};
+    const g = ilGeom();
     const textX = ilTextX();
     const nat = ilNaturalSize();
     const W = ilWidthCustom && ilWidth ? ilWidth : nat.w;
     const H = ilHeightCustom && ilHeight ? ilHeight : nat.h;
-    const bl = (IL_MARK_CY + ilFontSize * 0.35).toFixed(1);
+    const bl = (g.markCy + ilFontSize * 0.35).toFixed(1);
     const ff = effectiveFontFamily(ilFontFamily, opts.useSystemFont);
-    const mark = `<svg x="${IL_MARK_X}" y="${IL_MARK_Y}" width="48" height="48" viewBox="0 0 540 540">${coloredFacetsMarkup('il', false)}</svg>`;
+    const mark = `<svg x="${g.markX}" y="${g.markY}" width="48" height="48" viewBox="0 0 540 540">${coloredFacetsMarkup('il', false)}</svg>`;
     let iconEl = '';
     if (ilIconInner) {
       const L = ilPlacementLayout();
@@ -1388,9 +1431,10 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     const fi = (opts.forDownload && !opts.useSystemFont && needsWebFont(ilFontFamily))
       ? `<style>@import url('${GOOGLE_FONTS_IMPORT}');</style>`
       : '';
+    const marks = opts.withSizeMarks ? buildLockupSizeMarksOverlay(nat.w, nat.h, opts.marksColor || 'currentColor') : '';
     // Badge placements layer: bg, mark, badge+icon (on top, overlapping the mark), text.
     // Inline placements layer: bg, mark, icon, text.
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${nat.w} ${nat.h}" width="${W}" height="${H}">${fi}${bg}${mark}${iconEl}${text}</svg>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${nat.w} ${nat.h}" width="${W}" height="${H}">${fi}${bg}${mark}${iconEl}${text}${marks}</svg>`;
   }
   // Syncs the width/height number inputs to the natural computed size (unless the user has
   // set a custom override); called by renderPreview() whenever step 3 is the active step.
@@ -1480,7 +1524,7 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   });
 
   document.getElementById('il-copy-btn').addEventListener('click', () => {
-    navigator.clipboard.writeText(buildIconLockupSVG({})).then(() => {
+    navigator.clipboard.writeText(buildIconLockupSVG({ withSizeMarks: includeSizeMarksInExport, marksColor: SIZE_MARKS_EXPORT_COLOR })).then(() => {
       const btn = document.getElementById('il-copy-btn');
       const t = btn.textContent; btn.textContent = 'Copied!'; btn.classList.add('copied');
       setTimeout(() => { btn.textContent = t; btn.classList.remove('copied'); }, 1500);
@@ -1488,14 +1532,14 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   });
   document.getElementById('il-dl-svg-btn').addEventListener('click', () => {
     const name = (ilName || 'logo').replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 32) || 'logo';
-    downloadSVG(buildIconLockupSVG({ forDownload: true }), `ortiq-${name}.svg`);
+    downloadSVG(buildIconLockupSVG({ forDownload: true, withSizeMarks: includeSizeMarksInExport, marksColor: SIZE_MARKS_EXPORT_COLOR }), `ortiq-${name}.svg`);
   });
   document.getElementById('il-dl-png-btn').addEventListener('click', () => {
     const name = (ilName || 'logo').replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 32) || 'logo';
     const nat = ilNaturalSize();
     const W = (ilWidthCustom && ilWidth) ? ilWidth : nat.w * 3;
     const H = (ilHeightCustom && ilHeight) ? ilHeight : nat.h * 3;
-    downloadPNG(buildIconLockupSVG({ forDownload: true, useSystemFont: true }), W, H, `ortiq-${name}-${W}x${H}.png`,
+    downloadPNG(buildIconLockupSVG({ forDownload: true, useSystemFont: true, withSizeMarks: includeSizeMarksInExport, marksColor: SIZE_MARKS_EXPORT_COLOR }), W, H, `ortiq-${name}-${W}x${H}.png`,
       () => alert('PNG export failed — try SVG instead.'));
   });
 
