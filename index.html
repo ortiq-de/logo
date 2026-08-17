@@ -884,7 +884,45 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   // segments merge into a single undifferentiated shape. A thin same-hue stroke (a shade darker
   // than the fill) keeps the six-segment structure visible while staying strictly monochrome.
   function monoStrokeAttr(hex) {
-    return ` stroke="${shade(hex, -30)}" stroke-width="3" stroke-linejoin="round"`;
+    return ` stroke="${shade(hex, -12)}" stroke-width="3" stroke-linejoin="round"`;
+  }
+
+  // Extracts the 4 {x,y} corners from a facet's "M x y L x y L x y L x y Z" path string.
+  function quadPathPoints(d) {
+    const nums = d.match(/-?\d+(?:\.\d+)?/g).map(Number);
+    const pts = [];
+    for (let i = 0; i < 4; i++) pts.push({ x: nums[i * 2], y: nums[i * 2 + 1] });
+    return pts;
+  }
+
+  // Rebuilds a closed polygon with every corner filleted to `radius` (quadratic-curve corners,
+  // straight edges between them) — used only for Monochrome's facets, so the flat-colored
+  // segments read as smoothly connected rather than meeting at sharp points. hexGeometry()'s own
+  // sharp-cornered d strings stay untouched everywhere else (presets, gradient mode, states,
+  // lockups) so their pixel-exact geometry is unaffected.
+  function roundedQuadPath(pts, radius) {
+    const n = pts.length;
+    let d = '';
+    for (let i = 0; i < n; i++) {
+      const prev = pts[(i - 1 + n) % n];
+      const curr = pts[i];
+      const next = pts[(i + 1) % n];
+      const toPrev = { x: prev.x - curr.x, y: prev.y - curr.y };
+      const toNext = { x: next.x - curr.x, y: next.y - curr.y };
+      const lenPrev = Math.hypot(toPrev.x, toPrev.y);
+      const lenNext = Math.hypot(toNext.x, toNext.y);
+      const r = Math.min(radius, lenPrev / 2, lenNext / 2);
+      const start = { x: curr.x + (toPrev.x / lenPrev) * r, y: curr.y + (toPrev.y / lenPrev) * r };
+      const end = { x: curr.x + (toNext.x / lenNext) * r, y: curr.y + (toNext.y / lenNext) * r };
+      d += (i === 0 ? `M ${start.x.toFixed(2)} ${start.y.toFixed(2)} ` : `L ${start.x.toFixed(2)} ${start.y.toFixed(2)} `);
+      d += `Q ${curr.x.toFixed(2)} ${curr.y.toFixed(2)} ${end.x.toFixed(2)} ${end.y.toFixed(2)} `;
+    }
+    return d + 'Z';
+  }
+
+  const MONO_CORNER_RADIUS = 16;
+  function monoFacetPath(p) {
+    return roundedQuadPath(quadPathPoints(p.d), MONO_CORNER_RADIUS);
   }
 
   function buildMarkSVG(opts) {
@@ -896,7 +934,7 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       const dark = shade(light, -22);
       return `<linearGradient id="grad-${p.id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${light}"/><stop offset="1" stop-color="${dark}"/></linearGradient>`;
     }).join('');
-    const paths = geo.map(p => `<path id="${p.id}" d="${p.d}" fill="${monochrome ? facetColors[p.id] : `url(#grad-${p.id})`}"${monochrome ? monoStrokeAttr(facetColors[p.id]) : ''}/>`).join('');
+    const paths = geo.map(p => `<path id="${p.id}" d="${monochrome ? monoFacetPath(p) : p.d}" fill="${monochrome ? facetColors[p.id] : `url(#grad-${p.id})`}"${monochrome ? monoStrokeAttr(facetColors[p.id]) : ''}/>`).join('');
     const marks = opts.withSizeMarks ? buildSizeMarksOverlay(margin, opts.marksColor || 'currentColor') : '';
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 540" width="${size}" height="${size}"><defs>${defs}</defs><g id="mark">${paths}</g>${marks}</svg>`;
   }
@@ -913,7 +951,7 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       const dark = shade(light, -22);
       return `<linearGradient id="${prefix}-grad-${p.id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${light}"/><stop offset="1" stop-color="${dark}"/></linearGradient>`;
     }).join('');
-    const paths = geo.map(p => `<path${withIds ? ` id="${p.id}"` : ''} d="${p.d}" fill="${monochrome ? facetColors[p.id] : `url(#${prefix}-grad-${p.id})`}"${monochrome ? monoStrokeAttr(facetColors[p.id]) : ''}/>`).join('');
+    const paths = geo.map(p => `<path${withIds ? ` id="${p.id}"` : ''} d="${monochrome ? monoFacetPath(p) : p.d}" fill="${monochrome ? facetColors[p.id] : `url(#${prefix}-grad-${p.id})`}"${monochrome ? monoStrokeAttr(facetColors[p.id]) : ''}/>`).join('');
     return `<defs>${defs}</defs>${paths}`;
   }
 
