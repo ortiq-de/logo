@@ -72,16 +72,10 @@ describe('createIconLockup', () => {
     expect(svg).toContain('<svg')
   })
 
-  // The badge ring is a stroke-only circle with stroke-width="1" (r=12, the fixed corner-badge
-  // radius) — distinct from the test icon's own <circle> content, which carries neither attr.
-  const BADGE_RING_RE = /<circle[^>]*fill="none"[^>]*stroke="currentColor"[^>]*stroke-width="1"\/>/
+  // Corner placements overlap the mark's corner directly — icon only, no ring/backdrop circle.
+  const BADGE_RING_RE = /fill="none"[^>]*stroke="currentColor"[^>]*stroke-width="1"\/>/
 
-  it.each(cornerPlacements)('corner placement "%s" renders a badge ring', (placement) => {
-    const svg = createIconLockup('git', icon, { placement })
-    expect(svg).toMatch(BADGE_RING_RE)
-  })
-
-  it.each(edgePlacements)('edge placement "%s" does not render a badge ring', (placement) => {
+  it.each([...cornerPlacements, ...edgePlacements])('placement "%s" renders no badge ring', (placement) => {
     const svg = createIconLockup('git', icon, { placement })
     expect(svg).not.toMatch(BADGE_RING_RE)
   })

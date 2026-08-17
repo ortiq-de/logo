@@ -884,27 +884,28 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     opts = opts || {};
     const size = opts.size != null ? opts.size : exportSize;
     const geo = hexGeometry();
-    const defs = geo.map(p => {
+    const defs = monochrome ? '' : geo.map(p => {
       const light = facetColors[p.id];
       const dark = shade(light, -22);
       return `<linearGradient id="grad-${p.id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${light}"/><stop offset="1" stop-color="${dark}"/></linearGradient>`;
     }).join('');
-    const paths = geo.map(p => `<path id="${p.id}" d="${p.d}" fill="url(#grad-${p.id})"/>`).join('');
+    const paths = geo.map(p => `<path id="${p.id}" d="${p.d}" fill="${monochrome ? facetColors[p.id] : `url(#grad-${p.id})`}"/>`).join('');
     const marks = opts.withSizeMarks ? buildSizeMarksOverlay(margin, opts.marksColor || 'currentColor') : '';
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 540" width="${size}" height="${size}"><defs>${defs}</defs><g id="mark">${paths}</g>${marks}</svg>`;
   }
 
   // Per-facet gradient markup for embedding the mark's full "colored" look in contexts
   // that need multiple simultaneous copies on the page (each instance needs unique
-  // gradient ids so they don't collide in the document's id namespace).
+  // gradient ids so they don't collide in the document's id namespace). While Monochrome is
+  // on, every facet is an identical flat fill instead — no gradient anywhere on the mark.
   function coloredFacetsMarkup(prefix, withIds) {
     const geo = hexGeometry();
-    const defs = geo.map(p => {
+    const defs = monochrome ? '' : geo.map(p => {
       const light = facetColors[p.id];
       const dark = shade(light, -22);
       return `<linearGradient id="${prefix}-grad-${p.id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${light}"/><stop offset="1" stop-color="${dark}"/></linearGradient>`;
     }).join('');
-    const paths = geo.map(p => `<path${withIds ? ` id="${p.id}"` : ''} d="${p.d}" fill="url(#${prefix}-grad-${p.id})"/>`).join('');
+    const paths = geo.map(p => `<path${withIds ? ` id="${p.id}"` : ''} d="${p.d}" fill="${monochrome ? facetColors[p.id] : `url(#${prefix}-grad-${p.id})`}"/>`).join('');
     return `<defs>${defs}</defs>${paths}`;
   }
 
@@ -1507,8 +1508,8 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     };
   }
 
-  // Corners (ne/se/sw/nw) get a circular badge overlapping the mark's corner.
-  // Edges (n/e/s/w) sit just outside the mark with a small gap, no backdrop.
+  // Corners (ne/se/sw/nw) overlap the mark's corner directly, icon only, no backdrop.
+  // Edges (n/e/s/w) sit just outside the mark with a small gap.
   function ilPlacementLayout() {
     const g = ilGeom();
     const GAP = 4, ICON = 20, R = 12, BICON = 16;
@@ -1559,8 +1560,7 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     if (ilIconInner) {
       const L = ilPlacementLayout();
       if (L.kind === 'badge') {
-        const backdrop = `<circle cx="${L.cx}" cy="${L.cy}" r="${L.r}" fill="none" stroke="${markSolidColor}" stroke-width="1" opacity="0.98"/>`;
-        iconEl = `${backdrop}<svg x="${L.iconX}" y="${L.iconY}" width="${L.iconSize}" height="${L.iconSize}" viewBox="${ilIconVB}" color="${markSolidColor}" fill="none" stroke="${markSolidColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" overflow="visible">${ilIconInner}</svg>`;
+        iconEl = `<svg x="${L.iconX}" y="${L.iconY}" width="${L.iconSize}" height="${L.iconSize}" viewBox="${ilIconVB}" color="${markSolidColor}" fill="none" stroke="${markSolidColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" overflow="visible">${ilIconInner}</svg>`;
       } else {
         iconEl = `<svg x="${L.x}" y="${L.y}" width="${L.size}" height="${L.size}" viewBox="${ilIconVB}" color="${markSolidColor}" fill="none" stroke="${markSolidColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" overflow="visible">${ilIconInner}</svg>`;
       }
@@ -1573,8 +1573,8 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       ? `<style>@import url('${GOOGLE_FONTS_IMPORT}');</style>`
       : '';
     const marks = opts.withSizeMarks ? buildLockupSizeMarksOverlay(nat.w, nat.h, opts.marksColor || 'currentColor') : '';
-    // Badge placements layer: bg, mark, badge+icon (on top, overlapping the mark), text.
-    // Inline placements layer: bg, mark, icon, text.
+    // Corner placements layer: bg, mark, icon (on top, overlapping the mark's corner), text.
+    // Edge (inline) placements layer: bg, mark, icon, text.
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${nat.w} ${nat.h}" width="${W}" height="${H}">${fi}${bg}${mark}${iconEl}${text}${marks}</svg>`;
   }
   // Syncs the width/height number inputs to the natural computed size (unless the user has

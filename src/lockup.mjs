@@ -12,8 +12,8 @@
 // createIconLockup: mark at x=24,y=24 (48×48, extra margin on every side so any of the 8
 // placements fits without clipping). placement chooses where the icon sits: 'e'|'n'|'s'|'w'
 // render inline just outside that edge of the mark with a small gap; 'ne'|'se'|'sw'|'nw'
-// render as a small association badge (stroke ring, no fill) overlapping that corner of the
-// mark. The mark itself never moves — only the icon moves around it.
+// render the icon alone, overlapping that corner of the mark (no ring/backdrop). The mark
+// itself never moves — only the icon moves around it.
 export function createLockupApi(hexPaths) {
   const markInner = hexPaths.map(p => `<path d="${p.d}" opacity="${p.op}"/>`).join('')
 
@@ -103,8 +103,7 @@ export function createLockupApi(hexPaths) {
     const bl = (ilMarkCy + fontSize * 0.35).toFixed(1)
     let iconEl
     if (layout.kind === 'badge') {
-      iconEl = `<circle cx="${layout.cx}" cy="${layout.cy}" r="${layout.r}" fill="none" stroke="currentColor" stroke-width="1"/>` +
-        `<svg x="${layout.iconX}" y="${layout.iconY}" width="${layout.iconSize}" height="${layout.iconSize}" viewBox="${icon.vb}" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" overflow="visible">${icon.inner}</svg>`
+      iconEl = `<svg x="${layout.iconX}" y="${layout.iconY}" width="${layout.iconSize}" height="${layout.iconSize}" viewBox="${icon.vb}" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" overflow="visible">${icon.inner}</svg>`
     } else {
       iconEl = `<svg x="${layout.x}" y="${layout.y}" width="${layout.size}" height="${layout.size}" viewBox="${icon.vb}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" overflow="visible">${icon.inner}</svg>`
     }
