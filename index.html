@@ -54,9 +54,9 @@
       background: var(--surface); border-radius: var(--radius); padding: 40px;
       display: flex; align-items: center; justify-content: center; min-height: 340px;
     }
-    .preview-card > svg { width: 260px; height: 260px; }
+    .preview-card:not(.wide) #shared-preview > svg { width: 260px; height: 260px; }
     .preview-card.wide { min-height: 140px; }
-    .preview-card.wide > div > svg { width: auto; max-width: 100%; height: auto; }
+    .preview-card.wide #shared-preview > svg { width: auto; max-width: 100%; height: auto; }
     .sidebar { background: var(--surface); border-radius: var(--radius); padding: 24px; display: flex; flex-direction: column; gap: 22px; }
     .sidebar h3 { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
     .sidebar .hint { font-size: 11px; opacity: 0.45; line-height: 1.5; }
@@ -144,6 +144,27 @@
     .gen-panel.hidden { display: none; }
     .gen-panel.tab-anim-out { opacity: 0; transform: translateY(5px) scale(0.99); }
     .gen-panel.tab-anim-in { opacity: 0; transform: translateY(-5px) scale(0.99); }
+
+    /* ── Accordion wizard ── */
+    .wizard { display: flex; flex-direction: column; gap: 8px; }
+    .wizard-step { display: flex; flex-direction: column; gap: 8px; }
+    .wizard-step-header {
+      width: 100%; display: flex; align-items: center; gap: 10px; appearance: none; border: none;
+      background: var(--surface); border-radius: var(--radius); color: var(--text); font-family: inherit;
+      font-size: 13px; font-weight: 600; padding: 16px 20px; cursor: pointer; opacity: 0.55; transition: opacity 0.2s;
+    }
+    .wizard-step-header:hover { opacity: 0.85; }
+    .wizard-step-header.active { opacity: 1; }
+    .wizard-step-num {
+      display: flex; align-items: center; justify-content: center; width: 20px; height: 20px;
+      border-radius: 50%; background: var(--border); color: var(--text); font-size: 11px; flex-shrink: 0;
+      transition: background 0.2s, color 0.2s;
+    }
+    .wizard-step-header.active .wizard-step-num { background: var(--accent); color: var(--bg); }
+    .wizard-step-chevron { margin-left: auto; opacity: 0.5; transition: transform 0.2s; font-size: 11px; }
+    .wizard-step-header.active .wizard-step-chevron { transform: rotate(180deg); }
+    .wizard-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .wizard-nav .action-btn { flex: 0 0 auto; }
     .field-label { display: block; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; opacity: 0.4; margin-bottom: 8px; }
     .gen-text-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 22px; font-weight: 600; letter-spacing: -0.5px; padding: 11px 16px; transition: border-color 0.2s; }
     .gen-text-input:focus { outline: none; border-color: var(--accent); }
@@ -267,164 +288,199 @@
   <section>
     <div class="section-label">Mark &amp; lockups</div>
 
-    <div class="gen-tabs" id="main-tabs">
-      <button class="gen-tab active" data-maintab="mark">Mark</button>
-      <button class="gen-tab" data-maintab="text-lockup">Text lockup</button>
-      <button class="gen-tab" data-maintab="icon-lockup">Icon lockup</button>
-    </div>
-
-    <!-- Mark tab -->
-    <div class="gen-panel" id="tab-mark">
-      <div class="customizer">
-        <div class="preview-card">
-          <svg id="live-preview" viewBox="0 0 540 540" xmlns="http://www.w3.org/2000/svg">
-            <defs id="live-defs"></defs>
-            <g id="live-mark"></g>
-          </svg>
-        </div>
-        <div class="sidebar">
-          <div>
-            <h3>Facet colors</h3>
-            <div class="hint">Click a swatch to edit, or type a hex code.</div>
-          </div>
-          <div id="facet-rows"></div>
-
-          <div class="tint-row">
-            <span class="label">Rebuild all six from one hue</span>
-            <input type="color" id="tint-swatch" value="#206de9">
-          </div>
-          <div class="preset-row" id="preset-row"></div>
-
-          <div class="sidebar-actions">
-            <button class="action-btn primary" id="copy-svg-btn">Copy SVG code</button>
-            <div class="dl-format-row">
-              <button class="action-btn" id="dl-svg-btn">Download .svg</button>
-              <button class="action-btn" id="dl-png-btn">Download .png</button>
-            </div>
-          </div>
-        </div>
+    <div class="customizer">
+      <div class="preview-card" id="shared-preview-card">
+        <div id="shared-preview"></div>
       </div>
 
-      <!-- Color token codes widget -->
-      <div class="palette-codes">
-        <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;opacity:0.35">Color tokens</span>
-        <button class="codes-toggle" id="codes-toggle">show codes</button>
-        <div class="token-grid hidden" id="token-grid"></div>
-      </div>
-    </div>
+      <div class="wizard" id="wizard">
+        <!-- Step 1: color the mark -->
+        <div class="wizard-step">
+          <button class="wizard-step-header active" data-step-toggle="1" aria-expanded="true">
+            <span class="wizard-step-num">1</span> Color the mark <span class="wizard-step-chevron">⌄</span>
+          </button>
+          <div class="wizard-step-body sidebar gen-panel" id="step-body-1">
+            <div>
+              <h3>Facet colors</h3>
+              <div class="hint">Click a swatch to edit, or type a hex code.</div>
+            </div>
+            <div id="facet-rows"></div>
 
-    <!-- Text lockup tab -->
-    <div class="gen-panel hidden" id="tab-text-lockup">
-      <div class="customizer">
-        <div class="preview-card wide"><div id="tl-preview"></div></div>
-        <div class="sidebar">
-          <div>
-            <label class="field-label" for="tl-name">Sub-brand name</label>
-            <input class="gen-text-input" type="text" id="tl-name" value="blog" placeholder="e.g. blog, store, docs…" maxlength="48" autocomplete="off" spellcheck="false">
-            <div class="gen-slider-row">
-              <span class="lbl">Font size</span>
-              <input class="gen-slider" type="range" id="tl-font-size" min="12" max="40" value="24" step="1">
-              <span class="gen-slider-val" id="tl-font-size-val">24px</span>
+            <div class="tint-row">
+              <span class="label">Rebuild all six from one hue</span>
+              <input type="color" id="tint-swatch" value="#206de9">
             </div>
-          </div>
-          <div>
-            <label class="field-label" for="tl-font-family">Font</label>
-            <select class="gen-select" id="tl-font-family">
-              <option value="space-grotesk" selected>Space Grotesk</option>
-              <option value="inter">Inter</option>
-              <option value="system">System UI</option>
-              <option value="serif">Georgia (serif)</option>
-              <option value="mono">Fira Code (mono)</option>
-            </select>
-          </div>
-          <div>
-            <label class="field-label">Output size</label>
-            <div class="gen-size-row">
-              <div class="size-field"><label for="tl-width">Width</label><input class="gen-num-input" type="number" id="tl-width" min="40" max="4000" step="1"></div>
-              <div class="size-field"><label for="tl-height">Height</label><input class="gen-num-input" type="number" id="tl-height" min="20" max="2000" step="1"></div>
+            <div class="preset-row" id="preset-row"></div>
+
+            <div>
+              <h3>Shape</h3>
+              <div class="gen-slider-row">
+                <span class="lbl">Thickness</span>
+                <input class="gen-slider" type="range" id="thickness-slider" min="0" max="100" step="0.5" value="65.5">
+                <span class="gen-slider-val" id="thickness-val">66%</span>
+              </div>
+              <div class="gen-slider-row">
+                <span class="lbl">Margin</span>
+                <input class="gen-slider" type="range" id="margin-slider" min="0" max="200" step="1" value="22">
+                <span class="gen-slider-val" id="margin-val">22px</span>
+              </div>
             </div>
-            <button class="gen-size-reset" id="tl-size-reset">Reset to auto</button>
-          </div>
-          <div class="gen-color-row" style="margin-top:0">
-            <label>Background <input type="color" id="tl-bg-color" value="#0a0e15"></label>
-            <label><input type="checkbox" id="tl-with-bg"> Include background</label>
-          </div>
-          <div class="sidebar-actions">
-            <button class="action-btn primary" id="tl-copy-btn">Copy SVG code</button>
-            <div class="dl-format-row">
-              <button class="action-btn" id="tl-dl-svg-btn">Download .svg</button>
-              <button class="action-btn" id="tl-dl-png-btn">Download .png</button>
+
+            <div>
+              <h3>Export</h3>
+              <div class="gen-size-row">
+                <div class="size-field"><label for="export-size-input">Size (px)</label><input class="gen-num-input" type="number" id="export-size-input" min="16" max="4096" step="1" value="512"></div>
+              </div>
+              <div class="gen-color-row" style="margin-top:10px">
+                <label><input type="checkbox" id="show-size-marks"> Show size marks</label>
+                <label><input type="checkbox" id="include-size-marks-export"> Include size marks in export</label>
+              </div>
+            </div>
+
+            <div class="sidebar-actions">
+              <button class="action-btn primary" id="copy-svg-btn">Copy SVG code</button>
+              <div class="dl-format-row">
+                <button class="action-btn" id="dl-svg-btn">Download .svg</button>
+                <button class="action-btn" id="dl-png-btn">Download .png</button>
+              </div>
+            </div>
+
+            <!-- Color token codes widget -->
+            <div class="palette-codes">
+              <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;opacity:0.35">Color tokens</span>
+              <button class="codes-toggle" id="codes-toggle">show codes</button>
+              <div class="token-grid hidden" id="token-grid"></div>
+            </div>
+
+            <div class="wizard-nav">
+              <span></span>
+              <button class="action-btn primary wizard-next" data-next="2">Next: Add text →</button>
             </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Icon lockup tab -->
-    <div class="gen-panel hidden" id="tab-icon-lockup">
-      <div class="customizer">
-        <div class="preview-card wide"><div id="il-preview"></div></div>
-        <div class="sidebar">
-          <div>
-            <label class="field-label">Placement — indicates association with the main mark</label>
-            <div class="pos-picker" id="il-pos-picker">
-              <button class="pos-btn" data-placement="nw" title="North-west">NW</button>
-              <button class="pos-btn" data-placement="n" title="North">N</button>
-              <button class="pos-btn" data-placement="ne" title="North-east">NE</button>
-              <button class="pos-btn" data-placement="w" title="West">W</button>
-              <span class="pos-btn pos-center" title="Mark"><svg viewBox="0 0 540 540" fill="currentColor"><path d="M 270 22 L 484.77 146 L 344.1 227.22 L 270 184.44 Z" opacity="0.6"/><path d="M 484.77 146 L 484.77 394 L 344.1 312.78 L 344.1 227.22 Z" opacity="0.4"/><path d="M 484.77 394 L 270 518 L 270 355.56 L 344.1 312.78 Z" opacity="0.5"/><path d="M 270 518 L 55.23 394 L 195.9 312.78 L 270 355.56 Z" opacity="0.55"/><path d="M 55.23 394 L 55.23 146 L 195.9 227.22 L 195.9 312.78 Z" opacity="0.75"/><path d="M 55.23 146 L 270 22 L 270 184.44 L 195.9 227.22 Z" opacity="0.65"/></svg></span>
-              <button class="pos-btn active" data-placement="e" title="East">E</button>
-              <button class="pos-btn" data-placement="sw" title="South-west">SW</button>
-              <button class="pos-btn" data-placement="s" title="South">S</button>
-              <button class="pos-btn" data-placement="se" title="South-east">SE</button>
+        <!-- Step 2: add text -->
+        <div class="wizard-step">
+          <button class="wizard-step-header" data-step-toggle="2" aria-expanded="false">
+            <span class="wizard-step-num">2</span> Add text <span class="wizard-step-chevron">⌄</span>
+          </button>
+          <div class="wizard-step-body sidebar gen-panel hidden" id="step-body-2">
+            <div>
+              <label class="field-label" for="tl-name">Sub-brand name</label>
+              <input class="gen-text-input" type="text" id="tl-name" value="blog" placeholder="e.g. blog, store, docs…" maxlength="48" autocomplete="off" spellcheck="false">
+              <div class="gen-slider-row">
+                <span class="lbl">Font size</span>
+                <input class="gen-slider" type="range" id="tl-font-size" min="12" max="40" value="24" step="1">
+                <span class="gen-slider-val" id="tl-font-size-val">24px</span>
+              </div>
+            </div>
+            <div>
+              <label class="field-label" for="tl-font-family">Font</label>
+              <select class="gen-select" id="tl-font-family">
+                <option value="space-grotesk" selected>Space Grotesk</option>
+                <option value="inter">Inter</option>
+                <option value="system">System UI</option>
+                <option value="serif">Georgia (serif)</option>
+                <option value="mono">Fira Code (mono)</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label">Output size</label>
+              <div class="gen-size-row">
+                <div class="size-field"><label for="tl-width">Width</label><input class="gen-num-input" type="number" id="tl-width" min="40" max="4000" step="1"></div>
+                <div class="size-field"><label for="tl-height">Height</label><input class="gen-num-input" type="number" id="tl-height" min="20" max="2000" step="1"></div>
+              </div>
+              <button class="gen-size-reset" id="tl-size-reset">Reset to auto</button>
+            </div>
+            <div class="gen-color-row" style="margin-top:0">
+              <label>Background <input type="color" id="tl-bg-color" value="#0a0e15"></label>
+              <label><input type="checkbox" id="tl-with-bg"> Include background</label>
+            </div>
+            <div class="sidebar-actions">
+              <button class="action-btn primary" id="tl-copy-btn">Copy SVG code</button>
+              <div class="dl-format-row">
+                <button class="action-btn" id="tl-dl-svg-btn">Download .svg</button>
+                <button class="action-btn" id="tl-dl-png-btn">Download .png</button>
+              </div>
+            </div>
+            <div class="wizard-nav">
+              <button class="action-btn wizard-back" data-back="1">← Back</button>
+              <button class="action-btn primary wizard-next" data-next="3">Next: Add icon →</button>
             </div>
           </div>
-          <div>
-            <label class="field-label">Icon — pick a preset, or use your own SVG below</label>
-            <div class="icon-picker-grid" id="il-preset-icons"></div>
-            <label class="gen-upload-label" for="il-svg-file" style="margin-top:14px">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Upload SVG
-              <input type="file" id="il-svg-file" accept=".svg" style="display:none">
-            </label>
-            <textarea class="gen-svg-textarea" id="il-svg-code" rows="4" placeholder="…or paste SVG code here"></textarea>
-          </div>
-          <div>
-            <label class="field-label" for="il-name">Sub-brand name</label>
-            <input class="gen-text-input" type="text" id="il-name" value="blog" placeholder="e.g. blog, store, docs…" maxlength="48" autocomplete="off" spellcheck="false">
-            <div class="gen-slider-row">
-              <span class="lbl">Font size</span>
-              <input class="gen-slider" type="range" id="il-font-size" min="12" max="40" value="24" step="1">
-              <span class="gen-slider-val" id="il-font-size-val">24px</span>
+        </div>
+
+        <!-- Step 3: add icon -->
+        <div class="wizard-step">
+          <button class="wizard-step-header" data-step-toggle="3" aria-expanded="false">
+            <span class="wizard-step-num">3</span> Add icon <span class="wizard-step-chevron">⌄</span>
+          </button>
+          <div class="wizard-step-body sidebar gen-panel hidden" id="step-body-3">
+            <div>
+              <label class="field-label">Placement — indicates association with the main mark</label>
+              <div class="pos-picker" id="il-pos-picker">
+                <button class="pos-btn" data-placement="nw" title="North-west">NW</button>
+                <button class="pos-btn" data-placement="n" title="North">N</button>
+                <button class="pos-btn" data-placement="ne" title="North-east">NE</button>
+                <button class="pos-btn" data-placement="w" title="West">W</button>
+                <span class="pos-btn pos-center" title="Mark"><svg id="il-pos-center-mark" viewBox="0 0 540 540" fill="currentColor"></svg></span>
+                <button class="pos-btn active" data-placement="e" title="East">E</button>
+                <button class="pos-btn" data-placement="sw" title="South-west">SW</button>
+                <button class="pos-btn" data-placement="s" title="South">S</button>
+                <button class="pos-btn" data-placement="se" title="South-east">SE</button>
+              </div>
             </div>
-          </div>
-          <div>
-            <label class="field-label" for="il-font-family">Font</label>
-            <select class="gen-select" id="il-font-family">
-              <option value="space-grotesk" selected>Space Grotesk</option>
-              <option value="inter">Inter</option>
-              <option value="system">System UI</option>
-              <option value="serif">Georgia (serif)</option>
-              <option value="mono">Fira Code (mono)</option>
-            </select>
-          </div>
-          <div>
-            <label class="field-label">Output size</label>
-            <div class="gen-size-row">
-              <div class="size-field"><label for="il-width">Width</label><input class="gen-num-input" type="number" id="il-width" min="40" max="4000" step="1"></div>
-              <div class="size-field"><label for="il-height">Height</label><input class="gen-num-input" type="number" id="il-height" min="20" max="2000" step="1"></div>
+            <div>
+              <label class="field-label">Icon — pick a preset, or use your own SVG below</label>
+              <div class="icon-picker-grid" id="il-preset-icons"></div>
+              <label class="gen-upload-label" for="il-svg-file" style="margin-top:14px">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Upload SVG
+                <input type="file" id="il-svg-file" accept=".svg" style="display:none">
+              </label>
+              <textarea class="gen-svg-textarea" id="il-svg-code" rows="4" placeholder="…or paste SVG code here"></textarea>
             </div>
-            <button class="gen-size-reset" id="il-size-reset">Reset to auto</button>
-          </div>
-          <div class="gen-color-row" style="margin-top:0">
-            <label>Background <input type="color" id="il-bg-color" value="#0a0e15"></label>
-            <label><input type="checkbox" id="il-with-bg"> Include background</label>
-          </div>
-          <div class="sidebar-actions">
-            <button class="action-btn primary" id="il-copy-btn">Copy SVG code</button>
-            <div class="dl-format-row">
-              <button class="action-btn" id="il-dl-svg-btn">Download .svg</button>
-              <button class="action-btn" id="il-dl-png-btn">Download .png</button>
+            <div>
+              <label class="field-label" for="il-name">Sub-brand name</label>
+              <input class="gen-text-input" type="text" id="il-name" value="blog" placeholder="e.g. blog, store, docs…" maxlength="48" autocomplete="off" spellcheck="false">
+              <div class="gen-slider-row">
+                <span class="lbl">Font size</span>
+                <input class="gen-slider" type="range" id="il-font-size" min="12" max="40" value="24" step="1">
+                <span class="gen-slider-val" id="il-font-size-val">24px</span>
+              </div>
+            </div>
+            <div>
+              <label class="field-label" for="il-font-family">Font</label>
+              <select class="gen-select" id="il-font-family">
+                <option value="space-grotesk" selected>Space Grotesk</option>
+                <option value="inter">Inter</option>
+                <option value="system">System UI</option>
+                <option value="serif">Georgia (serif)</option>
+                <option value="mono">Fira Code (mono)</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label">Output size</label>
+              <div class="gen-size-row">
+                <div class="size-field"><label for="il-width">Width</label><input class="gen-num-input" type="number" id="il-width" min="40" max="4000" step="1"></div>
+                <div class="size-field"><label for="il-height">Height</label><input class="gen-num-input" type="number" id="il-height" min="20" max="2000" step="1"></div>
+              </div>
+              <button class="gen-size-reset" id="il-size-reset">Reset to auto</button>
+            </div>
+            <div class="gen-color-row" style="margin-top:0">
+              <label>Background <input type="color" id="il-bg-color" value="#0a0e15"></label>
+              <label><input type="checkbox" id="il-with-bg"> Include background</label>
+            </div>
+            <div class="sidebar-actions">
+              <button class="action-btn primary" id="il-copy-btn">Copy SVG code</button>
+              <div class="dl-format-row">
+                <button class="action-btn" id="il-dl-svg-btn">Download .svg</button>
+                <button class="action-btn" id="il-dl-png-btn">Download .png</button>
+              </div>
+            </div>
+            <div class="wizard-nav">
+              <button class="action-btn wizard-back" data-back="2">← Back</button>
+              <span></span>
             </div>
           </div>
         </div>
@@ -584,15 +640,39 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
 </footer>
 
 <script>
-  // ── Hexagon facet geometry (6 filled paths, viewBox 0 0 540 540) ──
-  const HEX_PATHS = [
-    { id: 'p0', d: 'M 270 22 L 484.77 146 L 344.1 227.22 L 270 184.44 Z' },
-    { id: 'p1', d: 'M 484.77 146 L 484.77 394 L 344.1 312.78 L 344.1 227.22 Z' },
-    { id: 'p2', d: 'M 484.77 394 L 270 518 L 270 355.56 L 344.1 312.78 Z' },
-    { id: 'p3', d: 'M 270 518 L 55.23 394 L 195.9 312.78 L 270 355.56 Z' },
-    { id: 'p4', d: 'M 55.23 394 L 55.23 146 L 195.9 227.22 L 195.9 312.78 Z' },
-    { id: 'p5', d: 'M 55.23 146 L 270 22 L 270 184.44 L 195.9 227.22 Z' },
-  ];
+  // ── Parametric hexagon geometry (6 filled paths, viewBox 0 0 540 540) ──
+  // Outer hexagon circumradius = 270 - margin, inner circumradius = outer * (1 - thickness/100).
+  // Pointy-top, vertices at angle -90+60*i degrees, centered at (270,270). Facet i is the
+  // quad [Outer[i], Outer[i+1], Inner[i+1], Inner[i]]. Defaults (65.5, 22) reproduce the
+  // original hand-authored mark exactly (R_outer=248, R_inner=85.56).
+  const DEFAULT_THICKNESS = 65.5;
+  const DEFAULT_MARGIN = 22;
+  const HEX_VB = 540, HEX_CX = 270, HEX_CY = 270;
+
+  function round2(n) { return Math.round(n * 100) / 100; }
+
+  function computeHexGeometry(thicknessPct, marginPx) {
+    const rOuter = HEX_CX - marginPx;
+    const rInner = rOuter * (1 - thicknessPct / 100);
+    const outer = [], inner = [];
+    for (let i = 0; i < 6; i++) {
+      const a = (-90 + 60 * i) * Math.PI / 180;
+      outer.push({ x: round2(HEX_CX + rOuter * Math.cos(a)), y: round2(HEX_CY + rOuter * Math.sin(a)) });
+      inner.push({ x: round2(HEX_CX + rInner * Math.cos(a)), y: round2(HEX_CY + rInner * Math.sin(a)) });
+    }
+    return [0, 1, 2, 3, 4, 5].map(i => {
+      const j = (i + 1) % 6, O0 = outer[i], O1 = outer[j], I1 = inner[j], I0 = inner[i];
+      return { id: `p${i}`, d: `M ${O0.x} ${O0.y} L ${O1.x} ${O1.y} L ${I1.x} ${I1.y} L ${I0.x} ${I0.y} Z` };
+    });
+  }
+
+  let _geomCache = null, _geomKey = '';
+  function hexGeometry() {
+    const key = thickness + '|' + margin;
+    if (key !== _geomKey) { _geomCache = computeHexGeometry(thickness, margin); _geomKey = key; }
+    return _geomCache;
+  }
+
   const ZZZ_TEXT = '<text id="zzz" x="335" y="151" style="font-family:\'Space Grotesk\',system-ui,sans-serif;font-weight:600;font-size:76px;fill:currentColor">Zzz</text>';
 
   function xe(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -634,6 +714,13 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   let markSolidColor = '#206de9';  // single representative mark color, shared by both lockup tabs
   let uiMode = 'dark';
   let uiOverrides = {};            // per-token overrides on top of the active preset's ui[uiMode]
+  let thickness = DEFAULT_THICKNESS;    // ring band width, 0 = thin ring, 100 = solid hexagon
+  let margin = DEFAULT_MARGIN;          // whitespace padding within the 540×540 viewBox
+  let exportSize = 512;                 // px, drives SVG/PNG download dimensions
+  let showSizeMarks = false;            // preview-only dimension overlay
+  let includeSizeMarksInExport = false; // bake the overlay into downloaded SVG/PNG
+  let activeStep = 1;                   // 1 | 2 | 3 — which wizard step is expanded
+  const SIZE_MARKS_EXPORT_COLOR = '#8a8f98'; // mid-gray, legible on both themes, baked-export only
 
   function tintFacets(hue, sat, light) {
     const out = {};
@@ -651,28 +738,52 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   }
 
   // ── SVG builders ──
-  function buildColoredSVG(opts) {
+  // Dimension lines + a "{exportSize}×{exportSize}px" label + a dashed square inset by
+  // `marginVal` from every viewBox edge (the literal margin, visualized directly).
+  function buildSizeMarksOverlay(marginVal, color) {
+    const c = color || 'currentColor';
+    const pad = 6, tick = 8;
+    const label = `${exportSize} × ${exportSize}px`;
+    return `<g class="size-marks" fill="none" stroke="${c}" opacity="0.65">
+      <rect x="${marginVal}" y="${marginVal}" width="${HEX_VB - 2 * marginVal}" height="${HEX_VB - 2 * marginVal}"
+            stroke-width="1.25" stroke-dasharray="6,5"/>
+      <g stroke-width="1">
+        <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${HEX_VB - pad}"/>
+        <line x1="${pad - tick / 2}" y1="${pad}" x2="${pad + tick / 2}" y2="${pad}"/>
+        <line x1="${pad - tick / 2}" y1="${HEX_VB - pad}" x2="${pad + tick / 2}" y2="${HEX_VB - pad}"/>
+        <line x1="${pad}" y1="${HEX_VB - pad}" x2="${HEX_VB - pad}" y2="${HEX_VB - pad}"/>
+        <line x1="${HEX_VB - pad}" y1="${HEX_VB - pad - tick / 2}" x2="${HEX_VB - pad}" y2="${HEX_VB - pad + tick / 2}"/>
+      </g>
+      <text x="${pad + 6}" y="${HEX_VB - pad - 6}" font-family="'Fira Code','SF Mono',monospace"
+            font-size="16" fill="${c}" stroke="none" opacity="0.9">${label}</text>
+    </g>`;
+  }
+
+  function buildMarkSVG(opts) {
     opts = opts || {};
-    const size = opts.size || 512;
-    const defs = HEX_PATHS.map(p => {
+    const size = opts.size != null ? opts.size : exportSize;
+    const geo = hexGeometry();
+    const defs = geo.map(p => {
       const light = facetColors[p.id];
       const dark = shade(light, -22);
       return `<linearGradient id="grad-${p.id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${light}"/><stop offset="1" stop-color="${dark}"/></linearGradient>`;
     }).join('');
-    const paths = HEX_PATHS.map(p => `<path id="${p.id}" d="${p.d}" fill="url(#grad-${p.id})"/>`).join('');
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 540" width="${size}" height="${size}"><defs>${defs}</defs><g id="mark">${paths}</g></svg>`;
+    const paths = geo.map(p => `<path id="${p.id}" d="${p.d}" fill="url(#grad-${p.id})"/>`).join('');
+    const marks = opts.withSizeMarks ? buildSizeMarksOverlay(margin, opts.marksColor || 'currentColor') : '';
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 540" width="${size}" height="${size}"><defs>${defs}</defs><g id="mark">${paths}</g>${marks}</svg>`;
   }
 
   // Per-facet gradient markup for embedding the mark's full "colored" look in contexts
   // that need multiple simultaneous copies on the page (each instance needs unique
   // gradient ids so they don't collide in the document's id namespace).
   function coloredFacetsMarkup(prefix, withIds) {
-    const defs = HEX_PATHS.map(p => {
+    const geo = hexGeometry();
+    const defs = geo.map(p => {
       const light = facetColors[p.id];
       const dark = shade(light, -22);
       return `<linearGradient id="${prefix}-grad-${p.id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${light}"/><stop offset="1" stop-color="${dark}"/></linearGradient>`;
     }).join('');
-    const paths = HEX_PATHS.map(p => `<path${withIds ? ` id="${p.id}"` : ''} d="${p.d}" fill="url(#${prefix}-grad-${p.id})"/>`).join('');
+    const paths = geo.map(p => `<path${withIds ? ` id="${p.id}"` : ''} d="${p.d}" fill="url(#${prefix}-grad-${p.id})"/>`).join('');
     return `<defs>${defs}</defs>${paths}`;
   }
 
@@ -708,15 +819,14 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   }
 
   // ── Rendering ──
-  function renderLivePreview() {
-    const defs = HEX_PATHS.map(p => {
-      const light = facetColors[p.id];
-      const dark = shade(light, -22);
-      return `<linearGradient id="live-grad-${p.id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${light}"/><stop offset="1" stop-color="${dark}"/></linearGradient>`;
-    }).join('');
-    document.getElementById('live-defs').innerHTML = defs;
-    document.getElementById('live-mark').innerHTML = HEX_PATHS.map(p =>
-      `<path d="${p.d}" fill="url(#live-grad-${p.id})"/>`).join('');
+  // Decorative center-hexagon icon in the position picker — kept as a flat, static-opacity
+  // glyph (not the gradient look) since it's a small illustrative diagram, not a real output.
+  // It still stays geometrically in sync via hexGeometry() so it never drifts.
+  const POS_CENTER_OPACITIES = [0.6, 0.4, 0.5, 0.55, 0.75, 0.65];
+  function renderPosCenterIcon() {
+    const el = document.getElementById('il-pos-center-mark');
+    if (!el) return;
+    el.innerHTML = hexGeometry().map((p, i) => `<path d="${p.d}" opacity="${POS_CENTER_OPACITIES[i]}"/>`).join('');
   }
 
   function renderFacetRows() {
@@ -757,8 +867,6 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
         renderUiTokenGrid();
         applyUiTokens();
         renderAll();
-        updateTextLockupPreview();
-        updateIconLockupPreview();
         persist();
       });
       wrap.appendChild(btn);
@@ -862,18 +970,41 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       </div>`;
   }
 
+  // The single mutation→render pipeline: every control in every wizard step calls
+  // renderAll() (plus persist()), and renderPreview() dispatches on activeStep to decide
+  // what the one shared preview shows — this is what makes "any control in any step
+  // updates the preview immediately" true by construction rather than by remembering
+  // to wire each new control to the right update function by hand.
+  function renderPreview() {
+    document.getElementById('shared-preview-card').classList.toggle('wide', activeStep !== 1);
+    const el = document.getElementById('shared-preview');
+    if (activeStep === 1) {
+      el.innerHTML = buildMarkSVG({ size: 260, withSizeMarks: showSizeMarks, marksColor: 'currentColor' });
+    } else if (activeStep === 2) {
+      tlSyncSizeInputs();
+      el.innerHTML = buildTextLockupSVG({});
+    } else {
+      ilSyncSizeInputs();
+      el.innerHTML = buildIconLockupSVG({});
+    }
+  }
+
   function renderAll() {
-    renderLivePreview();
+    renderPreview();
     renderMarkGrid();
     renderStateCells();
     renderLockupGrid();
+    renderPosCenterIcon();
   }
 
   // ── Persistence ──
   const STORAGE_KEY = 'ortiq-logo-prefs';
   function persist() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ activePresetId, facetColors, uiMode, uiOverrides }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        activePresetId, facetColors, uiMode, uiOverrides,
+        thickness, margin, exportSize, showSizeMarks, includeSizeMarksInExport, activeStep,
+      }));
     } catch (_) {}
   }
   function restore() {
@@ -886,6 +1017,12 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       facetColors = saved.facetColors;
       uiMode = saved.uiMode || 'dark';
       uiOverrides = saved.uiOverrides || {};
+      thickness = typeof saved.thickness === 'number' ? saved.thickness : DEFAULT_THICKNESS;
+      margin = typeof saved.margin === 'number' ? saved.margin : DEFAULT_MARGIN;
+      exportSize = (typeof saved.exportSize === 'number' && saved.exportSize > 0) ? saved.exportSize : 512;
+      showSizeMarks = !!saved.showSizeMarks;
+      includeSizeMarksInExport = !!saved.includeSizeMarksInExport;
+      activeStep = [1, 2, 3].includes(saved.activeStep) ? saved.activeStep : 1;
       return true;
     } catch (_) { return false; }
   }
@@ -966,54 +1103,105 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     renderFacetRows();
     renderPresetRow();
     renderAll();
-    updateTextLockupPreview();
-    updateIconLockupPreview();
+    persist();
+  });
+
+  // ── Shape (thickness/margin) ──
+  document.getElementById('thickness-slider').addEventListener('input', e => {
+    thickness = parseFloat(e.target.value);
+    document.getElementById('thickness-val').textContent = Math.round(thickness) + '%';
+    renderAll();
+    persist();
+  });
+  document.getElementById('margin-slider').addEventListener('input', e => {
+    margin = parseInt(e.target.value);
+    document.getElementById('margin-val').textContent = margin + 'px';
+    renderAll();
+    persist();
+  });
+
+  // ── Export size + size marks ──
+  document.getElementById('export-size-input').addEventListener('input', e => {
+    exportSize = parseInt(e.target.value) || 512;
+    renderAll();
+    persist();
+  });
+  document.getElementById('show-size-marks').addEventListener('change', e => {
+    showSizeMarks = e.target.checked;
+    renderAll();
+    persist();
+  });
+  document.getElementById('include-size-marks-export').addEventListener('change', e => {
+    includeSizeMarksInExport = e.target.checked;
     persist();
   });
 
   // ── Customizer actions ──
   document.getElementById('copy-svg-btn').addEventListener('click', () => {
-    navigator.clipboard.writeText(buildColoredSVG({ size: 512 })).then(() => {
+    navigator.clipboard.writeText(buildMarkSVG({ size: exportSize, withSizeMarks: includeSizeMarksInExport, marksColor: SIZE_MARKS_EXPORT_COLOR })).then(() => {
       const btn = document.getElementById('copy-svg-btn');
       const t = btn.textContent; btn.textContent = 'Copied!'; btn.classList.add('copied');
       setTimeout(() => { btn.textContent = t; btn.classList.remove('copied'); }, 1500);
     });
   });
   document.getElementById('dl-svg-btn').addEventListener('click', () => {
-    downloadSVG(buildColoredSVG({ size: 512 }), 'ortiq-mark.svg');
+    downloadSVG(buildMarkSVG({ size: exportSize, withSizeMarks: includeSizeMarksInExport, marksColor: SIZE_MARKS_EXPORT_COLOR }), `ortiq-mark-${exportSize}x${exportSize}.svg`);
   });
   document.getElementById('dl-png-btn').addEventListener('click', () => {
-    downloadPNG(buildColoredSVG({ size: 1024 }), 1024, 1024, 'ortiq-mark-1024x1024.png',
+    downloadPNG(buildMarkSVG({ size: exportSize, withSizeMarks: includeSizeMarksInExport, marksColor: SIZE_MARKS_EXPORT_COLOR }), exportSize, exportSize, `ortiq-mark-${exportSize}x${exportSize}.png`,
       () => alert('PNG export failed — try SVG instead.'));
   });
 
-  // ── Main tabs: Mark / Text lockup / Icon lockup ──
-  // The mark is the visual anchor across tabs: the preview card stays put and only
+  // ── Wizard: Step 1 Color the mark / Step 2 Add text / Step 3 Add icon ──
+  // The mark is the visual anchor across steps: the shared preview card stays put and only
   // crossfades + slides its content, rather than jump-cutting via instant hidden toggle.
-  const MAIN_TAB_PANELS = { mark: 'tab-mark', 'text-lockup': 'tab-text-lockup', 'icon-lockup': 'tab-icon-lockup' };
-  function switchMainTab(target) {
-    const nextEl = document.getElementById(MAIN_TAB_PANELS[target]);
-    const curEl = document.querySelector('.gen-panel:not(.hidden)');
-    if (curEl === nextEl) return;
-    if (target === 'text-lockup') updateTextLockupPreview();
-    if (target === 'icon-lockup') updateIconLockupPreview();
-    if (curEl) {
-      curEl.classList.add('tab-anim-out');
-      setTimeout(() => { curEl.classList.add('hidden'); curEl.classList.remove('tab-anim-out'); }, 200);
+  // activeStep is tracked in state rather than queried from the DOM (unlike the old tab
+  // version, which found the current panel via a document-wide `.gen-panel:not(.hidden)`
+  // selector that only worked because exactly 3 panels existed) so it stays correct however
+  // many step bodies exist.
+  function switchStep(n) {
+    if (n === activeStep) return;
+    const prevBody = document.getElementById(`step-body-${activeStep}`);
+    const nextBody = document.getElementById(`step-body-${n}`);
+    document.querySelectorAll('.wizard-step-header').forEach(h => {
+      const isActive = Number(h.dataset.stepToggle) === n;
+      h.classList.toggle('active', isActive);
+      h.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+    });
+    activeStep = n;
+    if (prevBody) {
+      prevBody.classList.add('tab-anim-out');
+      setTimeout(() => { prevBody.classList.add('hidden'); prevBody.classList.remove('tab-anim-out'); }, 200);
     }
-    nextEl.classList.remove('hidden');
-    nextEl.classList.add('tab-anim-in');
+    nextBody.classList.remove('hidden');
+    nextBody.classList.add('tab-anim-in');
     // Force layout so the browser registers the "in" starting state before we remove it,
     // otherwise the transition to the resting state never plays.
-    void nextEl.offsetWidth;
-    requestAnimationFrame(() => nextEl.classList.remove('tab-anim-in'));
+    void nextBody.offsetWidth;
+    requestAnimationFrame(() => nextBody.classList.remove('tab-anim-in'));
+    renderAll();
+    persist();
   }
-  document.querySelectorAll('#main-tabs .gen-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('#main-tabs .gen-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      switchMainTab(tab.dataset.maintab);
+  // Boot-only: apply the restored step's expanded/collapsed classes instantly, with no
+  // crossfade, so reloading onto step 3 doesn't play a spurious transition.
+  function applyStepClassesInstant(n) {
+    document.querySelectorAll('.wizard-step-header').forEach(h => {
+      const isActive = Number(h.dataset.stepToggle) === n;
+      h.classList.toggle('active', isActive);
+      h.setAttribute('aria-expanded', isActive ? 'true' : 'false');
     });
+    [1, 2, 3].forEach(i => {
+      document.getElementById(`step-body-${i}`).classList.toggle('hidden', i !== n);
+    });
+  }
+  document.querySelectorAll('.wizard-step-header').forEach(h => {
+    h.addEventListener('click', () => switchStep(Number(h.dataset.stepToggle)));
+  });
+  document.querySelectorAll('.wizard-next').forEach(b => {
+    b.addEventListener('click', () => switchStep(Number(b.dataset.next)));
+  });
+  document.querySelectorAll('.wizard-back').forEach(b => {
+    b.addEventListener('click', () => switchStep(Number(b.dataset.back)));
   });
 
   // ── Shared SVG-parsing helper (used by the Icon lockup tab) ──
@@ -1078,30 +1266,31 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       : '';
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${nat.w} ${nat.h}" width="${W}" height="${H}">${fi}${bg}${mark}${text}</svg>`;
   }
-  function updateTextLockupPreview() {
+  // Syncs the width/height number inputs to the natural computed size (unless the user has
+  // set a custom override); called by renderPreview() whenever step 2 is the active step.
+  function tlSyncSizeInputs() {
     const nat = tlNaturalSize();
     if (!tlWidthCustom) document.getElementById('tl-width').value = nat.w;
     if (!tlHeightCustom) document.getElementById('tl-height').value = nat.h;
-    document.getElementById('tl-preview').innerHTML = buildTextLockupSVG({});
   }
-  document.getElementById('tl-name').addEventListener('input', e => { tlName = e.target.value; updateTextLockupPreview(); });
+  document.getElementById('tl-name').addEventListener('input', e => { tlName = e.target.value; renderAll(); });
   document.getElementById('tl-font-size').addEventListener('input', e => {
     tlFontSize = parseInt(e.target.value);
     document.getElementById('tl-font-size-val').textContent = e.target.value + 'px';
-    updateTextLockupPreview();
+    renderAll();
   });
-  document.getElementById('tl-font-family').addEventListener('change', e => { tlFontFamily = e.target.value; updateTextLockupPreview(); });
+  document.getElementById('tl-font-family').addEventListener('change', e => { tlFontFamily = e.target.value; renderAll(); });
   document.getElementById('tl-width').addEventListener('input', e => {
-    tlWidthCustom = true; tlWidth = parseInt(e.target.value) || tlNaturalSize().w; updateTextLockupPreview();
+    tlWidthCustom = true; tlWidth = parseInt(e.target.value) || tlNaturalSize().w; renderAll();
   });
   document.getElementById('tl-height').addEventListener('input', e => {
-    tlHeightCustom = true; tlHeight = parseInt(e.target.value) || tlNaturalSize().h; updateTextLockupPreview();
+    tlHeightCustom = true; tlHeight = parseInt(e.target.value) || tlNaturalSize().h; renderAll();
   });
   document.getElementById('tl-size-reset').addEventListener('click', () => {
-    tlWidthCustom = false; tlHeightCustom = false; updateTextLockupPreview();
+    tlWidthCustom = false; tlHeightCustom = false; renderAll();
   });
-  document.getElementById('tl-bg-color').addEventListener('input', e => { tlBgColor = e.target.value; updateTextLockupPreview(); });
-  document.getElementById('tl-with-bg').addEventListener('change', e => { tlWithBg = e.target.checked; updateTextLockupPreview(); });
+  document.getElementById('tl-bg-color').addEventListener('input', e => { tlBgColor = e.target.value; renderAll(); });
+  document.getElementById('tl-with-bg').addEventListener('change', e => { tlWithBg = e.target.checked; renderAll(); });
   document.getElementById('tl-copy-btn').addEventListener('click', () => {
     navigator.clipboard.writeText(buildTextLockupSVG({})).then(() => {
       const btn = document.getElementById('tl-copy-btn');
@@ -1203,37 +1392,38 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     // Inline placements layer: bg, mark, icon, text.
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${nat.w} ${nat.h}" width="${W}" height="${H}">${fi}${bg}${mark}${iconEl}${text}</svg>`;
   }
-  function updateIconLockupPreview() {
+  // Syncs the width/height number inputs to the natural computed size (unless the user has
+  // set a custom override); called by renderPreview() whenever step 3 is the active step.
+  function ilSyncSizeInputs() {
     const nat = ilNaturalSize();
     if (!ilWidthCustom) document.getElementById('il-width').value = nat.w;
     if (!ilHeightCustom) document.getElementById('il-height').value = nat.h;
-    document.getElementById('il-preview').innerHTML = buildIconLockupSVG({});
   }
-  document.getElementById('il-name').addEventListener('input', e => { ilName = e.target.value; updateIconLockupPreview(); });
+  document.getElementById('il-name').addEventListener('input', e => { ilName = e.target.value; renderAll(); });
   document.getElementById('il-font-size').addEventListener('input', e => {
     ilFontSize = parseInt(e.target.value);
     document.getElementById('il-font-size-val').textContent = e.target.value + 'px';
-    updateIconLockupPreview();
+    renderAll();
   });
-  document.getElementById('il-font-family').addEventListener('change', e => { ilFontFamily = e.target.value; updateIconLockupPreview(); });
+  document.getElementById('il-font-family').addEventListener('change', e => { ilFontFamily = e.target.value; renderAll(); });
   document.getElementById('il-width').addEventListener('input', e => {
-    ilWidthCustom = true; ilWidth = parseInt(e.target.value) || ilNaturalSize().w; updateIconLockupPreview();
+    ilWidthCustom = true; ilWidth = parseInt(e.target.value) || ilNaturalSize().w; renderAll();
   });
   document.getElementById('il-height').addEventListener('input', e => {
-    ilHeightCustom = true; ilHeight = parseInt(e.target.value) || ilNaturalSize().h; updateIconLockupPreview();
+    ilHeightCustom = true; ilHeight = parseInt(e.target.value) || ilNaturalSize().h; renderAll();
   });
   document.getElementById('il-size-reset').addEventListener('click', () => {
-    ilWidthCustom = false; ilHeightCustom = false; updateIconLockupPreview();
+    ilWidthCustom = false; ilHeightCustom = false; renderAll();
   });
-  document.getElementById('il-bg-color').addEventListener('input', e => { ilBgColor = e.target.value; updateIconLockupPreview(); });
-  document.getElementById('il-with-bg').addEventListener('change', e => { ilWithBg = e.target.checked; updateIconLockupPreview(); });
+  document.getElementById('il-bg-color').addEventListener('input', e => { ilBgColor = e.target.value; renderAll(); });
+  document.getElementById('il-with-bg').addEventListener('change', e => { ilWithBg = e.target.checked; renderAll(); });
 
   document.querySelectorAll('#il-pos-picker .pos-btn[data-placement]').forEach(c => {
     c.addEventListener('click', () => {
       document.querySelectorAll('#il-pos-picker .pos-btn').forEach(x => x.classList.remove('active'));
       c.classList.add('active');
       ilPlacement = c.dataset.placement;
-      updateIconLockupPreview();
+      renderAll();
     });
   });
 
@@ -1243,7 +1433,7 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     const r = parseSVG(str);
     if (r) { ilIconInner = r.inner; ilIconVB = r.vb; }
     else ilIconInner = null;
-    updateIconLockupPreview();
+    renderAll();
   }
   document.getElementById('il-svg-code').addEventListener('input', e => ilApplyIcon(e.target.value));
   document.getElementById('il-svg-file').addEventListener('change', e => {
@@ -1284,7 +1474,7 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       document.getElementById('il-svg-code').value = '';
       ilIconInner = icon.paths;
       ilIconVB = icon.vb;
-      updateIconLockupPreview();
+      renderAll();
     });
     presetIconPanel.appendChild(btn);
   });
@@ -1331,13 +1521,20 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     document.getElementById('tl-bg-color').value = tlBgColor;
     document.getElementById('il-bg-color').value = ilBgColor;
 
+    document.getElementById('thickness-slider').value = thickness;
+    document.getElementById('thickness-val').textContent = Math.round(thickness) + '%';
+    document.getElementById('margin-slider').value = margin;
+    document.getElementById('margin-val').textContent = margin + 'px';
+    document.getElementById('export-size-input').value = exportSize;
+    document.getElementById('show-size-marks').checked = showSizeMarks;
+    document.getElementById('include-size-marks-export').checked = includeSizeMarksInExport;
+    applyStepClassesInstant(activeStep);
+
     renderFacetRows();
     renderPresetRow();
     renderUiTokenGrid();
     applyUiTokens();
     renderAll();
-    updateTextLockupPreview();
-    updateIconLockupPreview();
   }).catch(err => {
     console.error('Failed to load palette.json', err);
   });
