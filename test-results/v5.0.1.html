@@ -1,0 +1,133 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Test results — v5.0.1</title>
+<style>
+  body { font-family: ui-monospace, 'SF Mono', Menlo, monospace; background: #0a0e15; color: #edeff2; margin: 0; padding: 32px 24px 64px; }
+  a { color: #4f8cee; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .meta { color: #a9b0bc; font-size: 13px; margin-bottom: 24px; }
+  .stats { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .stat { background: #171d26; border: 1px solid #2d3543; border-radius: 8px; padding: 10px 16px; font-size: 13px; }
+  .stat b { font-size: 18px; display: block; }
+  .pass b { color: #2ecc71; } .fail b { color: #e74c3c; } .skip b { color: #f5a623; }
+  pre { background: #171d26; border: 1px solid #2d3543; border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 12px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+  table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+  td, th { text-align: left; padding: 6px 10px; border-bottom: 1px solid #2d3543; font-size: 13px; }
+</style></head>
+<body>
+  <p><a href="index.html">&larr; all versions</a></p>
+  <h1>Test results — v5.0.1</h1>
+  <div class="meta">commit 68361a0eefe3 &middot; generated 2026-08-17T12:22:34.160Z</div>
+  <div class="stats">
+    <div class="stat pass"><b>55</b>passed</div>
+    <div class="stat fail"><b>0</b>failed</div>
+    <div class="stat skip"><b>0</b>skipped</div>
+    <div class="stat"><b>55</b>total</div>
+    <div class="stat"><b>0.99s</b>duration</div>
+  </div>
+  <pre>
+&gt; @ortiq-de/logo@5.0.0 test
+&gt; vitest run --reporter=verbose --reporter=json --outputFile=test-results.json
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90m/home/runner/work/logo/logo[39m
+
+✓ palette.json
+✓ loaded base.svg
+✓ loaded plain.svg
+✓ loaded colored.svg
+✓ loaded gradient.svg
+✓ loaded animated.svg
+✓ loaded states/neutral.svg
+✓ loaded states/loading.svg
+✓ loaded states/success.svg
+✓ loaded states/warning.svg
+✓ loaded states/error.svg
+✓ loaded http/404.svg
+✓ loaded http/500.svg
+✓ loaded http/503.svg
+✓ loaded http/403.svg
+✓ loaded lockup/template.svg
+✓ loaded lockup/blog.svg
+✓ loaded lockup/icon-template.svg
+✓ index.js (CJS)
+✓ index.mjs (ESM)
+✓ index.d.ts (TypeScript)
+✓ index.css
+✓ states.css
+✓ favicons/favicon-16x16.png
+✓ favicons/favicon-32x32.png
+✓ favicons/favicon-48x48.png
+✓ favicons/favicon-96x96.png
+✓ favicons/apple-touch-icon.png
+✓ favicons/favicon-192x192.png
+✓ favicons/favicon-512x512.png
+✓ favicons/favicon.svg
+✓ favicons/favicon.ico
+✓ site.webmanifest
+✓ dist/package.json
+
+✅ Bundle complete → dist/
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateTextLockup[2m &gt; [22mproduces a well-formed SVG with the sub-brand name in a &lt;text&gt; node[32m 2[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateTextLockup[2m &gt; [22mdefaults to viewBox height 56 and a width matching the calcW formula[32m 0[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateTextLockup[2m &gt; [22mhonors fontSize/fontFamily/explicit width+height overrides[32m 0[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateTextLockup[2m &gt; [22mescapes special characters in the sub-brand name[32m 0[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mproduces well-formed output for placement "n"[32m 1[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mproduces well-formed output for placement "ne"[32m 0[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mproduces well-formed output for placement "e"[32m 0[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mproduces well-formed output for placement "se"[32m 0[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mproduces well-formed output for placement "s"[32m 0[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mproduces well-formed output for placement "sw"[32m 0[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mproduces well-formed output for placement "w"[32m 0[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mproduces well-formed output for placement "nw"[32m 0[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mplacement "ne" renders no badge ring[32m 0[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mplacement "se" renders no badge ring[32m 0[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mplacement "sw" renders no badge ring[32m 0[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mplacement "nw" renders no badge ring[32m 0[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mplacement "n" renders no badge ring[32m 0[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mplacement "e" renders no badge ring[32m 0[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mplacement "s" renders no badge ring[32m 0[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mplacement "w" renders no badge ring[32m 0[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mdefaults viewBox height to 96[32m 0[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mextracts inner markup + viewBox from a full &lt;svg viewBox="..."&gt; icon string[32m 0[2mms[22m[39m
+ [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mtreats bare inner markup as-is with a default 0 0 24 24 viewBox[32m 0[2mms[22m[39m
+ [32m✓[39m test/palette-schema.test.mjs[2m &gt; [22mpalette.json schema[2m &gt; [22mhas version 2 and a default preset id that resolves[32m 4[2mms[22m[39m
+ [32m✓[39m test/palette-schema.test.mjs[2m &gt; [22mpalette.json schema[2m &gt; [22mfacetGeometry has exactly 6 unique p0-p5 entries with numeric deltas and a valid baseOpacity[32m 3[2mms[22m[39m
+ [32m✓[39m test/palette-schema.test.mjs[2m &gt; [22mpalette.json schema[2m &gt; [22mpreset "cobalt" has name/solid/6 valid facets/full ui tokens[32m 2[2mms[22m[39m
+ [32m✓[39m test/palette-schema.test.mjs[2m &gt; [22mpalette.json schema[2m &gt; [22mpreset "violet" has name/solid/6 valid facets/full ui tokens[32m 2[2mms[22m[39m
+ [32m✓[39m test/palette-schema.test.mjs[2m &gt; [22mpalette.json schema[2m &gt; [22mpreset "teal" has name/solid/6 valid facets/full ui tokens[32m 3[2mms[22m[39m
+ [32m✓[39m test/palette-schema.test.mjs[2m &gt; [22mpalette.json schema[2m &gt; [22mpreset "ember" has name/solid/6 valid facets/full ui tokens[32m 1[2mms[22m[39m
+ [32m✓[39m test/palette-schema.test.mjs[2m &gt; [22mpalette.json schema[2m &gt; [22mpreset "graphite" has name/solid/6 valid facets/full ui tokens[32m 1[2mms[22m[39m
+ [32m✓[39m test/palette-schema.test.mjs[2m &gt; [22mpalette.json schema[2m &gt; [22mpreset "legacy-brand" has name/solid/6 valid facets/full ui tokens[32m 1[2mms[22m[39m
+ [32m✓[39m test/palette-schema.test.mjs[2m &gt; [22mpalette.json schema[2m &gt; [22msuccess/warning/error tokens are identical literals across every preset (documented invariant)[32m 1[2mms[22m[39m
+ [32m✓[39m test/favicons.test.mjs[2m &gt; [22mfavicon rasterization (requires rsvg-convert)[2m &gt; [22mproduces a non-empty PNG for size 16px[32m 6[2mms[22m[39m
+ [32m✓[39m test/favicons.test.mjs[2m &gt; [22mfavicon rasterization (requires rsvg-convert)[2m &gt; [22mproduces a non-empty PNG for size 32px[32m 0[2mms[22m[39m
+ [32m✓[39m test/favicons.test.mjs[2m &gt; [22mfavicon rasterization (requires rsvg-convert)[2m &gt; [22mproduces a non-empty PNG for size 48px[32m 0[2mms[22m[39m
+ [32m✓[39m test/favicons.test.mjs[2m &gt; [22mfavicon rasterization (requires rsvg-convert)[2m &gt; [22mproduces a non-empty PNG for size 96px[32m 0[2mms[22m[39m
+ [32m✓[39m test/favicons.test.mjs[2m &gt; [22mfavicon rasterization (requires rsvg-convert)[2m &gt; [22mproduces a non-empty PNG for size 180px[32m 0[2mms[22m[39m
+ [32m✓[39m test/favicons.test.mjs[2m &gt; [22mfavicon rasterization (requires rsvg-convert)[2m &gt; [22mproduces a non-empty PNG for size 192px[32m 0[2mms[22m[39m
+ [32m✓[39m test/favicons.test.mjs[2m &gt; [22mfavicon rasterization (requires rsvg-convert)[2m &gt; [22mproduces a non-empty PNG for size 512px[32m 0[2mms[22m[39m
+ [32m✓[39m test/favicons.test.mjs[2m &gt; [22mfavicon rasterization (requires rsvg-convert)[2m &gt; [22mproduces favicon.svg[32m 0[2mms[22m[39m
+ [32m✓[39m test/favicons.test.mjs[2m &gt; [22mfavicon rasterization (requires rsvg-convert)[2m &gt; [22mproduces a non-empty favicon.ico (requires imagemagick)[32m 1[2mms[22m[39m
+ [32m✓[39m test/dist-smoke.test.mjs[2m &gt; [22mdist/index.js (CJS) and dist/index.mjs (ESM) — real-world build smoke test[2m &gt; [22mboth expose palette, every svgMap key, and the lockup functions[32m 6[2mms[22m[39m
+ [32m✓[39m test/dist-smoke.test.mjs[2m &gt; [22mdist/index.js (CJS) and dist/index.mjs (ESM) — real-world build smoke test[2m &gt; [22mCJS output, ESM output, and src/lockup.mjs direct output are identical (drift guard)[32m 2[2mms[22m[39m
+ [32m✓[39m test/exports-map.test.mjs[2m &gt; [22mpackage.json exports map[2m &gt; [22mresolved at least one target per export path[32m 3[2mms[22m[39m
+ [32m✓[39m test/exports-map.test.mjs[2m &gt; [22mpackage.json exports map[2m &gt; [22m./dist/index.mjs exists in the built dist/ and is non-empty[32m 1[2mms[22m[39m
+ [32m✓[39m test/exports-map.test.mjs[2m &gt; [22mpackage.json exports map[2m &gt; [22m./dist/index.js exists in the built dist/ and is non-empty[32m 0[2mms[22m[39m
+ [32m✓[39m test/exports-map.test.mjs[2m &gt; [22mpackage.json exports map[2m &gt; [22m./dist/index.d.ts exists in the built dist/ and is non-empty[32m 0[2mms[22m[39m
+ [32m✓[39m test/exports-map.test.mjs[2m &gt; [22mpackage.json exports map[2m &gt; [22m./dist/index.css exists in the built dist/ and is non-empty[32m 0[2mms[22m[39m
+ [32m✓[39m test/exports-map.test.mjs[2m &gt; [22mpackage.json exports map[2m &gt; [22m./dist/states.css exists in the built dist/ and is non-empty[32m 0[2mms[22m[39m
+ [32m✓[39m test/exports-map.test.mjs[2m &gt; [22mpackage.json exports map[2m &gt; [22m./dist/palette.json exists in the built dist/ and is non-empty[32m 0[2mms[22m[39m
+ [32m✓[39m test/exports-map.test.mjs[2m &gt; [22mpackage.json exports map[2m &gt; [22mmain/module/types fields also resolve to existing, non-empty files[32m 0[2mms[22m[39m
+ [32m✓[39m test/pack-smoke.test.mjs[2m &gt; [22mnpm pack tarball — real consumer install simulation[2m &gt; [22mextracted tarball contains dist/, palette.json, and the other files-listed paths[32m 3[2mms[22m[39m
+ [32m✓[39m test/pack-smoke.test.mjs[2m &gt; [22mnpm pack tarball — real consumer install simulation[2m &gt; [22mrequire()s the extracted CJS build and gets working exports[32m 2[2mms[22m[39m
+ [32m✓[39m test/pack-smoke.test.mjs[2m &gt; [22mnpm pack tarball — real consumer install simulation[2m &gt; [22mimport()s the extracted ESM build and gets working exports[32m 18[2mms[22m[39m
+ [32m✓[39m test/pack-smoke.test.mjs[2m &gt; [22mnpm pack tarball — real consumer install simulation[2m &gt; [22mextracted dist/palette.json matches the repo palette.json[32m 0[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m6 passed[39m[22m[90m (6)[39m
+[2m      Tests [22m [1m[32m55 passed[39m[22m[90m (55)[39m
+[2m   Start at [22m 12:22:19
+[2m   Duration [22m 987ms[2m (transform 121ms, setup 0ms, import 229ms, tests 654ms, environment 1ms)[22m
+
+JSON report written to /home/runner/work/logo/logo/test-results.json
+</pre>
+</body></html>
