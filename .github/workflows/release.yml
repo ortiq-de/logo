@@ -126,14 +126,16 @@ jobs:
   # Runs only after `bundle` (tests + publish) succeeds, so a page only ever appears for a
   # version that actually shipped. Checks out main fresh (not the tag's detached HEAD) so the
   # commit doesn't overwrite main with the tagged tree's other files — it only ever touches
-  # test-results/. Pushing to main re-triggers pages.yml, which deploys the raw repo root, so
-  # this page goes live with no pages.yml changes needed.
+  # test-results/. NOTE: a push made with the default GITHUB_TOKEN does NOT trigger other
+  # workflows (GitHub's anti-recursion rule for the built-in token) — pages.yml would never
+  # re-run on its own, so this job explicitly dispatches it via the API after pushing.
   publish-test-report:
     name: Publish test report page
     runs-on: ubuntu-latest
     needs: bundle
     permissions:
       contents: write
+      actions: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -150,10 +152,21 @@ jobs:
           GITHUB_SHA: ${{ github.sha }}
 
       - name: Commit and push
+        id: commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add test-results/
-          git diff --cached --quiet && exit 0
+          if git diff --cached --quiet; then
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           git commit -m "Add test results for ${{ github.ref_name }}"
           git push origin HEAD:main
+          echo "committed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger Pages deploy
+        if: steps.commit.outputs.committed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run pages.yml --ref main
