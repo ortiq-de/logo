@@ -34,51 +34,12 @@ states.css                 all @keyframes as class-driven selectors (Option B) +
 palette.json                facet geometry + named presets (mark facets + light/dark UI tokens)
 ```
 
-## Theming via currentColor
+## Usage
 
-Set `color` on the SVG element (or any parent) to change the mark color:
-
-```html
-<!-- cobalt blue on dark bg -->
-<img src="base.svg" style="color: #206de9">
-
-<!-- or inline -->
-<svg ... style="color: #206de9"> ... </svg>
-```
-
-For React/Vue components, pass a `color` prop and bind it to the SVG's `style.color`.
-
-## Using state SVGs
-
-Drop-in (Option A — self-contained, each file has its own `<style>`):
-
-```html
-<img src="states/loading.svg" width="48" height="48">
-```
-
-Class-driven (Option B — one base SVG + `states.css`):
-
-```html
-<link rel="stylesheet" href="states.css">
-<svg class="state-loading" ...> <!-- base mark: id="mark" wrapping id="p0".."p5" --> </svg>
-```
-
-Available classes: `state-neutral` `state-loading` `state-success` `state-warning`
-`state-error` `state-404` `state-500` `state-503` `state-403`
-
-## Adding a sub-brand lockup
-
-1. Open `lockup/template.svg`
-2. Replace the dashed slot guide with a `<text>` element at `x="64" y="37"`
-3. Font: Space Grotesk 600, font-size 24, letter-spacing -0.5
-4. The mark never moves — only the text slot changes
-
-```xml
-<text x="64" y="37"
-      font-family="'Space Grotesk', system-ui, sans-serif"
-      font-size="24" font-weight="600" letter-spacing="-0.5"
-      fill="currentColor">your-sub-brand</text>
-```
+Theming (`currentColor`), the state SVGs (drop-in vs class-driven), and sub-brand lockup
+generation are all covered live, interactively, with copy-to-clipboard snippets and a working
+generator, at **https://ortiq-de.github.io/logo/** — that page is the up-to-date reference; it
+isn't duplicated here to avoid the two drifting out of sync.
 
 ## Adding a new state
 
