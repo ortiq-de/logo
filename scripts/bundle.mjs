@@ -8,6 +8,7 @@ import { readFileSync, writeFileSync, mkdirSync, copyFileSync, existsSync } from
 import { execSync } from 'child_process'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
+import { extractHexPaths } from '../src/hex-paths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -97,102 +98,15 @@ for (const { key, path } of SVG_FILES) {
 }
 
 // ── Lockup utility source ─────────────────────────────────────────────────
-// Shared implementation injected into both CJS and ESM bundles.
-// The hexagon mark is single-tone (six facets at fixed opacity, matching
-// base.svg) since a lockup needs one flat color — themed via currentColor,
-// same contract as createTextLockup/createIconLockup always had.
-//
-// createTextLockup: mark at x=0,y=4 (48×48), text starts at x=56.
-// createIconLockup: mark at x=24,y=24 (48×48, extra margin on every side so
-// any of the 8 placements fits without clipping). placement chooses where
-// the icon sits: 'e'|'n'|'s'|'w' render inline just outside that edge of the
-// mark with a small gap; 'ne'|'se'|'sw'|'nw' render as a small association
-// badge (stroke ring, no fill) overlapping that corner of the mark. The mark
-// itself never moves — only the icon moves around it.
-const HEX_PATHS = paletteData.facetGeometry.map(g => {
-  const path = svgMap.base.match(new RegExp(`id="${g.id}" d="([^"]+)"`))
-  return { d: path[1], op: g.baseOpacity }
-})
-const MARK_INNER_PATHS = HEX_PATHS.map(p => `<path d="${p.d}" opacity="${p.op}"/>`).join('')
-
-const _markInnerStr = JSON.stringify(MARK_INNER_PATHS)
-
-const LOCKUP_FN_SRC = `
-var _be_markInner=${_markInnerStr};
-function _be_mark(x,y){return '<svg x="'+x+'" y="'+y+'" width="48" height="48" viewBox="0 0 540 540"><g fill="currentColor">'+_be_markInner+'</g></svg>';}
-var _be_fonts={'space-grotesk':"'Space Grotesk',system-ui,sans-serif",'inter':"'Inter',system-ui,sans-serif",'system':'system-ui,sans-serif','serif':"Georgia,'Times New Roman',serif",'mono':"'Fira Code','SF Mono',monospace"};
-function _be_esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function _be_calcW(textX,text,fontSize){return Math.ceil(Math.max(220,textX+Math.max(60,String(text).length*fontSize*0.60+8)+12));}
-function _be_extractIcon(iconSvg){
-  var s=String(iconSvg).trim();
-  if(s.slice(0,4)!=='<svg') return {inner:s,vb:'0 0 24 24'};
-  var gt=s.indexOf('>');
-  var openTag=s.slice(0,gt+1);
-  var closeIdx=s.lastIndexOf('</svg>');
-  var inner=closeIdx>-1?s.slice(gt+1,closeIdx):s.slice(gt+1);
-  var vb='0 0 24 24';
-  var vbIdx=openTag.indexOf('viewBox="');
-  if(vbIdx>-1){
-    var start=vbIdx+9;
-    var end=openTag.indexOf('"',start);
-    vb=openTag.slice(start,end);
-  }
-  return {inner:inner,vb:vb};
-}
-function createTextLockup(subBrand,options){
-  options=options||{};
-  var fontSize=options.fontSize||24;
-  var ff=_be_fonts[options.fontFamily]||_be_fonts['space-grotesk'];
-  var textX=56,naturalH=56;
-  var naturalW=_be_calcW(textX,subBrand,fontSize);
-  var W=options.width||naturalW, H=options.height||naturalH;
-  var bl=(28+fontSize*0.35).toFixed(1);
-  var text='<text x="'+textX+'" y="'+bl+'" font-family="'+ff+'" font-size="'+fontSize+'" font-weight="600" letter-spacing="-0.5" fill="currentColor">'+_be_esc(subBrand)+'</text>';
-  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+naturalW+' '+naturalH+'" width="'+W+'" height="'+H+'">'+_be_mark(0,4)+text+'</svg>';
-}
-var _be_ilMarkX=24,_be_ilMarkY=24,_be_ilMarkRight=72,_be_ilMarkBottom=72,_be_ilMarkCx=48,_be_ilMarkCy=48,_be_ilCanvasH=96;
-function _be_ilLayout(placement){
-  var GAP=4,ICON=20,R=12,BICON=16;
-  var corners={
-    ne:{cx:_be_ilMarkRight-4,cy:_be_ilMarkY+4},
-    se:{cx:_be_ilMarkRight-4,cy:_be_ilMarkBottom-4},
-    sw:{cx:_be_ilMarkX+4,cy:_be_ilMarkBottom-4},
-    nw:{cx:_be_ilMarkX+4,cy:_be_ilMarkY+4}
-  };
-  if(corners[placement]){
-    var c=corners[placement];
-    var east=placement==='ne'||placement==='se';
-    return {kind:'badge',cx:c.cx,cy:c.cy,r:R,iconX:c.cx-BICON/2,iconY:c.cy-BICON/2,iconSize:BICON,textX:east?c.cx+R+8:_be_ilMarkRight+8};
-  }
-  var inline={
-    n:{x:_be_ilMarkCx-ICON/2,y:_be_ilMarkY-GAP-ICON},
-    s:{x:_be_ilMarkCx-ICON/2,y:_be_ilMarkBottom+GAP},
-    e:{x:_be_ilMarkRight+GAP,y:_be_ilMarkCy-ICON/2},
-    w:{x:_be_ilMarkX-GAP-ICON,y:_be_ilMarkCy-ICON/2}
-  };
-  var pos=inline[placement]||inline.e;
-  return {kind:'inline',x:pos.x,y:pos.y,size:ICON,textX:placement==='e'?pos.x+ICON+GAP:_be_ilMarkRight+8};
-}
-function createIconLockup(subBrand,iconSvg,options){
-  options=options||{};
-  var placement=options.placement||'e';
-  var fontSize=options.fontSize||24;
-  var ff=_be_fonts[options.fontFamily]||_be_fonts['space-grotesk'];
-  var icon=_be_extractIcon(iconSvg);
-  var layout=_be_ilLayout(placement);
-  var naturalW=_be_calcW(layout.textX,subBrand,fontSize), naturalH=_be_ilCanvasH;
-  var W=options.width||naturalW, H=options.height||naturalH;
-  var bl=(_be_ilMarkCy+fontSize*0.35).toFixed(1);
-  var iconEl;
-  if(layout.kind==='badge'){
-    iconEl='<circle cx="'+layout.cx+'" cy="'+layout.cy+'" r="'+layout.r+'" fill="none" stroke="currentColor" stroke-width="1"/>'+
-      '<svg x="'+layout.iconX+'" y="'+layout.iconY+'" width="'+layout.iconSize+'" height="'+layout.iconSize+'" viewBox="'+icon.vb+'" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" overflow="visible">'+icon.inner+'</svg>';
-  } else {
-    iconEl='<svg x="'+layout.x+'" y="'+layout.y+'" width="'+layout.size+'" height="'+layout.size+'" viewBox="'+icon.vb+'" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" overflow="visible">'+icon.inner+'</svg>';
-  }
-  var text='<text x="'+layout.textX+'" y="'+bl+'" font-family="'+ff+'" font-size="'+fontSize+'" font-weight="600" letter-spacing="-0.5" fill="currentColor">'+_be_esc(subBrand)+'</text>';
-  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+naturalW+' '+naturalH+'" width="'+W+'" height="'+H+'">'+_be_mark(_be_ilMarkX,_be_ilMarkY)+iconEl+text+'</svg>';
-}`
+// createTextLockup/createIconLockup live as real source in src/lockup.mjs (built from
+// src/hex-paths.mjs's extracted facet geometry) so they're directly unit-testable. Their
+// text is read here and string-injected into both the CJS and ESM bundles, instantiated
+// with the real hexagon path data — this is the one place that source gets duplicated as
+// text, so both bundles stay self-contained with zero internal imports.
+const HEX_PATHS = extractHexPaths(svgMap.base, paletteData.facetGeometry)
+const LOCKUP_SRC_RAW = readFileSync(join(ROOT, 'src', 'lockup.mjs'), 'utf8')
+const LOCKUP_FN_SRC = LOCKUP_SRC_RAW.replace(/^export function createLockupApi/m, 'function createLockupApi')
+const LOCKUP_INSTANTIATE = `const __hexPaths = ${JSON.stringify(HEX_PATHS)};\nconst __lockupApi = createLockupApi(__hexPaths);`
 
 // ── CJS bundle ────────────────────────────────────────────────────────────
 const cjsLines = [
@@ -200,6 +114,9 @@ const cjsLines = [
   `const palette = ${JSON.stringify(paletteData, null, 2)};`,
   ...Object.entries(svgMap).map(([k, v]) => `const ${k} = ${JSON.stringify(v)};`),
   LOCKUP_FN_SRC,
+  LOCKUP_INSTANTIATE,
+  `const createTextLockup = __lockupApi.createTextLockup;`,
+  `const createIconLockup = __lockupApi.createIconLockup;`,
   `module.exports = { palette, ${Object.keys(svgMap).join(', ')}, createTextLockup, createIconLockup };`,
 ]
 writeFileSync(join(DIST, 'index.js'), cjsLines.join('\n'))
@@ -209,9 +126,10 @@ console.log('✓ index.js (CJS)')
 const esmLines = [
   `export const palette = ${JSON.stringify(paletteData, null, 2)};`,
   ...Object.entries(svgMap).map(([k, v]) => `export const ${k} = ${JSON.stringify(v)};`),
-  LOCKUP_FN_SRC
-    .replace(/^function createTextLockup/m, 'export function createTextLockup')
-    .replace(/^function createIconLockup/m, 'export function createIconLockup'),
+  LOCKUP_FN_SRC,
+  LOCKUP_INSTANTIATE,
+  `export const createTextLockup = __lockupApi.createTextLockup;`,
+  `export const createIconLockup = __lockupApi.createIconLockup;`,
 ]
 writeFileSync(join(DIST, 'index.mjs'), esmLines.join('\n'))
 console.log('✓ index.mjs (ESM)')

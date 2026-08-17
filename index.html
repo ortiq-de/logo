@@ -41,7 +41,10 @@
     .wordmark { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
     .wordmark span { color: var(--primary); transition: color 0.3s; }
     .wordmark span.tag { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-left: 6px; }
+    .header-right { display: flex; align-items: center; gap: 12px; }
     .version-badge { font-size: 11px; padding: 3px 10px; border: 1px solid var(--border); border-radius: 20px; opacity: 0.6; white-space: nowrap; }
+    .test-results-link { font-size: 11px; color: var(--accent); text-decoration: none; white-space: nowrap; }
+    .test-results-link:hover { text-decoration: underline; }
 
     main { padding: 56px 0; }
     section { margin-bottom: 64px; }
@@ -68,6 +71,20 @@
     input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; border-radius: 50%; }
     input[type="color"]::-webkit-color-swatch { border-radius: 50%; border: 2px solid var(--border); }
 
+    .mono-row { display: flex; align-items: center; gap: 10px; padding: 12px; }
+    .mono-row .label { flex: 1; font-size: 12px; opacity: 0.7; }
+    .switch {
+      position: relative; width: 38px; height: 22px; border-radius: 11px; flex-shrink: 0;
+      border: 1px solid var(--border); background: rgba(255,255,255,0.08); padding: 0; cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .switch .switch-thumb {
+      position: absolute; top: 1px; left: 1px; width: 18px; height: 18px; border-radius: 50%;
+      background: #fff; transition: transform 0.15s;
+    }
+    .switch.on { background: var(--primary); border-color: var(--primary); }
+    .switch.on .switch-thumb { transform: translateX(16px); }
+    .disabled { opacity: 0.35; pointer-events: none; filter: grayscale(55%); }
     .tint-row { display: flex; align-items: center; gap: 10px; padding: 12px; background: rgba(0,0,0,0.15); border-radius: 8px; }
     .tint-row .label { flex: 1; font-size: 12px; opacity: 0.7; }
     .preset-row { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -276,7 +293,10 @@
         <svg id="header-mark" viewBox="0 0 540 540" width="34" height="34" fill="currentColor"></svg>
         <div class="wordmark"><span>O</span>rtiq <span class="tag">logo system</span></div>
       </div>
-      <span class="version-badge" id="version-badge">v3.0.0</span>
+      <div class="header-right">
+        <a class="test-results-link hidden" id="test-results-link" href="test-results/index.html">View test results &rarr;</a>
+        <span class="version-badge" id="version-badge">v3.0.0</span>
+      </div>
     </div>
   </div>
 </header>
@@ -300,16 +320,22 @@
             <span class="wizard-step-num">1</span> Color the mark <span class="wizard-step-chevron">⌄</span>
           </button>
           <div class="wizard-step-body sidebar gen-panel" id="step-body-1">
+            <div class="mono-row">
+              <span class="label">Monochrome</span>
+              <button type="button" class="switch" id="mono-toggle" role="switch" aria-checked="false">
+                <span class="switch-thumb"></span>
+              </button>
+            </div>
+            <div class="tint-row" id="tint-row">
+              <span class="label">Build all from color</span>
+              <input type="color" id="tint-swatch" value="#206de9">
+            </div>
+
             <div>
               <h3>Facet colors</h3>
               <div class="hint">Click a swatch to edit, or type a hex code.</div>
             </div>
             <div id="facet-rows"></div>
-
-            <div class="tint-row">
-              <span class="label">Rebuild all six from one hue</span>
-              <input type="color" id="tint-swatch" value="#206de9">
-            </div>
             <div class="preset-row" id="preset-row"></div>
 
             <div>
@@ -339,6 +365,7 @@
 
             <div class="sidebar-actions">
               <button class="action-btn primary" id="copy-svg-btn">Copy SVG code</button>
+              <button class="action-btn" id="copy-palette-btn">Copy palette JSON</button>
               <div class="dl-format-row">
                 <button class="action-btn" id="dl-svg-btn">Download .svg</button>
                 <button class="action-btn" id="dl-png-btn">Download .png</button>
@@ -627,6 +654,10 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
         Source on GitHub
       </a>
+      <a class="dl-btn" href="test-results/index.html">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        Browse test results by version
+      </a>
     </div>
   </section>
 
@@ -720,6 +751,8 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   let showSizeMarks = false;            // preview-only dimension overlay
   let includeSizeMarksInExport = false; // bake the overlay into downloaded SVG/PNG
   let activeStep = 1;                   // 1 | 2 | 3 — which wizard step is expanded
+  let monochrome = false;               // single-color mark mode
+  let monochromeSnapshot = null;        // { facetColors, activePresetId } captured when monochrome turns on
   const SIZE_MARKS_EXPORT_COLOR = '#8a8f98'; // mid-gray, legible on both themes, baked-export only
 
   function tintFacets(hue, sat, light) {
@@ -730,6 +763,36 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       out[g.id] = hslToHex(hue, facetS, clamp(facetL + 12, 0, 96));
     });
     return out;
+  }
+
+  // Rebuilds all six facets from the current #tint-swatch value — shared by the swatch's
+  // own input listener and by setMonochrome(true)'s initial seed.
+  function seedFacetsFromSwatch() {
+    const { r, g, b } = hexToRgb(document.getElementById('tint-swatch').value);
+    const hsl = rgbToHsl(r, g, b);
+    facetColors = tintFacets(hsl.h, hsl.s, hsl.l);
+  }
+
+  // Monochrome is a non-destructive overlay on top of the normal facet/preset state: turning
+  // it on snapshots the current colors and seeds all six facets from one hue (same math as
+  // "Build all from color"); per-facet pickers stay live while it's on. Turning it off restores
+  // the pre-monochrome snapshot — but leaves #tint-swatch itself showing the last color built
+  // from, ready to reuse.
+  function setMonochrome(on) {
+    if (on) {
+      monochromeSnapshot = { facetColors: { ...facetColors }, activePresetId };
+      seedFacetsFromSwatch();
+      activePresetId = 'custom';
+    } else if (monochromeSnapshot) {
+      facetColors = monochromeSnapshot.facetColors;
+      activePresetId = monochromeSnapshot.activePresetId;
+      monochromeSnapshot = null;
+    }
+    monochrome = on;
+    renderFacetRows();
+    renderPresetRow();
+    renderAll();
+    persist();
   }
 
   function currentUiTokens() {
@@ -807,6 +870,23 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 540" width="${size}" height="${size}"><g id="mark">${coloredFacetsMarkup(prefix, withIds)}</g></svg>`;
   }
 
+  // Live color state as a single palette.json preset object — pastable straight into
+  // palette.json's presets map. Resolves UI tokens off the active preset (falling back to the
+  // default when activePresetId is 'custom', same fallback the boot sequence uses) rather than
+  // currentUiTokens(), since that helper indexes PALETTE.presets[activePresetId] directly and
+  // would throw for 'custom' — the state this is most likely to be called in.
+  function buildPaletteJSON() {
+    const facets = {};
+    PALETTE.facetGeometry.forEach(g => {
+      const light = facetColors[g.id];
+      facets[g.id] = { light, dark: shade(light, -22) };
+    });
+    const basePreset = PALETTE.presets[activePresetId] || PALETTE.presets[PALETTE.default];
+    const ui = { dark: Object.assign({}, basePreset.ui.dark), light: Object.assign({}, basePreset.ui.light) };
+    ui[uiMode] = Object.assign({}, ui[uiMode], uiOverrides);
+    return JSON.stringify({ name: 'Custom', solid: markSolidColor, facets, ui }, null, 2);
+  }
+
   // ── Download helpers (reused across the customizer, states/http, and the generator) ──
   function downloadSVG(svgString, filename) {
     const blob = new Blob([svgString], { type: 'image/svg+xml' });
@@ -867,9 +947,12 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   function renderPresetRow() {
     const wrap = document.getElementById('preset-row');
     wrap.innerHTML = '';
+    wrap.classList.toggle('disabled', monochrome);
+    wrap.setAttribute('aria-disabled', String(monochrome));
     Object.entries(PALETTE.presets).forEach(([id, p]) => {
       const btn = document.createElement('button');
       btn.className = 'preset-swatch' + (activePresetId === id ? ' active' : '');
+      btn.disabled = monochrome;
       btn.innerHTML = `<span class="dot" style="background:${p.solid}"></span>${p.name}`;
       btn.addEventListener('click', () => {
         activePresetId = id;
@@ -1020,6 +1103,7 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         activePresetId, facetColors, uiMode, uiOverrides,
         thickness, margin, exportSize, showSizeMarks, includeSizeMarksInExport, activeStep,
+        monochrome, monochromeSnapshot,
       }));
     } catch (_) {}
   }
@@ -1039,6 +1123,8 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       showSizeMarks = !!saved.showSizeMarks;
       includeSizeMarksInExport = !!saved.includeSizeMarksInExport;
       activeStep = [1, 2, 3].includes(saved.activeStep) ? saved.activeStep : 1;
+      monochrome = !!saved.monochrome;
+      monochromeSnapshot = saved.monochromeSnapshot || null;
       return true;
     } catch (_) { return false; }
   }
@@ -1089,6 +1175,9 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     .then(d => {
       if (!d.tag_name) return Promise.reject();
       document.getElementById('version-badge').textContent = d.tag_name;
+      const trLink = document.getElementById('test-results-link');
+      trLink.href = `test-results/${d.tag_name}.html`;
+      trLink.classList.remove('hidden');
       const wrap = document.getElementById('dl-assets');
       const assets = (d.assets || []).slice().sort((a, b) => a.name.localeCompare(b.name));
       if (assets.length) {
@@ -1109,17 +1198,22 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   document.getElementById('mode-dark').addEventListener('click', () => { uiMode = 'dark'; uiOverrides = {}; renderUiTokenGrid(); applyUiTokens(); persist(); });
   document.getElementById('mode-light').addEventListener('click', () => { uiMode = 'light'; uiOverrides = {}; renderUiTokenGrid(); applyUiTokens(); persist(); });
 
-  // ── Tint-all-facets ──
+  // ── Tint-all-facets / Monochrome ──
   document.getElementById('tint-swatch').addEventListener('input', e => {
-    const { r, g, b } = hexToRgb(e.target.value);
-    const hsl = rgbToHsl(r, g, b);
-    facetColors = tintFacets(hsl.h, hsl.s, hsl.l);
+    seedFacetsFromSwatch();
     markSolidColor = e.target.value;
     activePresetId = 'custom';
     renderFacetRows();
     renderPresetRow();
     renderAll();
     persist();
+  });
+  document.getElementById('mono-toggle').addEventListener('click', () => {
+    const next = !monochrome;
+    const el = document.getElementById('mono-toggle');
+    el.classList.toggle('on', next);
+    el.setAttribute('aria-checked', String(next));
+    setMonochrome(next);
   });
 
   // ── Shape (thickness/margin) ──
@@ -1156,6 +1250,13 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   document.getElementById('copy-svg-btn').addEventListener('click', () => {
     navigator.clipboard.writeText(buildMarkSVG({ size: exportSize, withSizeMarks: includeSizeMarksInExport, marksColor: SIZE_MARKS_EXPORT_COLOR })).then(() => {
       const btn = document.getElementById('copy-svg-btn');
+      const t = btn.textContent; btn.textContent = 'Copied!'; btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = t; btn.classList.remove('copied'); }, 1500);
+    });
+  });
+  document.getElementById('copy-palette-btn').addEventListener('click', () => {
+    navigator.clipboard.writeText(buildPaletteJSON()).then(() => {
+      const btn = document.getElementById('copy-palette-btn');
       const t = btn.textContent; btn.textContent = 'Copied!'; btn.classList.add('copied');
       setTimeout(() => { btn.textContent = t; btn.classList.remove('copied'); }, 1500);
     });
@@ -1572,6 +1673,8 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     document.getElementById('export-size-input').value = exportSize;
     document.getElementById('show-size-marks').checked = showSizeMarks;
     document.getElementById('include-size-marks-export').checked = includeSizeMarksInExport;
+    document.getElementById('mono-toggle').classList.toggle('on', monochrome);
+    document.getElementById('mono-toggle').setAttribute('aria-checked', String(monochrome));
     applyStepClassesInstant(activeStep);
 
     renderFacetRows();

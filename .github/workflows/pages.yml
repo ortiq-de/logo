@@ -7,9 +7,9 @@ on:
 
 jobs:
 
-  # ── Validate SVGs ─────────────────────────────────────────────────────────
+  # ── Validate SVGs + run the npm package test suite ────────────────────────
   validate:
-    name: Validate SVGs
+    name: Validate SVGs & run tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,6 +21,13 @@ jobs:
             echo "Validating $f"
             xmllint --noout "$f" || exit 1
           done
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install JS deps
+        run: npm install --ignore-scripts
+      - name: Run tests
+        run: npm test
 
   # ── Deploy GitHub Pages ───────────────────────────────────────────────────
   pages:

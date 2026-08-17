@@ -49,6 +49,17 @@ jobs:
       - name: Build bundle (SVGs + PNGs + favicons + TypeScript defs)
         run: node scripts/bundle.mjs
 
+      - name: Run tests
+        run: npm test -- --reporter=verbose --reporter=json --outputFile=test-results.json | tee test-output.log
+
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            test-results.json
+            test-output.log
+
       - name: Create release archives
         run: |
           VERSION=${GITHUB_REF_NAME}
@@ -110,3 +121,39 @@ jobs:
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ── Publish this version's test-log page ─────────────────────────────────
+  # Runs only after `bundle` (tests + publish) succeeds, so a page only ever appears for a
+  # version that actually shipped. Checks out main fresh (not the tag's detached HEAD) so the
+  # commit doesn't overwrite main with the tagged tree's other files — it only ever touches
+  # test-results/. Pushing to main re-triggers pages.yml, which deploys the raw repo root, so
+  # this page goes live with no pages.yml changes needed.
+  publish-test-report:
+    name: Publish test report page
+    runs-on: ubuntu-latest
+    needs: bundle
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: test-results
+
+      - name: Build test-results/<version>.html + index.html
+        run: node scripts/build-test-report.mjs
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_SHA: ${{ github.sha }}
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add test-results/
+          git diff --cached --quiet && exit 0
+          git commit -m "Add test results for ${{ github.ref_name }}"
+          git push origin HEAD:main

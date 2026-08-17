@@ -15,7 +15,8 @@
   "scripts": {
     "build":    "node scripts/bundle.mjs",
     "validate": "find . -name '*.svg' -not -path './.git/*' -not -path './dist/*' | xargs xmllint --noout",
-    "preview":  "open preview.html || xdg-open preview.html"
+    "preview":  "open preview.html || xdg-open preview.html",
+    "test":     "vitest run"
   },
   "files": [
     "dist/",
@@ -29,6 +30,9 @@
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
     "access": "public"
+  },
+  "devDependencies": {
+    "vitest": "^4.0.0"
   },
   "keywords": ["ortiq", "logo", "brand", "svg", "hexagon", "design-system"],
   "license": "MIT",
