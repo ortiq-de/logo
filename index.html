@@ -66,6 +66,12 @@
 
     .facet-row { display: flex; align-items: center; gap: 10px; }
     .facet-row .label { flex: 1; font-size: 12px; opacity: 0.7; }
+    .hex-input {
+      font-family: 'SF Mono', 'Fira Code', monospace; font-size: 11px; width: 72px;
+      background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 6px;
+      color: var(--text); padding: 5px 7px;
+    }
+    .hex-input:focus { outline: none; border-color: var(--accent); }
     .facet-row .hex { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 11px; opacity: 0.5; width: 62px; }
     input[type="color"] { -webkit-appearance: none; width: 26px; height: 26px; border: none; border-radius: 50%; cursor: pointer; background: none; padding: 0; flex-shrink: 0; }
     input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; border-radius: 50%; }
@@ -327,7 +333,8 @@
               </button>
             </div>
             <div class="tint-row" id="tint-row">
-              <span class="label">Build all from color</span>
+              <span class="label">Primary</span>
+              <input type="text" class="hex-input" id="tint-hex" value="#206de9" maxlength="7" spellcheck="false">
               <input type="color" id="tint-swatch" value="#206de9">
             </div>
 
@@ -765,23 +772,58 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     return out;
   }
 
-  // Rebuilds all six facets from the current #tint-swatch value — shared by the swatch's
-  // own input listener and by setMonochrome(true)'s initial seed.
+  // Rebuilds all six facets from the current #tint-swatch value using the gem-tint algorithm
+  // (varied per-facet lightness/saturation) — used when Monochrome is off.
   function seedFacetsFromSwatch() {
     const { r, g, b } = hexToRgb(document.getElementById('tint-swatch').value);
     const hsl = rgbToHsl(r, g, b);
     facetColors = tintFacets(hsl.h, hsl.s, hsl.l);
   }
 
+  // Sets every facet to the exact same hex — used when Monochrome is on, so the mark is
+  // genuinely one flat color rather than a gem-tinted spread.
+  function fillFacetsFlat(hex) {
+    facetColors = {};
+    PALETTE.facetGeometry.forEach(g => { facetColors[g.id] = hex; });
+  }
+
+  function normalizeHex(hex) {
+    let h = String(hex).trim();
+    if (h[0] !== '#') h = '#' + h;
+    if (/^#[0-9a-f]{3}$/i.test(h)) h = '#' + [...h.slice(1)].map(c => c + c).join('');
+    return /^#[0-9a-f]{6}$/i.test(h) ? h.toLowerCase() : null;
+  }
+
+  // Single entry point for the Primary color control (swatch + hex text input). While
+  // Monochrome is on this is the only way to change color — every facet is set flat to this
+  // one value. While Monochrome is off it drives the existing gem-tint spread.
+  function applyPrimaryColor(rawHex) {
+    const hex = normalizeHex(rawHex);
+    if (!hex) return;
+    markSolidColor = hex;
+    document.getElementById('tint-swatch').value = hex;
+    document.getElementById('tint-hex').value = hex;
+    if (monochrome) {
+      fillFacetsFlat(hex);
+    } else {
+      seedFacetsFromSwatch();
+    }
+    activePresetId = 'custom';
+    renderFacetRows();
+    renderPresetRow();
+    renderAll();
+    persist();
+  }
+
   // Monochrome is a non-destructive overlay on top of the normal facet/preset state: turning
-  // it on snapshots the current colors and seeds all six facets from one hue (same math as
-  // "Build all from color"); per-facet pickers stay live while it's on. Turning it off restores
-  // the pre-monochrome snapshot — but leaves #tint-swatch itself showing the last color built
-  // from, ready to reuse.
+  // it on snapshots the current colors and flat-fills all six facets from the Primary color, and
+  // locks per-facet editing so the mark stays genuinely one color. Turning it off restores the
+  // pre-monochrome snapshot and re-enables per-facet editing — but leaves the Primary
+  // swatch/hex itself showing the last color used, ready to reuse.
   function setMonochrome(on) {
     if (on) {
       monochromeSnapshot = { facetColors: { ...facetColors }, activePresetId };
-      seedFacetsFromSwatch();
+      fillFacetsFlat(document.getElementById('tint-swatch').value);
       activePresetId = 'custom';
     } else if (monochromeSnapshot) {
       facetColors = monochromeSnapshot.facetColors;
@@ -928,12 +970,16 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   function renderFacetRows() {
     const wrap = document.getElementById('facet-rows');
     wrap.innerHTML = '';
+    wrap.classList.toggle('disabled', monochrome);
+    wrap.setAttribute('aria-disabled', String(monochrome));
     PALETTE.facetGeometry.forEach(g => {
       const row = document.createElement('div');
       row.className = 'facet-row';
       row.innerHTML = `<span class="label">${g.label}</span><span class="hex" id="hex-${g.id}">${facetColors[g.id]}</span><input type="color" id="picker-${g.id}" value="${facetColors[g.id]}">`;
       wrap.appendChild(row);
-      row.querySelector('input').addEventListener('input', e => {
+      const input = row.querySelector('input');
+      input.disabled = monochrome;
+      input.addEventListener('input', e => {
         facetColors[g.id] = e.target.value;
         document.getElementById(`hex-${g.id}`).textContent = e.target.value;
         activePresetId = 'custom';
@@ -960,6 +1006,7 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
         Object.entries(p.facets).forEach(([fid, c]) => { facetColors[fid] = c.light; });
         markSolidColor = p.solid;
         document.getElementById('tint-swatch').value = p.solid;
+        document.getElementById('tint-hex').value = p.solid;
         uiOverrides = {};
         renderFacetRows();
         renderPresetRow();
@@ -1198,16 +1245,9 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   document.getElementById('mode-dark').addEventListener('click', () => { uiMode = 'dark'; uiOverrides = {}; renderUiTokenGrid(); applyUiTokens(); persist(); });
   document.getElementById('mode-light').addEventListener('click', () => { uiMode = 'light'; uiOverrides = {}; renderUiTokenGrid(); applyUiTokens(); persist(); });
 
-  // ── Tint-all-facets / Monochrome ──
-  document.getElementById('tint-swatch').addEventListener('input', e => {
-    seedFacetsFromSwatch();
-    markSolidColor = e.target.value;
-    activePresetId = 'custom';
-    renderFacetRows();
-    renderPresetRow();
-    renderAll();
-    persist();
-  });
+  // ── Primary color / Monochrome ──
+  document.getElementById('tint-swatch').addEventListener('input', e => applyPrimaryColor(e.target.value));
+  document.getElementById('tint-hex').addEventListener('input', e => applyPrimaryColor(e.target.value));
   document.getElementById('mono-toggle').addEventListener('click', () => {
     const next = !monochrome;
     const el = document.getElementById('mono-toggle');
@@ -1661,6 +1701,7 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     }
     markSolidColor = PALETTE.presets[activePresetId] ? PALETTE.presets[activePresetId].solid : PALETTE.presets[PALETTE.default].solid;
     document.getElementById('tint-swatch').value = markSolidColor;
+    document.getElementById('tint-hex').value = markSolidColor;
     tlBgColor = PALETTE.presets[PALETTE.default].ui.dark.background;
     ilBgColor = tlBgColor;
     document.getElementById('tl-bg-color').value = tlBgColor;
