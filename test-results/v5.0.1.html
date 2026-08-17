@@ -16,20 +16,16 @@
 <body>
   <p><a href="index.html">&larr; all versions</a></p>
   <h1>Test results — v5.0.1</h1>
-  <div class="meta">commit 68361a0eefe3 &middot; generated 2026-08-17T12:22:34.160Z</div>
+  <div class="meta">commit 0186f2ab3c21 &middot; generated 2026-08-17T12:58:33.319Z</div>
   <div class="stats">
-    <div class="stat pass"><b>55</b>passed</div>
+    <div class="stat pass"><b>46</b>passed</div>
     <div class="stat fail"><b>0</b>failed</div>
-    <div class="stat skip"><b>0</b>skipped</div>
+    <div class="stat skip"><b>9</b>skipped</div>
     <div class="stat"><b>55</b>total</div>
-    <div class="stat"><b>0.99s</b>duration</div>
+    <div class="stat"><b>1.02s</b>duration</div>
   </div>
   <pre>
-&gt; @ortiq-de/logo@5.0.0 test
-&gt; vitest run --reporter=verbose --reporter=json --outputFile=test-results.json
-
-
-[1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90m/home/runner/work/logo/logo[39m
+ RUN  v4.1.10 /home/user/logo
 
 ✓ palette.json
 ✓ loaded base.svg
@@ -54,80 +50,72 @@
 ✓ index.d.ts (TypeScript)
 ✓ index.css
 ✓ states.css
-✓ favicons/favicon-16x16.png
-✓ favicons/favicon-32x32.png
-✓ favicons/favicon-48x48.png
-✓ favicons/favicon-96x96.png
-✓ favicons/apple-touch-icon.png
-✓ favicons/favicon-192x192.png
-✓ favicons/favicon-512x512.png
-✓ favicons/favicon.svg
-✓ favicons/favicon.ico
+⚠ rsvg-convert not available — skipping favicon rasterisation
 ✓ site.webmanifest
 ✓ dist/package.json
 
 ✅ Bundle complete → dist/
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateTextLockup[2m &gt; [22mproduces a well-formed SVG with the sub-brand name in a &lt;text&gt; node[32m 2[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateTextLockup[2m &gt; [22mdefaults to viewBox height 56 and a width matching the calcW formula[32m 0[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateTextLockup[2m &gt; [22mhonors fontSize/fontFamily/explicit width+height overrides[32m 0[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateTextLockup[2m &gt; [22mescapes special characters in the sub-brand name[32m 0[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mproduces well-formed output for placement "n"[32m 1[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mproduces well-formed output for placement "ne"[32m 0[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mproduces well-formed output for placement "e"[32m 0[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mproduces well-formed output for placement "se"[32m 0[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mproduces well-formed output for placement "s"[32m 0[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mproduces well-formed output for placement "sw"[32m 0[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mproduces well-formed output for placement "w"[32m 0[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mproduces well-formed output for placement "nw"[32m 0[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mplacement "ne" renders no badge ring[32m 0[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mplacement "se" renders no badge ring[32m 0[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mplacement "sw" renders no badge ring[32m 0[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mplacement "nw" renders no badge ring[32m 0[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mplacement "n" renders no badge ring[32m 0[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mplacement "e" renders no badge ring[32m 0[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mplacement "s" renders no badge ring[32m 0[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mplacement "w" renders no badge ring[32m 0[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mdefaults viewBox height to 96[32m 0[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mextracts inner markup + viewBox from a full &lt;svg viewBox="..."&gt; icon string[32m 0[2mms[22m[39m
- [32m✓[39m test/lockup.test.mjs[2m &gt; [22mcreateIconLockup[2m &gt; [22mtreats bare inner markup as-is with a default 0 0 24 24 viewBox[32m 0[2mms[22m[39m
- [32m✓[39m test/palette-schema.test.mjs[2m &gt; [22mpalette.json schema[2m &gt; [22mhas version 2 and a default preset id that resolves[32m 4[2mms[22m[39m
- [32m✓[39m test/palette-schema.test.mjs[2m &gt; [22mpalette.json schema[2m &gt; [22mfacetGeometry has exactly 6 unique p0-p5 entries with numeric deltas and a valid baseOpacity[32m 3[2mms[22m[39m
- [32m✓[39m test/palette-schema.test.mjs[2m &gt; [22mpalette.json schema[2m &gt; [22mpreset "cobalt" has name/solid/6 valid facets/full ui tokens[32m 2[2mms[22m[39m
- [32m✓[39m test/palette-schema.test.mjs[2m &gt; [22mpalette.json schema[2m &gt; [22mpreset "violet" has name/solid/6 valid facets/full ui tokens[32m 2[2mms[22m[39m
- [32m✓[39m test/palette-schema.test.mjs[2m &gt; [22mpalette.json schema[2m &gt; [22mpreset "teal" has name/solid/6 valid facets/full ui tokens[32m 3[2mms[22m[39m
- [32m✓[39m test/palette-schema.test.mjs[2m &gt; [22mpalette.json schema[2m &gt; [22mpreset "ember" has name/solid/6 valid facets/full ui tokens[32m 1[2mms[22m[39m
- [32m✓[39m test/palette-schema.test.mjs[2m &gt; [22mpalette.json schema[2m &gt; [22mpreset "graphite" has name/solid/6 valid facets/full ui tokens[32m 1[2mms[22m[39m
- [32m✓[39m test/palette-schema.test.mjs[2m &gt; [22mpalette.json schema[2m &gt; [22mpreset "legacy-brand" has name/solid/6 valid facets/full ui tokens[32m 1[2mms[22m[39m
- [32m✓[39m test/palette-schema.test.mjs[2m &gt; [22mpalette.json schema[2m &gt; [22msuccess/warning/error tokens are identical literals across every preset (documented invariant)[32m 1[2mms[22m[39m
- [32m✓[39m test/favicons.test.mjs[2m &gt; [22mfavicon rasterization (requires rsvg-convert)[2m &gt; [22mproduces a non-empty PNG for size 16px[32m 6[2mms[22m[39m
- [32m✓[39m test/favicons.test.mjs[2m &gt; [22mfavicon rasterization (requires rsvg-convert)[2m &gt; [22mproduces a non-empty PNG for size 32px[32m 0[2mms[22m[39m
- [32m✓[39m test/favicons.test.mjs[2m &gt; [22mfavicon rasterization (requires rsvg-convert)[2m &gt; [22mproduces a non-empty PNG for size 48px[32m 0[2mms[22m[39m
- [32m✓[39m test/favicons.test.mjs[2m &gt; [22mfavicon rasterization (requires rsvg-convert)[2m &gt; [22mproduces a non-empty PNG for size 96px[32m 0[2mms[22m[39m
- [32m✓[39m test/favicons.test.mjs[2m &gt; [22mfavicon rasterization (requires rsvg-convert)[2m &gt; [22mproduces a non-empty PNG for size 180px[32m 0[2mms[22m[39m
- [32m✓[39m test/favicons.test.mjs[2m &gt; [22mfavicon rasterization (requires rsvg-convert)[2m &gt; [22mproduces a non-empty PNG for size 192px[32m 0[2mms[22m[39m
- [32m✓[39m test/favicons.test.mjs[2m &gt; [22mfavicon rasterization (requires rsvg-convert)[2m &gt; [22mproduces a non-empty PNG for size 512px[32m 0[2mms[22m[39m
- [32m✓[39m test/favicons.test.mjs[2m &gt; [22mfavicon rasterization (requires rsvg-convert)[2m &gt; [22mproduces favicon.svg[32m 0[2mms[22m[39m
- [32m✓[39m test/favicons.test.mjs[2m &gt; [22mfavicon rasterization (requires rsvg-convert)[2m &gt; [22mproduces a non-empty favicon.ico (requires imagemagick)[32m 1[2mms[22m[39m
- [32m✓[39m test/dist-smoke.test.mjs[2m &gt; [22mdist/index.js (CJS) and dist/index.mjs (ESM) — real-world build smoke test[2m &gt; [22mboth expose palette, every svgMap key, and the lockup functions[32m 6[2mms[22m[39m
- [32m✓[39m test/dist-smoke.test.mjs[2m &gt; [22mdist/index.js (CJS) and dist/index.mjs (ESM) — real-world build smoke test[2m &gt; [22mCJS output, ESM output, and src/lockup.mjs direct output are identical (drift guard)[32m 2[2mms[22m[39m
- [32m✓[39m test/exports-map.test.mjs[2m &gt; [22mpackage.json exports map[2m &gt; [22mresolved at least one target per export path[32m 3[2mms[22m[39m
- [32m✓[39m test/exports-map.test.mjs[2m &gt; [22mpackage.json exports map[2m &gt; [22m./dist/index.mjs exists in the built dist/ and is non-empty[32m 1[2mms[22m[39m
- [32m✓[39m test/exports-map.test.mjs[2m &gt; [22mpackage.json exports map[2m &gt; [22m./dist/index.js exists in the built dist/ and is non-empty[32m 0[2mms[22m[39m
- [32m✓[39m test/exports-map.test.mjs[2m &gt; [22mpackage.json exports map[2m &gt; [22m./dist/index.d.ts exists in the built dist/ and is non-empty[32m 0[2mms[22m[39m
- [32m✓[39m test/exports-map.test.mjs[2m &gt; [22mpackage.json exports map[2m &gt; [22m./dist/index.css exists in the built dist/ and is non-empty[32m 0[2mms[22m[39m
- [32m✓[39m test/exports-map.test.mjs[2m &gt; [22mpackage.json exports map[2m &gt; [22m./dist/states.css exists in the built dist/ and is non-empty[32m 0[2mms[22m[39m
- [32m✓[39m test/exports-map.test.mjs[2m &gt; [22mpackage.json exports map[2m &gt; [22m./dist/palette.json exists in the built dist/ and is non-empty[32m 0[2mms[22m[39m
- [32m✓[39m test/exports-map.test.mjs[2m &gt; [22mpackage.json exports map[2m &gt; [22mmain/module/types fields also resolve to existing, non-empty files[32m 0[2mms[22m[39m
- [32m✓[39m test/pack-smoke.test.mjs[2m &gt; [22mnpm pack tarball — real consumer install simulation[2m &gt; [22mextracted tarball contains dist/, palette.json, and the other files-listed paths[32m 3[2mms[22m[39m
- [32m✓[39m test/pack-smoke.test.mjs[2m &gt; [22mnpm pack tarball — real consumer install simulation[2m &gt; [22mrequire()s the extracted CJS build and gets working exports[32m 2[2mms[22m[39m
- [32m✓[39m test/pack-smoke.test.mjs[2m &gt; [22mnpm pack tarball — real consumer install simulation[2m &gt; [22mimport()s the extracted ESM build and gets working exports[32m 18[2mms[22m[39m
- [32m✓[39m test/pack-smoke.test.mjs[2m &gt; [22mnpm pack tarball — real consumer install simulation[2m &gt; [22mextracted dist/palette.json matches the repo palette.json[32m 0[2mms[22m[39m
+ ✓ test/palette-schema.test.mjs &gt; palette.json schema &gt; has version 2 and a default preset id that resolves 10ms
+ ✓ test/palette-schema.test.mjs &gt; palette.json schema &gt; facetGeometry has exactly 6 unique p0-p5 entries with numeric deltas and a valid baseOpacity 4ms
+ ✓ test/palette-schema.test.mjs &gt; palette.json schema &gt; preset "cobalt" has name/solid/6 valid facets/full ui tokens 2ms
+ ✓ test/palette-schema.test.mjs &gt; palette.json schema &gt; preset "violet" has name/solid/6 valid facets/full ui tokens 2ms
+ ✓ test/palette-schema.test.mjs &gt; palette.json schema &gt; preset "teal" has name/solid/6 valid facets/full ui tokens 5ms
+ ✓ test/palette-schema.test.mjs &gt; palette.json schema &gt; preset "ember" has name/solid/6 valid facets/full ui tokens 1ms
+ ✓ test/palette-schema.test.mjs &gt; palette.json schema &gt; preset "graphite" has name/solid/6 valid facets/full ui tokens 1ms
+ ✓ test/palette-schema.test.mjs &gt; palette.json schema &gt; preset "legacy-brand" has name/solid/6 valid facets/full ui tokens 3ms
+ ✓ test/palette-schema.test.mjs &gt; palette.json schema &gt; success/warning/error tokens are identical literals across every preset (documented invariant) 1ms
+ ✓ test/lockup.test.mjs &gt; createTextLockup &gt; produces a well-formed SVG with the sub-brand name in a &lt;text&gt; node 3ms
+ ✓ test/lockup.test.mjs &gt; createTextLockup &gt; defaults to viewBox height 56 and a width matching the calcW formula 1ms
+ ✓ test/lockup.test.mjs &gt; createTextLockup &gt; honors fontSize/fontFamily/explicit width+height overrides 0ms
+ ✓ test/lockup.test.mjs &gt; createTextLockup &gt; escapes special characters in the sub-brand name 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; produces well-formed output for placement "n" 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; produces well-formed output for placement "ne" 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; produces well-formed output for placement "e" 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; produces well-formed output for placement "se" 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; produces well-formed output for placement "s" 1ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; produces well-formed output for placement "sw" 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; produces well-formed output for placement "w" 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; produces well-formed output for placement "nw" 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; placement "ne" renders no badge ring 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; placement "se" renders no badge ring 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; placement "sw" renders no badge ring 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; placement "nw" renders no badge ring 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; placement "n" renders no badge ring 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; placement "e" renders no badge ring 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; placement "s" renders no badge ring 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; placement "w" renders no badge ring 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; defaults viewBox height to 96 1ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; extracts inner markup + viewBox from a full &lt;svg viewBox="..."&gt; icon string 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; treats bare inner markup as-is with a default 0 0 24 24 viewBox 0ms
+ ✓ test/exports-map.test.mjs &gt; package.json exports map &gt; resolved at least one target per export path 2ms
+ ✓ test/exports-map.test.mjs &gt; package.json exports map &gt; ./dist/index.mjs exists in the built dist/ and is non-empty 1ms
+ ✓ test/exports-map.test.mjs &gt; package.json exports map &gt; ./dist/index.js exists in the built dist/ and is non-empty 0ms
+ ✓ test/exports-map.test.mjs &gt; package.json exports map &gt; ./dist/index.d.ts exists in the built dist/ and is non-empty 0ms
+ ✓ test/exports-map.test.mjs &gt; package.json exports map &gt; ./dist/index.css exists in the built dist/ and is non-empty 0ms
+ ✓ test/exports-map.test.mjs &gt; package.json exports map &gt; ./dist/states.css exists in the built dist/ and is non-empty 0ms
+ ✓ test/exports-map.test.mjs &gt; package.json exports map &gt; ./dist/palette.json exists in the built dist/ and is non-empty 0ms
+ ✓ test/exports-map.test.mjs &gt; package.json exports map &gt; main/module/types fields also resolve to existing, non-empty files 1ms
+ ✓ test/dist-smoke.test.mjs &gt; dist/index.js (CJS) and dist/index.mjs (ESM) — real-world build smoke test &gt; both expose palette, every svgMap key, and the lockup functions 10ms
+ ✓ test/dist-smoke.test.mjs &gt; dist/index.js (CJS) and dist/index.mjs (ESM) — real-world build smoke test &gt; CJS output, ESM output, and src/lockup.mjs direct output are identical (drift guard) 5ms
+ ↓ test/favicons.test.mjs &gt; favicon rasterization (requires rsvg-convert) &gt; produces a non-empty PNG for size 16px
+ ↓ test/favicons.test.mjs &gt; favicon rasterization (requires rsvg-convert) &gt; produces a non-empty PNG for size 32px
+ ↓ test/favicons.test.mjs &gt; favicon rasterization (requires rsvg-convert) &gt; produces a non-empty PNG for size 48px
+ ↓ test/favicons.test.mjs &gt; favicon rasterization (requires rsvg-convert) &gt; produces a non-empty PNG for size 96px
+ ↓ test/favicons.test.mjs &gt; favicon rasterization (requires rsvg-convert) &gt; produces a non-empty PNG for size 180px
+ ↓ test/favicons.test.mjs &gt; favicon rasterization (requires rsvg-convert) &gt; produces a non-empty PNG for size 192px
+ ↓ test/favicons.test.mjs &gt; favicon rasterization (requires rsvg-convert) &gt; produces a non-empty PNG for size 512px
+ ↓ test/favicons.test.mjs &gt; favicon rasterization (requires rsvg-convert) &gt; produces favicon.svg
+ ↓ test/favicons.test.mjs &gt; favicon rasterization (requires rsvg-convert) &gt; produces a non-empty favicon.ico (requires imagemagick)
+ ✓ test/pack-smoke.test.mjs &gt; npm pack tarball — real consumer install simulation &gt; extracted tarball contains dist/, palette.json, and the other files-listed paths 3ms
+ ✓ test/pack-smoke.test.mjs &gt; npm pack tarball — real consumer install simulation &gt; require()s the extracted CJS build and gets working exports 5ms
+ ✓ test/pack-smoke.test.mjs &gt; npm pack tarball — real consumer install simulation &gt; import()s the extracted ESM build and gets working exports 77ms
+ ✓ test/pack-smoke.test.mjs &gt; npm pack tarball — real consumer install simulation &gt; extracted dist/palette.json matches the repo palette.json 0ms
 
-[2m Test Files [22m [1m[32m6 passed[39m[22m[90m (6)[39m
-[2m      Tests [22m [1m[32m55 passed[39m[22m[90m (55)[39m
-[2m   Start at [22m 12:22:19
-[2m   Duration [22m 987ms[2m (transform 121ms, setup 0ms, import 229ms, tests 654ms, environment 1ms)[22m
+ Test Files  5 passed | 1 skipped (6)
+      Tests  46 passed | 9 skipped (55)
+   Start at  12:58:15
+   Duration  1.02s (transform 358ms, setup 0ms, import 437ms, tests 718ms, environment 1ms)
 
-JSON report written to /home/runner/work/logo/logo/test-results.json
+JSON report written to /home/user/logo/test-results.json
 </pre>
 </body></html>

@@ -29,6 +29,13 @@ function esc(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
+// vitest colorizes its terminal reporters even when piped (e.g. through `tee` in CI), so
+// test-output.log contains raw ANSI escape sequences — strip them before embedding in HTML,
+// since a browser <pre> has no ANSI support and would otherwise show the raw control codes.
+function stripAnsi(s) {
+  return String(s).replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '')
+}
+
 const stats = {
   total: results.numTotalTests,
   passed: results.numPassedTests,
@@ -68,7 +75,7 @@ const versionPage = `<!doctype html>
     <div class="stat"><b>${stats.total}</b>total</div>
     <div class="stat"><b>${(stats.durationMs / 1000).toFixed(2)}s</b>duration</div>
   </div>
-  <pre>${esc(log || 'No raw log captured.')}</pre>
+  <pre>${esc(stripAnsi(log) || 'No raw log captured.')}</pre>
 </body></html>
 `
 writeFileSync(join(OUT_DIR, `${tag}.html`), versionPage)
