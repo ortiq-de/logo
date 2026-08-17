@@ -40,7 +40,7 @@
     .logo-lockup svg { color: var(--primary); transition: color 0.3s; flex-shrink: 0; }
     .wordmark { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
     .wordmark span { color: var(--primary); transition: color 0.3s; }
-    .tag { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text); opacity: 0.35; margin-left: 6px; }
+    .wordmark span.tag { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-left: 6px; }
     .version-badge { font-size: 11px; padding: 3px 10px; border: 1px solid var(--border); border-radius: 20px; opacity: 0.6; white-space: nowrap; }
 
     main { padding: 56px 0; }
@@ -54,8 +54,8 @@
       background: var(--surface); border-radius: var(--radius); padding: 40px;
       display: flex; align-items: center; justify-content: center; min-height: 340px;
     }
+    #shared-preview > svg { display: block; }
     .preview-card:not(.wide) #shared-preview > svg { width: 260px; height: 260px; }
-    .preview-card.wide { min-height: 140px; }
     .preview-card.wide #shared-preview > svg { width: auto; max-width: 100%; height: auto; }
     .sidebar { background: var(--surface); border-radius: var(--radius); padding: 24px; display: flex; flex-direction: column; gap: 22px; }
     .sidebar h3 { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
