@@ -13,11 +13,12 @@
     #p5 { animation: warn-flare 0.8s ease-in-out 0.65s infinite; }
   </style>
   <g id="mark" fill="currentColor">
-    <path id="p0" d="M 270 22 L 484.77 146 L 344.1 227.22 L 270 184.44 Z" opacity="0.53"/>
-    <path id="p1" d="M 484.77 146 L 484.77 394 L 344.1 312.78 L 344.1 227.22 Z" opacity="0.35"/>
-    <path id="p2" d="M 484.77 394 L 270 518 L 270 355.56 L 344.1 312.78 Z" opacity="0.44"/>
-    <path id="p3" d="M 270 518 L 55.23 394 L 195.9 312.78 L 270 355.56 Z" opacity="0.50"/>
-    <path id="p4" d="M 55.23 394 L 55.23 146 L 195.9 227.22 L 195.9 312.78 Z" opacity="0.74"/>
-    <path id="p5" d="M 55.23 146 L 270 22 L 270 184.44 L 195.9 227.22 Z" opacity="0.62"/>
+    <path id="p0" d="M 270 22 L 484.77 146 L 407.46 190.64 L 270 111.28 Z" opacity="0.53"/>
+    <path id="p1" d="M 484.77 146 L 484.77 394 L 407.46 349.36 L 407.46 190.64 Z" opacity="0.35"/>
+    <path id="p2" d="M 484.77 394 L 270 518 L 270 428.72 L 407.46 349.36 Z" opacity="0.44"/>
+    <path id="p3" d="M 270 518 L 55.23 394 L 132.54 349.36 L 270 428.72 Z" opacity="0.50"/>
+    <path id="p4" d="M 55.23 394 L 55.23 146 L 132.54 190.64 L 132.54 349.36 Z" opacity="0.74"/>
+    <path id="p5" d="M 55.23 146 L 270 22 L 270 111.28 L 132.54 190.64 Z" opacity="0.62"/>
+    <circle id="pupil" cx="270" cy="270" r="59.52"/>
   </g>
 </svg>
