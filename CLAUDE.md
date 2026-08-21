@@ -65,10 +65,14 @@ them by hand (there's no script for this — the geometry/colors are static, mat
 `computeHexGeometry(36, 22)` and `gradientFacetColors('#206de9')`) whenever the *default* preset,
 ring thickness, or pupil size changes; per-request customizer output (other presets, other
 slider values) still only lives in `index.html`'s live rendering (`buildMarkSVG`/
-`coloredFacetsMarkup`) — see below. `lockup/*.svg` and `src/lockup.mjs`'s `createTextLockup`/
-`createIconLockup` (via `extractPupilRadius(base.svg)`) also carry the pupil, so every shipped
-static mark — favicons included, since they're rasterized from `base.svg` — matches the eye
-concept.
+`coloredFacetsMarkup`) — see below. `lockup/*.svg`, `moods/*.svg`, `states/*.svg`, `http/*.svg`,
+and `src/lockup.mjs`'s `createTextLockup`/`createIconLockup` (via `extractPupilRadius(base.svg)`)
+all carry the same `<circle id="pupil" cx="270" cy="270" r="59.52"/>` at v6's default geometry
+too, so every shipped static mark — favicons included, since they're rasterized from `base.svg`
+— matches the eye concept. `states/*.svg`/`http/*.svg` are still single-tone `currentColor`
+(same convention as `base.svg`); their existing animations key off `#mark` (or specific `#p0`-
+`#p5` facets) and pick up the pupil for free since it's a sibling inside the same `#mark` group,
+so ring-level effects (spin, shake, scale, dim) carry the pupil along with them.
 
 **`plain.svg`/`gradient.svg`/`animated.svg`** are a completely different, older pre-hexagon
 triskelion mark (not a facet variant of the current hexagon) — kept in the repo for reference but
