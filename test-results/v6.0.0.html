@@ -1,0 +1,140 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Test results — v6.0.0</title>
+<style>
+  body { font-family: ui-monospace, 'SF Mono', Menlo, monospace; background: #0a0e15; color: #edeff2; margin: 0; padding: 32px 24px 64px; }
+  a { color: #4f8cee; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .meta { color: #a9b0bc; font-size: 13px; margin-bottom: 24px; }
+  .stats { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .stat { background: #171d26; border: 1px solid #2d3543; border-radius: 8px; padding: 10px 16px; font-size: 13px; }
+  .stat b { font-size: 18px; display: block; }
+  .pass b { color: #2ecc71; } .fail b { color: #e74c3c; } .skip b { color: #f5a623; }
+  pre { background: #171d26; border: 1px solid #2d3543; border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 12px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+  table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+  td, th { text-align: left; padding: 6px 10px; border-bottom: 1px solid #2d3543; font-size: 13px; }
+</style></head>
+<body>
+  <p><a href="index.html">&larr; all versions</a></p>
+  <h1>Test results — v6.0.0</h1>
+  <div class="meta">commit 2af31392f18a &middot; generated 2026-08-21T11:16:31.053Z</div>
+  <div class="stats">
+    <div class="stat pass"><b>57</b>passed</div>
+    <div class="stat fail"><b>0</b>failed</div>
+    <div class="stat skip"><b>0</b>skipped</div>
+    <div class="stat"><b>57</b>total</div>
+    <div class="stat"><b>1.06s</b>duration</div>
+  </div>
+  <pre>
+&gt; @ortiq-de/logo@6.0.0 test
+&gt; vitest run --reporter=verbose --reporter=json --outputFile=test-results.json
+
+
+ RUN  v4.1.10 /home/runner/work/logo/logo
+
+✓ palette.json
+✓ loaded base.svg
+✓ loaded plain.svg
+✓ loaded colored.svg
+✓ loaded gradient.svg
+✓ loaded animated.svg
+✓ loaded states/neutral.svg
+✓ loaded states/loading.svg
+✓ loaded states/success.svg
+✓ loaded states/warning.svg
+✓ loaded states/error.svg
+✓ loaded moods/happy.svg
+✓ loaded moods/sad.svg
+✓ loaded moods/angry.svg
+✓ loaded moods/surprised.svg
+✓ loaded moods/sleepy.svg
+✓ loaded http/404.svg
+✓ loaded http/500.svg
+✓ loaded http/503.svg
+✓ loaded http/403.svg
+✓ loaded lockup/template.svg
+✓ loaded lockup/blog.svg
+✓ loaded lockup/icon-template.svg
+✓ index.js (CJS)
+✓ index.mjs (ESM)
+✓ index.d.ts (TypeScript)
+✓ index.css
+✓ states.css
+✓ favicons/favicon-16x16.png
+✓ favicons/favicon-32x32.png
+✓ favicons/favicon-48x48.png
+✓ favicons/favicon-96x96.png
+✓ favicons/apple-touch-icon.png
+✓ favicons/favicon-192x192.png
+✓ favicons/favicon-512x512.png
+✓ favicons/favicon.svg
+✓ favicons/favicon.ico
+✓ site.webmanifest
+✓ dist/package.json
+
+✅ Bundle complete → dist/
+ ✓ test/lockup.test.mjs &gt; createTextLockup &gt; produces a well-formed SVG with the sub-brand name in a &lt;text&gt; node 4ms
+ ✓ test/lockup.test.mjs &gt; createTextLockup &gt; defaults to viewBox height 56 and a width matching the calcW formula 0ms
+ ✓ test/lockup.test.mjs &gt; createTextLockup &gt; honors fontSize/fontFamily/explicit width+height overrides 1ms
+ ✓ test/lockup.test.mjs &gt; createTextLockup &gt; escapes special characters in the sub-brand name 1ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; produces well-formed output for placement "n" 1ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; produces well-formed output for placement "ne" 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; produces well-formed output for placement "e" 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; produces well-formed output for placement "se" 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; produces well-formed output for placement "s" 1ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; produces well-formed output for placement "sw" 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; produces well-formed output for placement "w" 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; produces well-formed output for placement "nw" 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; placement "ne" renders no badge ring 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; placement "se" renders no badge ring 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; placement "sw" renders no badge ring 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; placement "nw" renders no badge ring 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; placement "n" renders no badge ring 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; placement "e" renders no badge ring 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; placement "s" renders no badge ring 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; placement "w" renders no badge ring 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; defaults viewBox height to 96 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; extracts inner markup + viewBox from a full &lt;svg viewBox="..."&gt; icon string 0ms
+ ✓ test/lockup.test.mjs &gt; createIconLockup &gt; treats bare inner markup as-is with a default 0 0 24 24 viewBox 0ms
+ ✓ test/build-test-report.test.mjs &gt; scripts/build-test-report.mjs &gt; strips ANSI escape codes from the embedded log 4ms
+ ✓ test/build-test-report.test.mjs &gt; scripts/build-test-report.mjs &gt; writes a version index listing the generated page 0ms
+ ✓ test/palette-schema.test.mjs &gt; palette.json schema &gt; has version 2 and a default preset id that resolves 3ms
+ ✓ test/palette-schema.test.mjs &gt; palette.json schema &gt; facetGeometry has exactly 6 unique p0-p5 entries with numeric deltas and a valid baseOpacity 4ms
+ ✓ test/palette-schema.test.mjs &gt; palette.json schema &gt; preset "cobalt" has name/solid/6 valid facets/full ui tokens 2ms
+ ✓ test/palette-schema.test.mjs &gt; palette.json schema &gt; preset "violet" has name/solid/6 valid facets/full ui tokens 2ms
+ ✓ test/palette-schema.test.mjs &gt; palette.json schema &gt; preset "teal" has name/solid/6 valid facets/full ui tokens 1ms
+ ✓ test/palette-schema.test.mjs &gt; palette.json schema &gt; preset "ember" has name/solid/6 valid facets/full ui tokens 2ms
+ ✓ test/palette-schema.test.mjs &gt; palette.json schema &gt; preset "graphite" has name/solid/6 valid facets/full ui tokens 1ms
+ ✓ test/palette-schema.test.mjs &gt; palette.json schema &gt; preset "legacy-brand" has name/solid/6 valid facets/full ui tokens 1ms
+ ✓ test/palette-schema.test.mjs &gt; palette.json schema &gt; success/warning/error tokens are identical literals across every preset (documented invariant) 1ms
+ ✓ test/dist-smoke.test.mjs &gt; dist/index.js (CJS) and dist/index.mjs (ESM) — real-world build smoke test &gt; both expose palette, every svgMap key, and the lockup functions 8ms
+ ✓ test/dist-smoke.test.mjs &gt; dist/index.js (CJS) and dist/index.mjs (ESM) — real-world build smoke test &gt; CJS output, ESM output, and src/lockup.mjs direct output are identical (drift guard) 4ms
+ ✓ test/favicons.test.mjs &gt; favicon rasterization (requires rsvg-convert) &gt; produces a non-empty PNG for size 16px 3ms
+ ✓ test/favicons.test.mjs &gt; favicon rasterization (requires rsvg-convert) &gt; produces a non-empty PNG for size 32px 0ms
+ ✓ test/favicons.test.mjs &gt; favicon rasterization (requires rsvg-convert) &gt; produces a non-empty PNG for size 48px 0ms
+ ✓ test/favicons.test.mjs &gt; favicon rasterization (requires rsvg-convert) &gt; produces a non-empty PNG for size 96px 0ms
+ ✓ test/favicons.test.mjs &gt; favicon rasterization (requires rsvg-convert) &gt; produces a non-empty PNG for size 180px 0ms
+ ✓ test/favicons.test.mjs &gt; favicon rasterization (requires rsvg-convert) &gt; produces a non-empty PNG for size 192px 0ms
+ ✓ test/favicons.test.mjs &gt; favicon rasterization (requires rsvg-convert) &gt; produces a non-empty PNG for size 512px 0ms
+ ✓ test/favicons.test.mjs &gt; favicon rasterization (requires rsvg-convert) &gt; produces favicon.svg 0ms
+ ✓ test/favicons.test.mjs &gt; favicon rasterization (requires rsvg-convert) &gt; produces a non-empty favicon.ico (requires imagemagick) 1ms
+ ✓ test/exports-map.test.mjs &gt; package.json exports map &gt; resolved at least one target per export path 4ms
+ ✓ test/exports-map.test.mjs &gt; package.json exports map &gt; ./dist/index.mjs exists in the built dist/ and is non-empty 1ms
+ ✓ test/exports-map.test.mjs &gt; package.json exports map &gt; ./dist/index.js exists in the built dist/ and is non-empty 0ms
+ ✓ test/exports-map.test.mjs &gt; package.json exports map &gt; ./dist/index.d.ts exists in the built dist/ and is non-empty 0ms
+ ✓ test/exports-map.test.mjs &gt; package.json exports map &gt; ./dist/index.css exists in the built dist/ and is non-empty 0ms
+ ✓ test/exports-map.test.mjs &gt; package.json exports map &gt; ./dist/states.css exists in the built dist/ and is non-empty 0ms
+ ✓ test/exports-map.test.mjs &gt; package.json exports map &gt; ./dist/palette.json exists in the built dist/ and is non-empty 0ms
+ ✓ test/exports-map.test.mjs &gt; package.json exports map &gt; main/module/types fields also resolve to existing, non-empty files 1ms
+ ✓ test/pack-smoke.test.mjs &gt; npm pack tarball — real consumer install simulation &gt; extracted tarball contains dist/, palette.json, and the other files-listed paths 3ms
+ ✓ test/pack-smoke.test.mjs &gt; npm pack tarball — real consumer install simulation &gt; require()s the extracted CJS build and gets working exports 2ms
+ ✓ test/pack-smoke.test.mjs &gt; npm pack tarball — real consumer install simulation &gt; import()s the extracted ESM build and gets working exports 20ms
+ ✓ test/pack-smoke.test.mjs &gt; npm pack tarball — real consumer install simulation &gt; extracted dist/palette.json matches the repo palette.json 0ms
+
+ Test Files  7 passed (7)
+      Tests  57 passed (57)
+   Start at  11:16:15
+   Duration  1.06s (transform 153ms, setup 0ms, import 279ms, tests 791ms, environment 1ms)
+
+JSON report written to /home/runner/work/logo/logo/test-results.json
+</pre>
+</body></html>
