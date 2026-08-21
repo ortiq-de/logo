@@ -350,8 +350,13 @@
               <h3>Shape</h3>
               <div class="gen-slider-row">
                 <span class="lbl">Thickness</span>
-                <input class="gen-slider" type="range" id="thickness-slider" min="0" max="100" step="0.5" value="65.5">
-                <span class="gen-slider-val" id="thickness-val">66%</span>
+                <input class="gen-slider" type="range" id="thickness-slider" min="10" max="50" step="0.5" value="36">
+                <span class="gen-slider-val" id="thickness-val">36%</span>
+              </div>
+              <div class="gen-slider-row">
+                <span class="lbl">Pupil</span>
+                <input class="gen-slider" type="range" id="pupil-slider" min="10" max="60" step="0.5" value="36">
+                <span class="gen-slider-val" id="pupil-val">36%</span>
               </div>
               <div class="gen-slider-row">
                 <span class="lbl">Margin</span>
@@ -681,14 +686,21 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
 <script>
   // ── Parametric hexagon geometry (6 filled paths, viewBox 0 0 540 540) ──
   // Outer hexagon circumradius = 270 - margin, inner circumradius = outer * (1 - thickness/100).
-  // Pointy-top, vertices at angle -90+60*i degrees, centered at (270,270). Facet i is the
-  // quad [Outer[i], Outer[i+1], Inner[i+1], Inner[i]]. Defaults (65.5, 22) reproduce the
-  // original hand-authored mark exactly (R_outer=248, R_inner=85.56).
-  const DEFAULT_THICKNESS = 65.5;
+  // Pointy-top, vertices at angle -90+60*i degrees, centered at (270,270) — vertex 0 sits at
+  // 12 o'clock, so facet p0 (spanning vertex0→vertex1) is the first facet clockwise from 12,
+  // p1..p5 continue clockwise around. Facet i is the quad [Outer[i], Outer[i+1], Inner[i+1],
+  // Inner[i]]. v6: default thickness 36% (inner edge at 64% of outer radius) — the eye/pupil
+  // redesign's ring; see DEFAULT_PUPIL_PCT below for the pupil circle added in the same viewBox.
+  const DEFAULT_THICKNESS = 36;
+  const DEFAULT_PUPIL_PCT = 36; // pupil diameter as % of the outer hexagon's circumdiameter
   const DEFAULT_MARGIN = 22;
   const HEX_VB = 540, HEX_CX = 270, HEX_CY = 270;
 
   function round2(n) { return Math.round(n * 100) / 100; }
+
+  // Outer hexagon circumradius for the current margin — shared by the facet geometry and by
+  // the pupil's size/position so they always scale together.
+  function outerRadius() { return HEX_CX - margin; }
 
   function computeHexGeometry(thicknessPct, marginPx) {
     const rOuter = HEX_CX - marginPx;
@@ -753,7 +765,8 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   let markSolidColor = '#206de9';  // single representative mark color, shared by both lockup tabs
   let uiMode = 'dark';
   let uiOverrides = {};            // per-token overrides on top of the active preset's ui[uiMode]
-  let thickness = DEFAULT_THICKNESS;    // ring band width, 0 = thin ring, 100 = solid hexagon
+  let thickness = DEFAULT_THICKNESS;    // ring band width, % of outer radius (10-50)
+  let pupilPct = DEFAULT_PUPIL_PCT;     // pupil circle diameter, % of outer circumdiameter (10-60)
   let margin = DEFAULT_MARGIN;          // whitespace padding within the 540×540 viewBox
   let exportSize = 512;                 // px, drives SVG/PNG download dimensions
   let showSizeMarks = false;            // preview-only dimension overlay
@@ -763,30 +776,27 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   let monochromeSnapshot = null;        // { facetColors, activePresetId } captured when monochrome turns on
   const SIZE_MARKS_EXPORT_COLOR = '#8a8f98'; // mid-gray, legible on both themes, baked-export only
 
-  function tintFacets(hue, sat, light) {
+  // v6 facet coloring: every shade is derived from one primary color, never mood/hue-varied
+  // per facet. The 6 facets (p0..p5, already sequential clockwise from 12 o'clock per the
+  // geometry above) take 6 evenly spaced lightness steps from +35% (lightest, p0) to -35%
+  // (darkest, p5) — a pure lightness ramp around the ring, hue/saturation untouched.
+  const FACET_LIGHTNESS_OFFSETS = [35, 21, 7, -7, -21, -35];
+  function gradientFacetColors(primaryHex) {
     const out = {};
-    PALETTE.facetGeometry.forEach(g => {
-      const facetL = clamp(light + g.lightnessDelta, 8, 92);
-      const facetS = clamp(sat + g.satDelta, 0, 100);
-      out[g.id] = hslToHex(hue, facetS, clamp(facetL + 12, 0, 96));
-    });
+    PALETTE.facetGeometry.forEach((g, i) => { out[g.id] = shade(primaryHex, FACET_LIGHTNESS_OFFSETS[i]); });
     return out;
   }
 
-  // Rebuilds all six facets from the current #tint-swatch value using the gem-tint algorithm
-  // (varied per-facet lightness/saturation) — used when Monochrome is off.
-  function seedFacetsFromSwatch() {
-    const { r, g, b } = hexToRgb(document.getElementById('tint-swatch').value);
-    const hsl = rgbToHsl(r, g, b);
-    facetColors = tintFacets(hsl.h, hsl.s, hsl.l);
-  }
-
   // Sets every facet to the exact same hex — used when Monochrome is on, so the mark is
-  // genuinely one flat color rather than a gem-tinted spread.
+  // genuinely one flat color rather than the gradient ramp.
   function fillFacetsFlat(hex) {
     facetColors = {};
     PALETTE.facetGeometry.forEach(g => { facetColors[g.id] = hex; });
   }
+
+  // The pupil is always a darker shade of the live primary color (the same shade as the
+  // darkest ring facet), so it reads as an "iris + pupil" contrast in both Monochrome states.
+  function pupilColor() { return shade(markSolidColor, -35); }
 
   function normalizeHex(hex) {
     let h = String(hex).trim();
@@ -797,18 +807,14 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
 
   // Single entry point for the Primary color control (swatch + hex text input). While
   // Monochrome is on this is the only way to change color — every facet is set flat to this
-  // one value. While Monochrome is off it drives the existing gem-tint spread.
+  // one value. While Monochrome is off (the reference state) it drives the gradient ramp.
   function applyPrimaryColor(rawHex) {
     const hex = normalizeHex(rawHex);
     if (!hex) return;
     markSolidColor = hex;
     document.getElementById('tint-swatch').value = hex;
     document.getElementById('tint-hex').value = hex;
-    if (monochrome) {
-      fillFacetsFlat(hex);
-    } else {
-      seedFacetsFromSwatch();
-    }
+    if (monochrome) fillFacetsFlat(hex); else facetColors = gradientFacetColors(hex);
     activePresetId = 'custom';
     renderFacetRows();
     renderPresetRow();
@@ -838,8 +844,13 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     persist();
   }
 
+  // Falls back to the default preset when activePresetId is 'custom' (e.g. after an individual
+  // facet edit) or otherwise doesn't resolve — PALETTE.presets has no 'custom' entry, so indexing
+  // it directly would throw. UI tokens are independent of the mark's own (possibly custom)
+  // colors, so this fallback only affects which base UI palette gets used, not the mark.
   function currentUiTokens() {
-    const base = PALETTE.presets[activePresetId].ui[uiMode];
+    const preset = PALETTE.presets[activePresetId] || PALETTE.presets[PALETTE.default];
+    const base = preset.ui[uiMode];
     return Object.assign({}, base, uiOverrides);
   }
 
@@ -881,10 +892,12 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     </g>`;
   }
 
-  // Every facet shares one identical fill while Monochrome is on, so without a divider the six
-  // segments merge into a single undifferentiated shape. A thin same-hue stroke (a shade darker
-  // than the fill) keeps the six-segment structure visible while staying strictly monochrome.
-  function monoStrokeAttr(hex) {
+  // v6: every facet is always a flat single shade (never a two-tone gradient) — the "gradient"
+  // is the sequence of shades across the 6 facets (see gradientFacetColors), not a blend within
+  // one facet. A thin same-hue stroke (a shade darker than the fill) divides the six segments so
+  // they stay visually distinct even when identical (Monochrome). Applied identically in both
+  // Monochrome states, so toggling it only ever changes color, never shape.
+  function facetStrokeAttr(hex) {
     return ` stroke="${shade(hex, -12)}" stroke-width="3" stroke-linejoin="round"`;
   }
 
@@ -897,10 +910,10 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   }
 
   // Rebuilds a closed polygon with every corner filleted to `radius` (quadratic-curve corners,
-  // straight edges between them) — used only for Monochrome's facets, so the flat-colored
-  // segments read as smoothly connected rather than meeting at sharp points. hexGeometry()'s own
-  // sharp-cornered d strings stay untouched everywhere else (presets, gradient mode, states,
-  // lockups) so their pixel-exact geometry is unaffected.
+  // straight edges between them) so the flat-colored segments read as smoothly connected rather
+  // than meeting at sharp points. hexGeometry()'s own sharp-cornered d strings are still what
+  // drive the underlying geometry (margin/thickness math) — this only reshapes the rendered
+  // facet outline, identically in both Monochrome states.
   function roundedQuadPath(pts, radius) {
     const n = pts.length;
     let d = '';
@@ -921,39 +934,35 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     return d + 'Z';
   }
 
-  const MONO_CORNER_RADIUS = 16;
-  function monoFacetPath(p) {
-    return roundedQuadPath(quadPathPoints(p.d), MONO_CORNER_RADIUS);
+  const FACET_CORNER_RADIUS = 16;
+  function roundedFacetPath(p) {
+    return roundedQuadPath(quadPathPoints(p.d), FACET_CORNER_RADIUS);
+  }
+
+  // The pupil — a plain filled circle centered in the ring's opening, sized off the same
+  // outerRadius() the ring geometry uses so it always scales together with the mark.
+  function pupilMarkup() {
+    const r = round2((pupilPct / 100) * outerRadius());
+    return `<circle cx="${HEX_CX}" cy="${HEX_CY}" r="${r}" fill="${pupilColor()}"/>`;
   }
 
   function buildMarkSVG(opts) {
     opts = opts || {};
     const size = opts.size != null ? opts.size : exportSize;
     const geo = hexGeometry();
-    const defs = monochrome ? '' : geo.map(p => {
-      const light = facetColors[p.id];
-      const dark = shade(light, -22);
-      return `<linearGradient id="grad-${p.id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${light}"/><stop offset="1" stop-color="${dark}"/></linearGradient>`;
-    }).join('');
-    const paths = geo.map(p => `<path id="${p.id}" d="${monochrome ? monoFacetPath(p) : p.d}" fill="${monochrome ? facetColors[p.id] : `url(#grad-${p.id})`}"${monochrome ? monoStrokeAttr(facetColors[p.id]) : ''}/>`).join('');
+    const paths = geo.map(p => `<path id="${p.id}" d="${roundedFacetPath(p)}" fill="${facetColors[p.id]}"${facetStrokeAttr(facetColors[p.id])}/>`).join('');
     const marks = opts.withSizeMarks ? buildSizeMarksOverlay(margin, opts.marksColor || 'currentColor') : '';
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 540" width="${size}" height="${size}"><defs>${defs}</defs><g id="mark">${paths}</g>${marks}</svg>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 540" width="${size}" height="${size}"><g id="mark">${paths}${pupilMarkup()}</g>${marks}</svg>`;
   }
 
-  // Per-facet gradient markup for embedding the mark's full "colored" look in contexts
-  // that need multiple simultaneous copies on the page (each instance needs unique
-  // gradient ids so they don't collide in the document's id namespace). While Monochrome is
-  // on, every facet is an identical flat fill instead — no gradient anywhere on the mark —
-  // with a same-hue stroke (see monoStrokeAttr) keeping the six segments visually distinct.
+  // Per-facet + pupil markup for embedding the mark's full "colored" look in contexts that
+  // need multiple simultaneous copies on the page (header mark, mark grid, state cells, lockup
+  // previews) — all flat fills now, so unlike the old gradient-def version no per-instance id
+  // namespacing is needed; `prefix` is kept for call-site compatibility.
   function coloredFacetsMarkup(prefix, withIds) {
     const geo = hexGeometry();
-    const defs = monochrome ? '' : geo.map(p => {
-      const light = facetColors[p.id];
-      const dark = shade(light, -22);
-      return `<linearGradient id="${prefix}-grad-${p.id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${light}"/><stop offset="1" stop-color="${dark}"/></linearGradient>`;
-    }).join('');
-    const paths = geo.map(p => `<path${withIds ? ` id="${p.id}"` : ''} d="${monochrome ? monoFacetPath(p) : p.d}" fill="${monochrome ? facetColors[p.id] : `url(#${prefix}-grad-${p.id})`}"${monochrome ? monoStrokeAttr(facetColors[p.id]) : ''}/>`).join('');
-    return `<defs>${defs}</defs>${paths}`;
+    const paths = geo.map(p => `<path${withIds ? ` id="${p.id}"` : ''} d="${roundedFacetPath(p)}" fill="${facetColors[p.id]}"${facetStrokeAttr(facetColors[p.id])}/>`).join('');
+    return `${paths}${pupilMarkup()}`;
   }
 
   function buildColoredMarkSVG(size, prefix, withIds) {
@@ -1050,8 +1059,7 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       btn.innerHTML = `<span class="dot" style="background:${p.solid}"></span>${p.name}`;
       btn.addEventListener('click', () => {
         activePresetId = id;
-        facetColors = {};
-        Object.entries(p.facets).forEach(([fid, c]) => { facetColors[fid] = c.light; });
+        facetColors = gradientFacetColors(p.solid);
         markSolidColor = p.solid;
         document.getElementById('tint-swatch').value = p.solid;
         document.getElementById('tint-hex').value = p.solid;
@@ -1197,7 +1205,7 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         activePresetId, facetColors, uiMode, uiOverrides,
-        thickness, margin, exportSize, showSizeMarks, includeSizeMarksInExport, activeStep,
+        thickness, pupilPct, margin, exportSize, showSizeMarks, includeSizeMarksInExport, activeStep,
         monochrome, monochromeSnapshot,
       }));
     } catch (_) {}
@@ -1212,7 +1220,8 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       facetColors = saved.facetColors;
       uiMode = saved.uiMode || 'dark';
       uiOverrides = saved.uiOverrides || {};
-      thickness = typeof saved.thickness === 'number' ? saved.thickness : DEFAULT_THICKNESS;
+      thickness = clamp(typeof saved.thickness === 'number' ? saved.thickness : DEFAULT_THICKNESS, 10, 50);
+      pupilPct = clamp(typeof saved.pupilPct === 'number' ? saved.pupilPct : DEFAULT_PUPIL_PCT, 10, 60);
       margin = typeof saved.margin === 'number' ? saved.margin : DEFAULT_MARGIN;
       exportSize = (typeof saved.exportSize === 'number' && saved.exportSize > 0) ? saved.exportSize : 512;
       showSizeMarks = !!saved.showSizeMarks;
@@ -1307,6 +1316,12 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   document.getElementById('thickness-slider').addEventListener('input', e => {
     thickness = parseFloat(e.target.value);
     document.getElementById('thickness-val').textContent = Math.round(thickness) + '%';
+    renderAll();
+    persist();
+  });
+  document.getElementById('pupil-slider').addEventListener('input', e => {
+    pupilPct = parseFloat(e.target.value);
+    document.getElementById('pupil-val').textContent = Math.round(pupilPct) + '%';
     renderAll();
     persist();
   });
@@ -1736,8 +1751,7 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     const restored = restore();
     if (!restored) {
       activePresetId = PALETTE.default;
-      facetColors = {};
-      Object.entries(PALETTE.presets[activePresetId].facets).forEach(([fid, c]) => { facetColors[fid] = c.light; });
+      facetColors = gradientFacetColors(PALETTE.presets[activePresetId].solid);
       uiMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches === false ? 'light' : 'dark';
       uiOverrides = {};
     }
@@ -1755,6 +1769,8 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
 
     document.getElementById('thickness-slider').value = thickness;
     document.getElementById('thickness-val').textContent = Math.round(thickness) + '%';
+    document.getElementById('pupil-slider').value = pupilPct;
+    document.getElementById('pupil-val').textContent = Math.round(pupilPct) + '%';
     document.getElementById('margin-slider').value = margin;
     document.getElementById('margin-val').textContent = margin + 'px';
     document.getElementById('export-size-input').value = exportSize;

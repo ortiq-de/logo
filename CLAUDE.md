@@ -2,7 +2,7 @@
 
 Brand asset repository for Ortiq. Six-facet hexagon mark with full state animation system, HTTP error states, lockup templates, favicon set, and CI release pipeline.
 
-**Current version:** v5.0.0
+**Current version:** v6.0.0
 **GH Pages:** https://ortiq-de.github.io/logo/ (interactive facet + UI theme customizer, sub-logo builder)
 **npm:** `@ortiq-de/logo` on GitHub Packages
 
@@ -41,7 +41,7 @@ palette.json                facet geometry + named presets (facets + light/dark 
 
 ## The mark
 
-A regular hexagon (viewBox `0 0 540 540`, centered at `270,270`) with a transparent hexagonal core, split into six quadrilateral facets (`p0`–`p5`, clockwise from upper-right) that give it a 3D beveled-gem look:
+A regular hexagon (viewBox `0 0 540 540`, centered at `270,270`) with a transparent hexagonal core, split into six quadrilateral facets (`p0`–`p5`, clockwise from upper-right):
 
 ```
 p0 Upper right   p1 Right   p2 Lower right
@@ -51,17 +51,50 @@ p3 Lower left    p4 Left    p5 Upper left
 - `base.svg` — single-tone: all six facets filled `currentColor`, each at a fixed opacity (0.35–0.74, calibrated from the gradient version's relative lightness) to preserve the facet/bevel look in one color.
 - `colored.svg` — each facet is its own two-stop linear gradient (`grad-p0`..`grad-p5`).
 
+These static asset files are the pre-v6 "gem" look and are unchanged. **v6's pupil + eye redesign lives in the interactive customizer only** (`index.html`'s live rendering, `buildMarkSVG`/`coloredFacetsMarkup`) — see below.
+
+### v6 — pupil + eye concept (interactive customizer)
+
+The ring reads as an eye: the hexagon is the iris, a centered circle is the pupil. Facets are
+rounded-corner shapes (filleted to a 16-unit radius, `roundedFacetPath()`) with a thin same-hue
+divider stroke (`facetStrokeAttr()`) — this rounded+stroked treatment applies identically whether
+Monochrome is on or off, so toggling Monochrome only ever changes color, never shape.
+
+- **Ring thickness** — slider, 10–50%, default **36%** (inner edge sits at 64% of the outer
+  radius). Same `computeHexGeometry(thicknessPct, marginPx)` formula as before, just a new
+  default/range.
+- **Pupil** — a plain filled circle, `cx=cy=270`, radius = `pupilPct/100 * outerRadius()`.
+  Slider 10–60%, default **36%**. Color is always `shade(markSolidColor, -35)` (the same shade as
+  the darkest ring facet), so it's derived from the live primary color in both Monochrome states.
+  At the defaults (thickness 36%, margin 22 ⇒ `rOuter=248`), the inner hexagon's apothem is
+  `rInner·cos(30°) ≈ 137.5`, comfortably clear of the pupil's `≈89.3` radius (~48-unit margin) —
+  verified, no collision. Extreme slider combinations (e.g. pupil 60% + thickness 50%) can
+  overlap the ring's inner edge; that's an accepted consequence of two independent sliders, not
+  clamped against each other.
+- **Facet coloring — gradient derived from primary color, not mood-based.** `gradientFacetColors(primaryHex)`
+  assigns each of the 6 facets one flat shade — `FACET_LIGHTNESS_OFFSETS = [35, 21, 7, -7, -21, -35]`
+  applied to p0..p5 (already sequential clockwise from 12 o'clock) — lightest at p0 (just
+  clockwise of 12 o'clock), darkest at p5. No per-facet internal gradient anymore; each facet is
+  a single flat fill. This is the **Monochrome-off reference state**. Monochrome-on flat-fills
+  every facet to `markSolidColor` (`fillFacetsFlat()`) — same geometry, gradient collapses to one
+  color.
+- Presets (`renderPresetRow()`'s click handler) now derive their facet colors live via
+  `gradientFacetColors(preset.solid)` instead of reading palette.json's per-preset `facets`
+  table — that table (and `facetGeometry.lightnessDelta`/`satDelta`, the old asymmetric tint
+  deltas) is no longer read by the customizer, kept only for the public `palette.json` schema /
+  `dist/index.css`'s per-preset CSS custom properties (`scripts/bundle.mjs`, untouched by v6 —
+  those still reflect the old hand-authored table, a known divergence from the live customizer).
+
 ## Palette system
 
 `palette.json` (`version: 2`) holds:
-- `facetGeometry` — per-facet `label`, `lightnessDelta`/`satDelta` (relative to a base hue/sat/lightness), and `baseOpacity` (for the single-tone mark). These deltas were reverse-engineered from the original supplied hexagon so that plugging Cobalt's hue/sat/lightness back through the tint algorithm reproduces it.
+- `facetGeometry` — per-facet `label`, `lightnessDelta`/`satDelta` (legacy — no longer read by
+  the v6 customizer, see above), and `baseOpacity` (for the single-tone mark).
 - `presets` — six named presets (`cobalt` *default*, `violet`, `teal`, `ember`, `graphite`, `legacy-brand`). Each carries:
-  - `facets` — six `{ light, dark }` gradient stop pairs for the mark
-  - `solid` — one representative hex (favicon coloring, wordmark, lockup mark color, webmanifest theme color)
+  - `facets` — six `{ light, dark }` pairs (legacy per-preset table; the live customizer now derives facet colors from `solid` at runtime instead — see v6 above)
+  - `solid` — one representative hex (favicon coloring, wordmark, lockup mark color, webmanifest theme color, and v6's gradient/pupil seed)
   - `ui.dark` / `ui.light` — a **complete UI palette** (`background`, `surface`, `primary`, `text`, `textMuted`, `border`, `accent`, `success`, `warning`, `error`) that themes the whole page, independent of the mark's own colors
 - `tokens` — legacy flat 6-key brand token map, kept for backward compatibility
-
-**Tint-all-facets algorithm** (rebuilds all six facets from one hue): for each facet, `facetL = clamp(baseLightness + lightnessDelta, 8, 92)`, `facetS = clamp(baseSaturation + satDelta, 0, 100)`, gradient stops = `hsl(hue, facetS, facetL±12)`.
 
 ## Animation design principle
 
@@ -196,7 +229,7 @@ Favicon HTML:
 - **Tag push (`v*.*.*`):** full release bundle + npm publish
 
 ```bash
-git tag v5.0.0 && git push origin v5.0.0
+git tag v6.0.0 && git push origin v6.0.0
 ```
 
 Release artifacts: zip/tarball with all SVGs, PNGs at 7 sizes, favicon.ico, webmanifest, CJS/ESM/CSS bundles, TypeScript defs, palette.json.
