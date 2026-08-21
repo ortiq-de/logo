@@ -2,14 +2,15 @@ import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { join, dirname } from 'path'
-import { extractHexPaths } from '../src/hex-paths.mjs'
+import { extractHexPaths, extractPupilRadius } from '../src/hex-paths.mjs'
 import { createLockupApi } from '../src/lockup.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const baseSvg = readFileSync(join(ROOT, 'base.svg'), 'utf8')
 const palette = JSON.parse(readFileSync(join(ROOT, 'palette.json'), 'utf8'))
 const hexPaths = extractHexPaths(baseSvg, palette.facetGeometry)
-const { createTextLockup, createIconLockup } = createLockupApi(hexPaths)
+const pupilR = extractPupilRadius(baseSvg)
+const { createTextLockup, createIconLockup } = createLockupApi(hexPaths, pupilR)
 
 // Lightweight tag-balance check — no xmllint dependency, so `npm test` needs no system binaries.
 function isWellFormedXml(str) {
@@ -36,6 +37,12 @@ describe('createTextLockup', () => {
     expect(isWellFormedXml(svg)).toBe(true)
     expect(svg).toContain('<svg')
     expect(svg).toMatch(/<text[^>]*>blog<\/text>/)
+  })
+
+  it('carries the mark\'s pupil circle (v6 eye concept)', () => {
+    const svg = createTextLockup('blog')
+    expect(pupilR).toBeGreaterThan(0)
+    expect(svg).toContain(`<circle cx="270" cy="270" r="${pupilR}"/>`)
   })
 
   it('defaults to viewBox height 56 and a width matching the calcW formula', () => {
@@ -70,6 +77,11 @@ describe('createIconLockup', () => {
     const svg = createIconLockup('git', icon, { placement })
     expect(isWellFormedXml(svg)).toBe(true)
     expect(svg).toContain('<svg')
+  })
+
+  it.each(placements)('carries the mark\'s pupil circle for placement "%s"', (placement) => {
+    const svg = createIconLockup('git', icon, { placement })
+    expect(svg).toContain(`<circle cx="270" cy="270" r="${pupilR}"/>`)
   })
 
   // Corner placements overlap the mark's corner directly — icon only, no ring/backdrop circle.

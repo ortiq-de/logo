@@ -8,7 +8,7 @@ import { readFileSync, writeFileSync, mkdirSync, copyFileSync, existsSync } from
 import { execSync } from 'child_process'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
-import { extractHexPaths } from '../src/hex-paths.mjs'
+import { extractHexPaths, extractPupilRadius } from '../src/hex-paths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -65,12 +65,13 @@ console.log('✓ palette.json')
 const DEFAULT_PALETTE = paletteData.presets[paletteData.default]
 
 // ── SVG sources ───────────────────────────────────────────────────────────
+// plain.svg/gradient.svg/animated.svg are the legacy pre-hexagon triskelion mark — kept in
+// the repo for reference (see CLAUDE.md) but deliberately not bundled into dist/, the npm
+// package exports, or release archives, since they don't reflect the current six-facet
+// hexagon/eye design at all.
 const SVG_FILES = [
   { key: 'base',           path: 'base.svg' },
-  { key: 'logoPlain',      path: 'plain.svg' },
   { key: 'logoColored',    path: 'colored.svg' },
-  { key: 'logoGradient',   path: 'gradient.svg' },
-  { key: 'logoAnimated',   path: 'animated.svg' },
   { key: 'stateNeutral',   path: 'states/neutral.svg' },
   { key: 'stateLoading',   path: 'states/loading.svg' },
   { key: 'stateSuccess',   path: 'states/success.svg' },
@@ -109,9 +110,10 @@ for (const { key, path } of SVG_FILES) {
 // with the real hexagon path data — this is the one place that source gets duplicated as
 // text, so both bundles stay self-contained with zero internal imports.
 const HEX_PATHS = extractHexPaths(svgMap.base, paletteData.facetGeometry)
+const PUPIL_R = extractPupilRadius(svgMap.base)
 const LOCKUP_SRC_RAW = readFileSync(join(ROOT, 'src', 'lockup.mjs'), 'utf8')
 const LOCKUP_FN_SRC = LOCKUP_SRC_RAW.replace(/^export function createLockupApi/m, 'function createLockupApi')
-const LOCKUP_INSTANTIATE = `const __hexPaths = ${JSON.stringify(HEX_PATHS)};\nconst __lockupApi = createLockupApi(__hexPaths);`
+const LOCKUP_INSTANTIATE = `const __hexPaths = ${JSON.stringify(HEX_PATHS)};\nconst __pupilR = ${JSON.stringify(PUPIL_R)};\nconst __lockupApi = createLockupApi(__hexPaths, __pupilR);`
 
 // ── CJS bundle ────────────────────────────────────────────────────────────
 const cjsLines = [

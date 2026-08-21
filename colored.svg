@@ -1,36 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 540" width="512" height="512">
-  <defs>
-    <linearGradient id="grad-p0" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#5894f3"/>
-      <stop offset="1" stop-color="#0e53c4"/>
-    </linearGradient>
-    <linearGradient id="grad-p1" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#1655bb"/>
-      <stop offset="1" stop-color="#09234e"/>
-    </linearGradient>
-    <linearGradient id="grad-p2" x1="1" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#3179ed"/>
-      <stop offset="1" stop-color="#0d4296"/>
-    </linearGradient>
-    <linearGradient id="grad-p3" x1="1" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#4489f8"/>
-      <stop offset="1" stop-color="#074cbb"/>
-    </linearGradient>
-    <linearGradient id="grad-p4" x1="1" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#c2d5f5"/>
-      <stop offset="1" stop-color="#598ee3"/>
-    </linearGradient>
-    <linearGradient id="grad-p5" x1="0" y1="1" x2="1" y2="0">
-      <stop offset="0" stop-color="#89b1f0"/>
-      <stop offset="1" stop-color="#1c68e3"/>
-    </linearGradient>
-  </defs>
   <g id="mark">
-    <path id="p0" d="M 270 22 L 484.77 146 L 344.1 227.22 L 270 184.44 Z" fill="url(#grad-p0)"/>
-    <path id="p1" d="M 484.77 146 L 484.77 394 L 344.1 312.78 L 344.1 227.22 Z" fill="url(#grad-p1)"/>
-    <path id="p2" d="M 484.77 394 L 270 518 L 270 355.56 L 344.1 312.78 Z" fill="url(#grad-p2)"/>
-    <path id="p3" d="M 270 518 L 55.23 394 L 195.9 312.78 L 270 355.56 Z" fill="url(#grad-p3)"/>
-    <path id="p4" d="M 55.23 394 L 55.23 146 L 195.9 227.22 L 195.9 312.78 Z" fill="url(#grad-p4)"/>
-    <path id="p5" d="M 55.23 146 L 270 22 L 270 184.44 L 195.9 227.22 Z" fill="url(#grad-p5)"/>
+    <path id="p0" d="M 270 22 L 484.77 146 L 407.46 190.64 L 270 111.28 Z" fill="#c2d7f9" stroke="#8ab2f4" stroke-width="3" stroke-linejoin="round"/>
+    <path id="p1" d="M 484.77 146 L 484.77 394 L 407.46 349.36 L 407.46 190.64 Z" fill="#81adf3" stroke="#4989ee" stroke-width="3" stroke-linejoin="round"/>
+    <path id="p2" d="M 484.77 394 L 270 518 L 270 428.72 L 407.46 349.36 Z" fill="#4082ec" stroke="#1661d9" stroke-width="3" stroke-linejoin="round"/>
+    <path id="p3" d="M 270 518 L 55.23 394 L 132.54 349.36 L 270 428.72 Z" fill="#155dd1" stroke="#0f4499" stroke-width="3" stroke-linejoin="round"/>
+    <path id="p4" d="M 55.23 394 L 55.23 146 L 132.54 190.64 L 132.54 349.36 Z" fill="#0e4090" stroke="#092758" stroke-width="3" stroke-linejoin="round"/>
+    <path id="p5" d="M 55.23 146 L 270 22 L 270 111.28 L 132.54 190.64 Z" fill="#08234f" stroke="#020a17" stroke-width="3" stroke-linejoin="round"/>
+    <circle id="pupil" cx="270" cy="270" r="59.52" fill="#206de9"/>
   </g>
 </svg>

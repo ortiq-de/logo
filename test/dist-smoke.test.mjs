@@ -3,7 +3,7 @@ import { createRequire } from 'module'
 import { fileURLToPath } from 'url'
 import { readFileSync } from 'fs'
 import { join, dirname } from 'path'
-import { extractHexPaths } from '../src/hex-paths.mjs'
+import { extractHexPaths, extractPupilRadius } from '../src/hex-paths.mjs'
 import { createLockupApi } from '../src/lockup.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
@@ -13,7 +13,7 @@ const cjs = require(join(ROOT, 'dist', 'index.js'))
 const esm = await import(join(ROOT, 'dist', 'index.mjs') + `?t=${Date.now()}`)
 
 const SVG_KEYS = [
-  'base', 'logoPlain', 'logoColored', 'logoGradient', 'logoAnimated',
+  'base', 'logoColored',
   'stateNeutral', 'stateLoading', 'stateSuccess', 'stateWarning', 'stateError',
   'moodHappy', 'moodSad', 'moodAngry', 'moodSurprised', 'moodSleepy',
   'http404', 'http500', 'http503', 'http403',
@@ -37,7 +37,8 @@ describe('dist/index.js (CJS) and dist/index.mjs (ESM) — real-world build smok
     const baseSvg = readFileSync(join(ROOT, 'base.svg'), 'utf8')
     const palette = JSON.parse(readFileSync(join(ROOT, 'palette.json'), 'utf8'))
     const hexPaths = extractHexPaths(baseSvg, palette.facetGeometry)
-    const src = createLockupApi(hexPaths)
+    const pupilR = extractPupilRadius(baseSvg)
+    const src = createLockupApi(hexPaths, pupilR)
 
     const textArgs = ['blog', { fontSize: 28 }]
     const iconArgs = ['git', '<circle cx="6" cy="6" r="3"/>', { placement: 'se' }]

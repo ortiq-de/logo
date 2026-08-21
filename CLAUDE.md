@@ -9,11 +9,11 @@ Brand asset repository for Ortiq. Six-facet hexagon mark with full state animati
 ## File tree
 
 ```
-base.svg                    clean mark, currentColor fill, six facets at fixed opacity, no animation
-plain.svg                   black stroke variant (legacy — pre-hexagon triskelion, untouched)
-colored.svg                 flagship gradient hexagon (Cobalt palette by default)
-gradient.svg                gradient + CSS rotation (legacy — pre-hexagon triskelion, untouched)
-animated.svg                legacy CSS rotation (legacy — pre-hexagon triskelion, untouched)
+base.svg                    clean mark, currentColor fill, six facets at fixed opacity + pupil, no animation
+plain.svg                   black stroke variant (legacy — pre-hexagon triskelion, untouched, NOT bundled into dist/npm/release)
+colored.svg                 flagship mark, Cobalt palette, v6 eye/pupil concept (facet gradient + pupil)
+gradient.svg                gradient + CSS rotation (legacy — pre-hexagon triskelion, untouched, NOT bundled into dist/npm/release)
+animated.svg                legacy CSS rotation (legacy — pre-hexagon triskelion, untouched, NOT bundled into dist/npm/release)
 
 states/
   neutral.svg               double heartbeat pulse — alive, 2.5s loop
@@ -55,10 +55,25 @@ p0 Upper right   p1 Right   p2 Lower right
 p3 Lower left    p4 Left    p5 Upper left
 ```
 
-- `base.svg` — single-tone: all six facets filled `currentColor`, each at a fixed opacity (0.35–0.74, calibrated from the gradient version's relative lightness) to preserve the facet/bevel look in one color.
-- `colored.svg` — each facet is its own two-stop linear gradient (`grad-p0`..`grad-p5`).
+- `base.svg` — single-tone: all six facets filled `currentColor`, each at a fixed opacity (0.35–0.74, calibrated from the gradient version's relative lightness) to preserve the facet/bevel look in one color, plus a `<circle id="pupil">` (also `currentColor`, full opacity) at v6's default geometry.
+- `colored.svg` — each facet is a single flat fill from `gradientFacetColors('#206de9')` (Cobalt, the default preset's `solid`) with a same-hue divider stroke, plus a `<circle id="pupil" fill="#206de9">`.
 
-These static asset files are the pre-v6 "gem" look and are unchanged. **v6's pupil + eye redesign lives in the interactive customizer only** (`index.html`'s live rendering, `buildMarkSVG`/`coloredFacetsMarkup`) — see below.
+Both static asset files carry v6's pupil + eye concept at its default geometry (ring thickness
+36%, pupil 24%, margin 22) and default Cobalt (`#206de9`) coloring — they are real, standalone
+snapshots of the interactive customizer's boot state, not a separate pre-v6 look. Regenerate
+them by hand (there's no script for this — the geometry/colors are static, matching
+`computeHexGeometry(36, 22)` and `gradientFacetColors('#206de9')`) whenever the *default* preset,
+ring thickness, or pupil size changes; per-request customizer output (other presets, other
+slider values) still only lives in `index.html`'s live rendering (`buildMarkSVG`/
+`coloredFacetsMarkup`) — see below. `lockup/*.svg` and `src/lockup.mjs`'s `createTextLockup`/
+`createIconLockup` (via `extractPupilRadius(base.svg)`) also carry the pupil, so every shipped
+static mark — favicons included, since they're rasterized from `base.svg` — matches the eye
+concept.
+
+**`plain.svg`/`gradient.svg`/`animated.svg`** are a completely different, older pre-hexagon
+triskelion mark (not a facet variant of the current hexagon) — kept in the repo for reference but
+deliberately excluded from `scripts/bundle.mjs`'s `SVG_FILES`, so they ship in none of `dist/`,
+the npm package exports, or the release zip/tar.gz.
 
 ### v6 — pupil + eye concept (interactive customizer)
 
