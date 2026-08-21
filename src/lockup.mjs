@@ -14,8 +14,9 @@
 // render inline just outside that edge of the mark with a small gap; 'ne'|'se'|'sw'|'nw'
 // render the icon alone, overlapping that corner of the mark (no ring/backdrop). The mark
 // itself never moves — only the icon moves around it.
-export function createLockupApi(hexPaths) {
+export function createLockupApi(hexPaths, pupilR) {
   const markInner = hexPaths.map(p => `<path d="${p.d}" opacity="${p.op}"/>`).join('')
+    + (pupilR ? `<circle cx="270" cy="270" r="${pupilR}"/>` : '')
 
   function mark(x, y) {
     return `<svg x="${x}" y="${y}" width="48" height="48" viewBox="0 0 540 540"><g fill="currentColor">${markInner}</g></svg>`
