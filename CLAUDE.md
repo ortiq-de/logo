@@ -22,6 +22,13 @@ states/
   warning.svg                alert flare chases fast around all six facets — alert, 0.8s loop
   error.svg                  frustrated shake ×3, pause — angry, 2.2s loop
 
+moods/                      v6 eye/pupil concept — ring never moves, only the pupil animates
+  happy.svg                 pupil dilates rhythmically — joyful, 1.4s loop
+  sad.svg                   pupil shrinks and droops downward — downcast, 2.6s loop
+  angry.svg                 pupil narrows and shakes — glaring, 1.1s loop
+  surprised.svg             pupil snaps wide and holds — startled, 1.8s loop
+  sleepy.svg                pupil slowly pulses smaller — heavy-lidded, 3.2s loop
+
 http/
   404.svg                   confused tilt oscillation ±6°, three facets lose focus — lost, 2.4s loop
   500.svg                   glitch → dim (desaturating) → death rattle → flicker — dying, 4s loop
@@ -55,19 +62,20 @@ These static asset files are the pre-v6 "gem" look and are unchanged. **v6's pup
 
 ### v6 — pupil + eye concept (interactive customizer)
 
-The ring reads as an eye: the hexagon is the iris, a centered circle is the pupil. Facets are
-rounded-corner shapes (filleted to a 16-unit radius, `roundedFacetPath()`) with a thin same-hue
-divider stroke (`facetStrokeAttr()`) — this rounded+stroked treatment applies identically whether
-Monochrome is on or off, so toggling Monochrome only ever changes color, never shape.
+The ring reads as an eye: the hexagon is the iris, a centered circle is the pupil. Facets keep
+their original sharp-cornered geometry (`hexGeometry()`'s `d` strings, unchanged — no corner
+rounding) with a thin same-hue divider stroke (`facetStrokeAttr()`) so the six segments stay
+visually distinct even when identical (Monochrome). Applied identically whether Monochrome is on
+or off, so toggling Monochrome only ever changes color, never shape.
 
 - **Ring thickness** — slider, 10–50%, default **36%** (inner edge sits at 64% of the outer
   radius). Same `computeHexGeometry(thicknessPct, marginPx)` formula as before, just a new
   default/range.
 - **Pupil** — a plain filled circle, `cx=cy=270`, radius = `pupilPct/100 * outerRadius()`.
-  Slider 10–60%, default **36%**. Color is always `shade(markSolidColor, -35)` (the same shade as
-  the darkest ring facet), so it's derived from the live primary color in both Monochrome states.
+  Slider 10–60%, default **24%**. Color is always `markSolidColor` — the exact primary color the
+  facet gradient is built from — in both Monochrome states.
   At the defaults (thickness 36%, margin 22 ⇒ `rOuter=248`), the inner hexagon's apothem is
-  `rInner·cos(30°) ≈ 137.5`, comfortably clear of the pupil's `≈89.3` radius (~48-unit margin) —
+  `rInner·cos(30°) ≈ 137.5`, comfortably clear of the pupil's `≈59.5` radius (~78-unit margin) —
   verified, no collision. Extreme slider combinations (e.g. pupil 60% + thickness 50%) can
   overlap the ring's inner edge; that's an accepted consequence of two independent sliders, not
   clamped against each other.
@@ -84,6 +92,25 @@ Monochrome is on or off, so toggling Monochrome only ever changes color, never s
   deltas) is no longer read by the customizer, kept only for the public `palette.json` schema /
   `dist/index.css`'s per-preset CSS custom properties (`scripts/bundle.mjs`, untouched by v6 —
   those still reflect the old hand-authored table, a known divergence from the live customizer).
+
+### Moods
+
+A "Moods" grid sits between States and HTTP states on the live page (`renderMoodCells()`),
+showing the eye concept expressing five emotions — **happy, sad, angry, surprised, sleepy**.
+Only the pupil animates (scale + a small translate for sad/angry); the ring's shape and color
+never change, so the emotional read comes entirely from the pupil's motion — same "physical
+metaphor" principle as the States/HTTP-states animations below. The pupil markup carries a
+stable `.pupil` class (`pupilMarkup()`) as the animation hook; `.mood-<name> .pupil` CSS rules
+(scoped to each `<svg class="mood-happy">` cell) are the only new styling.
+
+`moods/*.svg` are standalone, self-contained versions of the same five (matching the
+`states/*.svg` Option A convention exactly: single-tone `currentColor`, fixed per-facet
+`baseOpacity`, embedded `<style>`/`@keyframes`) at v6's default ring geometry (thickness 36%,
+margin 22) and pupil size (24%, `r=59.52`) — pastable/reusable independent of the live page.
+They're wired into `scripts/bundle.mjs`'s `SVG_FILES` (keys `moodHappy`/`moodSad`/`moodAngry`/
+`moodSurprised`/`moodSleepy`) exactly like every other state/http SVG, so they ship in
+`dist/svgs/moods/`, the npm package's named exports, and the release zip/tar.gz automatically —
+and `moods/` is in `package.json`'s `files` array alongside `states/`/`http/`/`lockup/`.
 
 ## Palette system
 
@@ -241,4 +268,18 @@ Release artifacts: zip/tarball with all SVGs, PNGs at 7 sizes, favicon.ico, webm
 3. Add `.state-<name>` rule to `states.css`
 4. Add the file to `SVG_FILES` in `scripts/bundle.mjs`
 5. Add inline version to `index.html` states grid (`renderStateCells()` in its `<script>`)
+6. Document here and bump the version
+
+## Adding a new mood
+
+1. Copy `moods/happy.svg` as template — only the `#pupil` `<circle>` and its `@keyframes` need
+   editing; the six `<path id="p0">`..`<path id="p5">` facets stay untouched (the ring never
+   moves or changes shape/color for any mood)
+2. Write the `@keyframes` as a pupil `transform` (scale, and a small translate if the mood
+   droops/shakes) with a physical metaphor, `animation: ... infinite`
+3. Add `.mood-<name> .pupil { animation: ...; }` + its `@keyframes` to `index.html`'s `<style>`
+4. Add a `<svg class="mood-<name>" ... id="cell-mood-<name>">` cell to the Moods grid, and the
+   name to `renderMoodCells()`'s array in its `<script>`
+5. Add the file to `SVG_FILES` in `scripts/bundle.mjs` (key `mood<Name>`) — this alone ships it
+   in `dist/svgs/moods/`, the npm package's named exports, and the release archive
 6. Document here and bump the version

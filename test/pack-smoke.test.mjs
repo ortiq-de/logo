@@ -31,7 +31,7 @@ describe('npm pack tarball — real consumer install simulation', () => {
   it('extracted tarball contains dist/, palette.json, and the other files-listed paths', () => {
     const pkgRoot = join(extractDir, 'package')
     const entries = readdirSync(pkgRoot)
-    for (const expected of ['dist', 'base.svg', 'states', 'http', 'lockup', 'palette.json', 'states.css', 'package.json']) {
+    for (const expected of ['dist', 'base.svg', 'states', 'moods', 'http', 'lockup', 'palette.json', 'states.css', 'package.json']) {
       expect(entries).toContain(expected)
     }
   })
