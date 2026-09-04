@@ -1478,6 +1478,11 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     'mono':          "'Fira Code','SF Mono',monospace",
   };
   const GOOGLE_FONTS_IMPORT = 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600&family=Inter:wght@600&family=Fira+Code:wght@600&display=swap';
+  // The raw URL's bare `&`s are fine in an HTML attribute (browsers' HTML parsers are
+  // lenient) but invalid once dropped into a downloaded SVG's <style> text content, which
+  // strict XML parsing requires escaped as `&amp;` — an unescaped `&` there is exactly what
+  // produced "EntityRef: expecting ';'" when a downloaded lockup .svg was opened directly.
+  const GOOGLE_FONTS_IMPORT_XML = xe(GOOGLE_FONTS_IMPORT);
   function needsWebFont(family) { return family === 'space-grotesk' || family === 'inter' || family === 'mono'; }
   // Canvas rasterization (PNG export) can't reliably wait on an @import webfont, so
   // downloads fall back to a native stack for any family that would need one.
@@ -1517,7 +1522,7 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       : '';
     const marks = opts.withSizeMarks ? buildLockupSizeMarksOverlay(nat.w, nat.h, opts.marksColor || 'currentColor') : '';
     const fi = (opts.forDownload && !opts.useSystemFont && needsWebFont(tlFontFamily))
-      ? `<style>@import url('${GOOGLE_FONTS_IMPORT}');</style>`
+      ? `<style>@import url('${GOOGLE_FONTS_IMPORT_XML}');</style>`
       : '';
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${nat.w} ${nat.h}" width="${W}" height="${H}">${fi}${bg}${mark}${text}${marks}</svg>`;
   }
@@ -1652,7 +1657,7 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
       ? `<text x="${textX}" y="${bl}" font-family="${ff}" font-size="${ilFontSize}" font-weight="600" letter-spacing="-0.5" fill="${markSolidColor}">${xe(ilName)}</text>`
       : '';
     const fi = (opts.forDownload && !opts.useSystemFont && needsWebFont(ilFontFamily))
-      ? `<style>@import url('${GOOGLE_FONTS_IMPORT}');</style>`
+      ? `<style>@import url('${GOOGLE_FONTS_IMPORT_XML}');</style>`
       : '';
     const marks = opts.withSizeMarks ? buildLockupSizeMarksOverlay(nat.w, nat.h, opts.marksColor || 'currentColor') : '';
     // Corner placements layer: bg, mark, icon (on top, overlapping the mark's corner), text.

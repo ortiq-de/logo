@@ -1,6 +1,6 @@
 {
   "name": "@ortiq-de/logo",
-  "version": "6.0.3",
+  "version": "6.0.4",
   "description": "Ortiq brand logo system — six-facet hexagon mark, state animations, HTTP error states, lockups, favicons",
   "type": "module",
   "main": "dist/index.js",
