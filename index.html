@@ -1490,7 +1490,14 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     return (forPngExport && needsWebFont(family)) ? FONT_FAMILIES.system : FONT_FAMILIES[family];
   }
 
+  // The 220px floor + text-reserve below only make sense when there's actually a name to
+  // lay out — with no text, reserving 220px of canvas for it left the mark flush left in a
+  // wide box with dead space to its right (this was the "can't fit a no-text lockup to size"
+  // bug: the Icon lockup tab, whose text can be cleared while an icon is still placed,
+  // otherwise inherited that same dead space). With no text, fit tightly to whatever the
+  // mark/icon actually occupies instead of reserving room for a label that isn't there.
   function calcLockupW(textStartX, text, fontSize) {
+    if (!text) return Math.ceil(textStartX);
     return Math.ceil(Math.max(220, textStartX + Math.max(60, text.length * fontSize * 0.60 + 8) + 12));
   }
 
@@ -1503,24 +1510,34 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   // 48 (mark) + 2×margin, matching the convention Step 1 established.
   function tlMarkY() { return margin; }
   function tlCanvasH() { return round2(48 + 2 * margin); }
+  // With no sub-brand name there's nothing to sit beside, so the "lockup" is just the mark —
+  // fit it to a square canvas (same height convention as the text layout) rather than the
+  // wide, text-shaped canvas below, which left it flush left with dead space to the right.
   function tlNaturalSize() {
+    if (!tlName) { const h = tlCanvasH(); return { w: h, h }; }
     return { w: calcLockupW(56, tlName, tlFontSize), h: tlCanvasH() };
   }
   function buildTextLockupSVG(opts) {
     opts = opts || {};
-    const textX = 56;
     const nat = tlNaturalSize();
     const W = tlWidthCustom && tlWidth ? tlWidth : nat.w;
     const H = tlHeightCustom && tlHeight ? tlHeight : nat.h;
+    const bg = tlWithBg ? `<rect width="${nat.w}" height="${nat.h}" fill="${tlBgColor}"/>` : '';
+    const marks = opts.withSizeMarks ? buildLockupSizeMarksOverlay(nat.w, nat.h, opts.marksColor || 'currentColor') : '';
+
+    if (!tlName) {
+      // Mark-only: fill the square canvas edge to edge (viewBox 0 0 540 540, same as Step
+      // 1's own mark export) instead of the fixed 48x48 box the text layout positions it in.
+      const mark = `<svg width="${nat.w}" height="${nat.h}" viewBox="0 0 540 540">${coloredFacetsMarkup('tl', false)}</svg>`;
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${nat.w} ${nat.h}" width="${W}" height="${H}">${bg}${mark}${marks}</svg>`;
+    }
+
+    const textX = 56;
     const markY = tlMarkY();
     const bl = (markY + 24 + tlFontSize * 0.35).toFixed(1);
     const ff = effectiveFontFamily(tlFontFamily, opts.useSystemFont);
     const mark = `<svg x="0" y="${markY}" width="48" height="48" viewBox="0 0 540 540">${coloredFacetsMarkup('tl', false)}</svg>`;
-    const bg = tlWithBg ? `<rect width="${nat.w}" height="${nat.h}" fill="${tlBgColor}"/>` : '';
-    const text = tlName
-      ? `<text x="${textX}" y="${bl}" font-family="${ff}" font-size="${tlFontSize}" font-weight="600" letter-spacing="-0.5" fill="${markSolidColor}">${xe(tlName)}</text>`
-      : '';
-    const marks = opts.withSizeMarks ? buildLockupSizeMarksOverlay(nat.w, nat.h, opts.marksColor || 'currentColor') : '';
+    const text = `<text x="${textX}" y="${bl}" font-family="${ff}" font-size="${tlFontSize}" font-weight="600" letter-spacing="-0.5" fill="${markSolidColor}">${xe(tlName)}</text>`;
     const fi = (opts.forDownload && !opts.useSystemFont && needsWebFont(tlFontFamily))
       ? `<style>@import url('${GOOGLE_FONTS_IMPORT_XML}');</style>`
       : '';
@@ -1630,7 +1647,11 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
   function ilTextX() {
     return ilIconInner ? ilPlacementLayout().textX : ilGeom().markRight + 8;
   }
+  // With neither a name nor an icon, the Icon lockup is just the mark too — same bare-mark
+  // square fit as the Text lockup tab (see tlNaturalSize/buildTextLockupSVG) instead of the
+  // markX/markY-offset 48x48 box the icon+text layout positions it in.
   function ilNaturalSize() {
+    if (!ilName && !ilIconInner) { const h = ilGeom().canvasH; return { w: h, h }; }
     return { w: calcLockupW(ilTextX(), ilName, ilFontSize), h: ilGeom().canvasH };
   }
   function buildIconLockupSVG(opts) {
@@ -1640,6 +1661,14 @@ import <span class="hl">'@ortiq-de/logo/css'</span></pre>
     const nat = ilNaturalSize();
     const W = ilWidthCustom && ilWidth ? ilWidth : nat.w;
     const H = ilHeightCustom && ilHeight ? ilHeight : nat.h;
+
+    if (!ilName && !ilIconInner) {
+      const bg = ilWithBg ? `<rect width="${nat.w}" height="${nat.h}" fill="${ilBgColor}"/>` : '';
+      const marks = opts.withSizeMarks ? buildLockupSizeMarksOverlay(nat.w, nat.h, opts.marksColor || 'currentColor') : '';
+      const mark = `<svg width="${nat.w}" height="${nat.h}" viewBox="0 0 540 540">${coloredFacetsMarkup('il', false)}</svg>`;
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${nat.w} ${nat.h}" width="${W}" height="${H}">${bg}${mark}${marks}</svg>`;
+    }
+
     const bl = (g.markCy + ilFontSize * 0.35).toFixed(1);
     const ff = effectiveFontFamily(ilFontFamily, opts.useSystemFont);
     const mark = `<svg x="${g.markX}" y="${g.markY}" width="48" height="48" viewBox="0 0 540 540">${coloredFacetsMarkup('il', false)}</svg>`;

@@ -65,6 +65,22 @@ describe('createTextLockup', () => {
     expect(svg).toContain('a &amp; b &lt;c&gt;')
     expect(isWellFormedXml(svg)).toBe(true)
   })
+
+  // With no sub-brand name there's nothing to lay out beside the mark, so it should fit a
+  // square canvas edge to edge rather than sitting at its fixed 48x48 offset inside the
+  // usual wide, text-shaped (220px+) canvas with dead space to its right.
+  it('with no sub-brand name, fits a square canvas with no <text> node', () => {
+    const svg = createTextLockup('')
+    expect(isWellFormedXml(svg)).toBe(true)
+    expect(svg).not.toContain('<text')
+    const vb = svg.match(/viewBox="0 0 (\d+) (\d+)"/)
+    expect(vb[1]).toBe(vb[2])
+  })
+
+  it('with no sub-brand name, still honors explicit width/height overrides', () => {
+    const svg = createTextLockup('', { width: 300, height: 300 })
+    expect(svg).toContain('width="300" height="300"')
+  })
 })
 
 describe('createIconLockup', () => {
@@ -109,5 +125,16 @@ describe('createIconLockup', () => {
     const svg = createIconLockup('git', icon, { placement: 'e' })
     expect(svg).toContain(icon)
     expect(svg).toContain('viewBox="0 0 24 24"')
+  })
+
+  // With no sub-brand name (icon still present, e.g. a mark+icon lockup with no label), the
+  // canvas should fit tightly to the mark+icon instead of reserving the usual 220px text
+  // floor for a label that isn't there.
+  it('with no sub-brand name, fits width tightly instead of the 220px text floor', () => {
+    const svg = createIconLockup('', icon, { placement: 'e' })
+    expect(isWellFormedXml(svg)).toBe(true)
+    expect(svg).not.toContain('<text')
+    const vb = svg.match(/viewBox="0 0 (\d+) (\d+)"/)
+    expect(Number(vb[1])).toBeLessThan(220)
   })
 })

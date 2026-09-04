@@ -34,7 +34,11 @@ export function createLockupApi(hexPaths, pupilR) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
   }
 
+  // With no sub-brand text there's nothing to reserve the 220px floor / text gap for — fit
+  // tightly to whatever the mark/icon actually occupies instead (see createTextLockup's and
+  // createIconLockup's own no-text branches for the mark-only case this enables).
   function calcW(textX, text, fontSize) {
+    if (!text) return Math.ceil(textX)
     return Math.ceil(Math.max(220, textX + Math.max(60, String(text).length * fontSize * 0.60 + 8) + 12))
   }
 
@@ -60,6 +64,16 @@ export function createLockupApi(hexPaths, pupilR) {
     const fontSize = options.fontSize || 24
     const ff = fonts[options.fontFamily] || fonts['space-grotesk']
     const textX = 56, naturalH = 56
+
+    if (!subBrand) {
+      // No sub-brand name: nothing to lay out beside the mark, so it fills a square canvas
+      // edge to edge instead of sitting at its fixed (0,4) 48x48 offset in a 220px+-wide,
+      // mostly-empty canvas sized for text that isn't there.
+      const size = options.width || options.height || naturalH
+      const W = options.width || size, H = options.height || size
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 540" width="${W}" height="${H}"><g fill="currentColor">${markInner}</g></svg>`
+    }
+
     const naturalW = calcW(textX, subBrand, fontSize)
     const W = options.width || naturalW, H = options.height || naturalH
     const bl = (28 + fontSize * 0.35).toFixed(1)
@@ -108,7 +122,9 @@ export function createLockupApi(hexPaths, pupilR) {
     } else {
       iconEl = `<svg x="${layout.x}" y="${layout.y}" width="${layout.size}" height="${layout.size}" viewBox="${icon.vb}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" overflow="visible">${icon.inner}</svg>`
     }
-    const text = `<text x="${layout.textX}" y="${bl}" font-family="${ff}" font-size="${fontSize}" font-weight="600" letter-spacing="-0.5" fill="currentColor">${esc(subBrand)}</text>`
+    const text = subBrand
+      ? `<text x="${layout.textX}" y="${bl}" font-family="${ff}" font-size="${fontSize}" font-weight="600" letter-spacing="-0.5" fill="currentColor">${esc(subBrand)}</text>`
+      : ''
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${naturalW} ${naturalH}" width="${W}" height="${H}">${mark(ilMarkX, ilMarkY)}${iconEl}${text}</svg>`
   }
 
